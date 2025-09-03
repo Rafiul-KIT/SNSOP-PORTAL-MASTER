@@ -1,0 +1,92 @@
+@if(showLogin){
+<div class="login-wrapper">
+  <h4 class="fw-bold text-center m-0 text-primary">SIGN IN</h4>
+  <form [formGroup]="loginForm" class="d-flex flex-column w-100 gap-3 p-4">
+    <p-floatlabel variant="on" class="w-100">
+      <input
+        pInputText
+        inputId="username"
+        formControlName="username"
+        autocomplete="off"
+        [autofocus]="false"
+      />
+      <label for="username">Username/Email</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on" class="w-100">
+      <p-password
+        inputId="password"
+        formControlName="password"
+        [feedback]="false"
+        autocomplete="off"
+        [autofocus]="false"
+        [toggleMask]="true"
+      />
+      <label for="password">Password</label>
+    </p-floatlabel>
+    <p-button
+      label="Sign In"
+      severity="success"
+      rounded="true"
+      icon="fas fa-right-to-bracket"
+      [routerLink]="['/home']"
+    />
+  </form>
+  <div class="d-flex flex-row gap-3 align-items-center justify-content-center">
+    <p-button
+      label="Forgot Password?"
+      severity="info"
+      variant="text"
+      (onClick)="viewToggle(false)"
+    />
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      outlined="true"
+      (onClick)="closeDialog()"
+      size="small"
+    />
+  </div>
+</div>
+}@else {
+<div class="forgot-password-wrapper">
+  <h4 class="fw-bold text-center m-0 text-primary">RESET PASSWORD</h4>
+  <form
+    [formGroup]="forgotPasswordForm"
+    class="d-flex flex-column w-100 gap-3 p-4"
+  >
+    <p-floatlabel variant="on" class="w-100">
+      <input
+        pInputText
+        id="username"
+        formControlName="username"
+        autocomplete="off"
+      />
+      <label for="username">Username/Email</label>
+    </p-floatlabel>
+    <p-button
+      label="Send Reset Link"
+      severity="success"
+      rounded="true"
+      iconPos="right"
+      icon="fas fa-external-link"
+      (onClick)="closeDialog()"
+    />
+  </form>
+  <div class="d-flex flex-row gap-3 align-items-center justify-content-center">
+    <p-button
+      label="Back to Login"
+      severity="info"
+      variant="text"
+      icon="fas fa-arrow-left"
+      (onClick)="viewToggle(true)"
+    />
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      outlined="true"
+      (onClick)="closeDialog()"
+      size="small"
+    />
+  </div>
+</div>
+}

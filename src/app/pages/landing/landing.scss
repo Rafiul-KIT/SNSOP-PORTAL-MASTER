@@ -1,0 +1,31 @@
+.home {
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 60px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100vw;
+    padding: 0 10px;
+    z-index: 999;
+    border-bottom: 1px solid #95bce4;
+
+    .brand {
+      color: #0ea5e9;
+      margin: 0;
+    }
+  }
+  .wrapper {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    height: calc(100vh - 60px);
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #f1f1f1;
+  }
+}
