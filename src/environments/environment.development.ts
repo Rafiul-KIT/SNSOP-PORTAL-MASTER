@@ -9,4 +9,17 @@ export const environment = {
     grm: "http://grm.snsopmis.com:4040/",
     report: "http://report.snsopmis.com:4050/",
   },
+  msalConfig: {
+    auth: {
+      clientId: '28e228a5-45c6-41c4-aa70-800a5394d072',
+      authority: 'https://login.microsoftonline.com/97ad2261-cae6-421b-bd59-61a96a159203',
+      redirectUri: 'http://master.snsopmis.com:4010/',
+      postLogoutRedirectUri: 'http://master.snsopmis.com:4010/'
+    },
+    cache: {
+      cacheLocation: 'localStorage',
+      storeAuthStateInCookie: false,
+    }
+  },
+  authBackend: 'http://devteam.karoothitbd.com:8088/mis_auth'
 };

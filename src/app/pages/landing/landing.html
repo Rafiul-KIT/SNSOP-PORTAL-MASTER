@@ -3,12 +3,39 @@
     <h4 class="brand">
       <img src="SNSOP_logo.png" height="30px" alt="" />
     </h4>
-    <p-button
-      severity="secondary"
-      icon="fas fa-right-to-bracket"
-      label="Sign In"
-      (onClick)="showLogin()"
-    />
+    <p-button severity="secondary" icon="fas fa-right-to-bracket" label="Sign In" (onClick)="showLogin()" />
   </div>
-  <div class="wrapper">Web Content will goes here!!</div>
+  <!-- Full-height center wrapper -->
+  <div class="surface-ground" style="min-height: 100vh; display: flex; align-items: center;">
+    <div class="w-full px-3">
+      <div class="grid justify-content-center">
+        <div class="col-12 lg:col-10 xl:col-8">
+          <div class="grid">
+            <!-- Left: Login card -->
+            <div class="col-12 md:col-7">
+              <p-card class="h-full">
+                <ng-template pTemplate="content">
+                  <form>
+                    <h1 class="m-0">Login</h1>
+                    <p class="text-600 mt-2">Sign In with your Microsoft account</p>
+
+                    <div class="grid mt-3">
+                      <div class="col-12">
+                        <p-button styleClass="w-full" icon="pi pi-microsoft" [loading]="loading" [disabled]="loading"
+                          (onClick)="loginWithAzureAD()"
+                          [label]="loading ? 'Logging in...' : 'Login with Microsoft Azure AD'">
+                        </p-button>
+                      </div>
+                    </div>
+                  </form>
+                </ng-template>
+              </p-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </div>
