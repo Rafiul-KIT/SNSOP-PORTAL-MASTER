@@ -13,6 +13,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { CookieService } from 'ngx-cookie-service';
 
 import {
   MSAL_INSTANCE,
@@ -81,7 +82,8 @@ function initMsal(
   authService: MsalService,
   msalBroadcastService: MsalBroadcastService,
   http: HttpClient,
-  router: Router
+  router: Router,
+  cookieService: CookieService
 ) {
   return () => {
     const checkAccount = () => {
@@ -135,10 +137,19 @@ function initMsal(
           http.get(`${environment.authBackend}/auth/exchange`, { headers }).subscribe({
             next: (r: any) => {
               if (r?.status === 'OK' || r?.data?.access_token) {
-                localStorage.setItem('mis_ta', r.data.access_token);
-                router.navigate(['dashboard']);
+                cookieService.set(
+  'mis_ta',
+  r.data.access_token,
+  undefined, // expires (use undefined = session cookie, or set a number of days)
+  '/',       // path
+  'localhost', // domain for all subdomains
+  true,      // secure
+  'None'     // sameSite
+);
+
+                router.navigate(['home']);
               } else {
-                router.navigate(['dashboard']);
+                router.navigate(['**']);
               }
             },
             error: () => router.navigate(['**']),
@@ -158,6 +169,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideNoopAnimations(),
+    CookieService,
 
     // Enable DI-based interceptors (MsalInterceptor)
     provideHttpClient(withInterceptorsFromDi()),
@@ -179,7 +191,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       multi: true,
       useFactory: initMsal,
-      deps: [MsalService, MsalBroadcastService, HttpClient, Router],
+      deps: [MsalService, MsalBroadcastService, HttpClient, Router, CookieService],
     },
   ],
 };

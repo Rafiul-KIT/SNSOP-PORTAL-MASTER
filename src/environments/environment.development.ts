@@ -3,11 +3,11 @@ export const environment = {
   domain: "localhost",
   globalApi: 'http://api.snsopmis.com:8000/services',
   portals: {
-    master: "http://master.snsopmis.com:4010/",
-    beneficiary: "http://beneficiary.snsopmis.com:4020/",
-    payment: "http://payment.snsopmis.com:4030/",
-    grm: "http://grm.snsopmis.com:4040/",
-    report: "http://report.snsopmis.com:4050/",
+    master: "http://localhost:4010/",
+    beneficiary: "http://localhost:4020/",
+    payment: "http://localhost:4030/",
+    grm: "http://localhost:4040/",
+    report: "http://localhost:4050/",
   },
   msalConfig: {
     auth: {
