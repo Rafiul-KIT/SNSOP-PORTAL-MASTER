@@ -138,7 +138,7 @@ function initMsal(
                 localStorage.setItem('mis_ta', r.data.access_token);
                 router.navigate(['dashboard']);
               } else {
-                router.navigate(['**']);
+                router.navigate(['dashboard']);
               }
             },
             error: () => router.navigate(['**']),
