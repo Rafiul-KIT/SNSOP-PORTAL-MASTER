@@ -85,81 +85,89 @@ function initMsal(
   router: Router,
   cookieService: CookieService
 ) {
-  return () => {
-    const checkAccount = () => {
-      const _loggedIn = !!authService.instance.getActiveAccount();
-    };
-
-    const checkAndSetActiveAccount = () => {
-      let active = authService.instance.getActiveAccount();
-      if (!active) {
-        const accounts = authService.instance.getAllAccounts();
-        if (accounts.length > 0) {
-          authService.instance.setActiveAccount(accounts[0]);
-          active = authService.instance.getActiveAccount();
-        }
+  return async () => {
+    try {
+      // Step 1: Wait for MSAL initialization to complete and handle the redirect
+      const redirectResponse = await authService.handleRedirectObservable().toPromise();
+      if (redirectResponse) {
+        // If redirect response is available, set the active account
+        authService.instance.setActiveAccount(redirectResponse.account);
       }
-      checkAccount();
-    };
 
-    msalBroadcastService.inProgress$
-      .pipe(filter((s: InteractionStatus) => s === InteractionStatus.None))
-      .subscribe(() => {
-        checkAccount();
-        checkAndSetActiveAccount();
-      });
+      // Step 2: Check if an active account exists and set it
+      const checkAccount = () => {
+        const _loggedIn = !!authService.instance.getActiveAccount();
+      };
 
-    msalBroadcastService.msalSubject$
-      .pipe(
-        filter(
-          (msg: EventMessage) =>
-            msg.eventType === EventType.LOGIN_SUCCESS ||
-            msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
-        )
-      )
-      .subscribe((msg: EventMessage) => {
-        const payload = msg.payload as AuthenticationResult;
-        authService.instance.setActiveAccount(payload.account);
-        // If you want, stash payload.idToken for later here.
-      });
-
-    // Handle redirect and exchange ID token with your backend
-    authService.handleRedirectObservable().subscribe({
-      next: (res) => {
-        if (res) {
-          authService.instance.setActiveAccount(res.account);
-          checkAccount();
-
-          const headers = new HttpHeaders({
-            Authorization: `Bearer ${res.idToken}`, // backend expects ID token
-          });
-
-          http.get(`${environment.authBackend}/auth/exchange`, { headers }).subscribe({
-            next: (r: any) => {
-              if (r?.status === 'OK' || r?.data?.access_token) {
-                cookieService.set(
-  'mis_ta',
-  r.data.access_token,
-  undefined, // expires (use undefined = session cookie, or set a number of days)
-  '/',       // path
-  'localhost', // domain for all subdomains
-  true,      // secure
-  'None'     // sameSite
-);
-
-                router.navigate(['home']);
-              } else {
-                router.navigate(['**']);
-              }
-            },
-            error: () => router.navigate(['**']),
-          });
+      const checkAndSetActiveAccount = () => {
+        let active = authService.instance.getActiveAccount();
+        if (!active) {
+          const accounts = authService.instance.getAllAccounts();
+          if (accounts.length > 0) {
+            authService.instance.setActiveAccount(accounts[0]);
+            active = authService.instance.getActiveAccount();
+          }
         }
-      },
-      error: (err) => console.error(err),
-    });
+        checkAccount();
+      };
 
-    checkAndSetActiveAccount();
+      // Step 3: Subscribe to MSAL broadcast service once initialization is done
+      msalBroadcastService.inProgress$
+        .pipe(filter((s: InteractionStatus) => s === InteractionStatus.None))
+        .subscribe(() => {
+          checkAccount();
+          checkAndSetActiveAccount();
+        });
+
+      msalBroadcastService.msalSubject$
+        .pipe(
+          filter(
+            (msg: EventMessage) =>
+              msg.eventType === EventType.LOGIN_SUCCESS ||
+              msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
+          )
+        )
+        .subscribe((msg: EventMessage) => {
+          const payload = msg.payload as AuthenticationResult;
+          authService.instance.setActiveAccount(payload.account);
+          // Optionally stash the payload.idToken for later
+        });
+
+      // Step 4: Handle redirect and exchange ID token with backend
+      const response = await authService.handleRedirectObservable().toPromise();
+      if (response) {
+        authService.instance.setActiveAccount(response.account);
+        checkAccount();
+
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${response.idToken}`, // backend expects ID token
+        });
+
+        http.get(`${environment.authBackend}/auth/exchange`, { headers }).subscribe({
+          next: (r: any) => {
+            if (r?.status === 'OK' || r?.data?.access_token) {
+              cookieService.set(
+                'mis_ta',
+                r.data.access_token,
+                undefined, // session cookie
+                '/',       // path
+                'localhost', // domain
+                true,      // secure
+                'None'     // sameSite
+              );
+              router.navigate(['home']);
+            } else {
+              router.navigate(['**']);
+            }
+          },
+          error: () => router.navigate(['**']),
+        });
+      }
+
+      checkAndSetActiveAccount();
+    } catch (err) {
+      console.error('MSAL initialization failed:', err);
+    }
   };
 }
 
