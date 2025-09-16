@@ -24,6 +24,20 @@ export class AzureAdAuthService {
       .subscribe(() => {
         this.checkAndSetActiveAccount();
       });
+
+    window.addEventListener('message', (event: MessageEvent) => {
+      // Ensure the message is coming from the Child Portal
+      if (event.data === 'logout') {
+        this.logout();  // Trigger logout when 'logout' message is received
+      }
+    });
+
+    // Or, use localStorage approach (alternative to postMessage)
+    window.addEventListener('storage', () => {
+      if (localStorage.getItem('isLoggedOut') === 'true') {
+        this.logout();  // Trigger logout when 'isLoggedOut' flag is set in localStorage
+      }
+    });
   }
 
   private checkAndSetActiveAccount(): void {
@@ -42,8 +56,21 @@ export class AzureAdAuthService {
     this.msalService.loginRedirect(loginRequest);
   }
 
-  logout(): void {
+  /*logout(): void {
     this.msalService.logoutRedirect();
+  }*/
+
+  logout(): void {
+    // Clear authentication-related cookies
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear token cookie
+    document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear expiry cookie
+    document.cookie = 'mis_ta=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear any session cookie (e.g., mis_ta)
+
+    // Perform MSAL logout (to end the user's session in MSAL)
+    this.msalService.logoutRedirect();
+
+    // Redirect to the login page of the master portal
+    window.location.href = `${environment.portals.master}/landing`;  // Update the login page path if needed
   }
 
   isAuthenticated(): boolean {
