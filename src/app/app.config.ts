@@ -8,168 +8,177 @@ import {
 import { provideRouter, Router, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi, HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+  HttpClient,
+  HttpHeaders,
+} from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { CookieService } from 'ngx-cookie-service';
 
-// import {
-//   MSAL_INSTANCE,
-//   MSAL_GUARD_CONFIG,
-//   MSAL_INTERCEPTOR_CONFIG,
-//   MsalGuardConfiguration,
-//   MsalInterceptorConfiguration,
-//   MsalService,
-//   MsalGuard,
-//   MsalBroadcastService,
-//   MsalInterceptor,
-// } from '@azure/msal-angular';
-// import {
-//   PublicClientApplication,
-//   BrowserCacheLocation,
-//   InteractionType,
-//   InteractionStatus,
-//   EventMessage,
-//   EventType,
-//   AuthenticationResult,
-// } from '@azure/msal-browser';
+import {
+  MSAL_INSTANCE,
+  MSAL_GUARD_CONFIG,
+  MSAL_INTERCEPTOR_CONFIG,
+  MsalGuardConfiguration,
+  MsalInterceptorConfiguration,
+  MsalService,
+  MsalGuard,
+  MsalBroadcastService,
+  MsalInterceptor,
+} from '@azure/msal-angular';
+import {
+  PublicClientApplication,
+  BrowserCacheLocation,
+  InteractionType,
+  InteractionStatus,
+  EventMessage,
+  EventType,
+  AuthenticationResult,
+} from '@azure/msal-browser';
 import { filter } from 'rxjs/operators';
 
 import { environment } from '../environments/environment.development';
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
-// function msalInstanceFactory() {
-//   const cfg = environment.msalConfig;
-//   const cacheLocation =
-//     cfg.cache?.cacheLocation === 'localStorage'
-//       ? BrowserCacheLocation.LocalStorage
-//       : BrowserCacheLocation.SessionStorage;
+function msalInstanceFactory() {
+  const cfg = environment.msalConfig;
+  const cacheLocation =
+    cfg.cache?.cacheLocation === 'localStorage'
+      ? BrowserCacheLocation.LocalStorage
+      : BrowserCacheLocation.SessionStorage;
 
-//   return new PublicClientApplication({
-//     auth: {
-//       clientId: cfg.auth.clientId,
-//       authority: cfg.auth.authority,
-//       redirectUri: cfg.auth.redirectUri,
-//       postLogoutRedirectUri: cfg.auth.postLogoutRedirectUri,
-//     },
-//     cache: {
-//       cacheLocation,
-//       storeAuthStateInCookie: !!cfg.cache?.storeAuthStateInCookie,
-//     },
-//   });
-// }
+  return new PublicClientApplication({
+    auth: {
+      clientId: cfg.auth.clientId,
+      authority: cfg.auth.authority,
+      redirectUri: cfg.auth.redirectUri,
+      postLogoutRedirectUri: cfg.auth.postLogoutRedirectUri,
+    },
+    cache: {
+      cacheLocation,
+      storeAuthStateInCookie: !!cfg.cache?.storeAuthStateInCookie,
+    },
+  });
+}
 
-// function msalGuardConfigFactory(): MsalGuardConfiguration {
-//   return {
-//     interactionType: InteractionType.Redirect,
-//     authRequest: { scopes: ['user.read'] },
-//   };
-// }
+function msalGuardConfigFactory(): MsalGuardConfiguration {
+  return {
+    interactionType: InteractionType.Redirect,
+    authRequest: { scopes: ['user.read'] },
+  };
+}
 
-// function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {
-//   const protectedResourceMap = new Map<string, string[]>();
-//   protectedResourceMap.set('https://graph.microsoft.com/v1.0/', ['user.read']);
-//   return {
-//     interactionType: InteractionType.Redirect,
-//     protectedResourceMap,
-//   };
-// }
+function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {
+  const protectedResourceMap = new Map<string, string[]>();
+  protectedResourceMap.set('https://graph.microsoft.com/v1.0/', ['user.read']);
+  return {
+    interactionType: InteractionType.Redirect,
+    protectedResourceMap,
+  };
+}
 
 // ---------- Bootstrap initializer: MSAL redirect + token exchange (no ApiService) ----------
-// function initMsal(
-//   authService: MsalService,
-//   msalBroadcastService: MsalBroadcastService,
-//   http: HttpClient,
-//   router: Router,
-//   cookieService: CookieService
-// ) {
-//   return async () => {
-//     try {
-//       // Step 1: Wait for MSAL initialization to complete and handle the redirect
-//       const redirectResponse = await authService.handleRedirectObservable().toPromise();
-//       if (redirectResponse) {
-//         // If redirect response is available, set the active account
-//         authService.instance.setActiveAccount(redirectResponse.account);
-//       }
+function initMsal(
+  authService: MsalService,
+  msalBroadcastService: MsalBroadcastService,
+  http: HttpClient,
+  router: Router,
+  cookieService: CookieService
+) {
+  return async () => {
+    try {
+      // Step 1: Wait for MSAL initialization to complete and handle the redirect
+      const redirectResponse = await authService
+        .handleRedirectObservable()
+        .toPromise();
+      if (redirectResponse) {
+        // If redirect response is available, set the active account
+        authService.instance.setActiveAccount(redirectResponse.account);
+      }
 
-//       // Step 2: Check if an active account exists and set it
-//       const checkAccount = () => {
-//         const _loggedIn = !!authService.instance.getActiveAccount();
-//       };
+      // Step 2: Check if an active account exists and set it
+      const checkAccount = () => {
+        const _loggedIn = !!authService.instance.getActiveAccount();
+      };
 
-//       const checkAndSetActiveAccount = () => {
-//         let active = authService.instance.getActiveAccount();
-//         if (!active) {
-//           const accounts = authService.instance.getAllAccounts();
-//           if (accounts.length > 0) {
-//             authService.instance.setActiveAccount(accounts[0]);
-//             active = authService.instance.getActiveAccount();
-//           }
-//         }
-//         checkAccount();
-//       };
+      const checkAndSetActiveAccount = () => {
+        let active = authService.instance.getActiveAccount();
+        if (!active) {
+          const accounts = authService.instance.getAllAccounts();
+          if (accounts.length > 0) {
+            authService.instance.setActiveAccount(accounts[0]);
+            active = authService.instance.getActiveAccount();
+          }
+        }
+        checkAccount();
+      };
 
-//       // Step 3: Subscribe to MSAL broadcast service once initialization is done
-//       msalBroadcastService.inProgress$
-//         .pipe(filter((s: InteractionStatus) => s === InteractionStatus.None))
-//         .subscribe(() => {
-//           checkAccount();
-//           checkAndSetActiveAccount();
-//         });
+      // Step 3: Subscribe to MSAL broadcast service once initialization is done
+      msalBroadcastService.inProgress$
+        .pipe(filter((s: InteractionStatus) => s === InteractionStatus.None))
+        .subscribe(() => {
+          checkAccount();
+          checkAndSetActiveAccount();
+        });
 
-//       msalBroadcastService.msalSubject$
-//         .pipe(
-//           filter(
-//             (msg: EventMessage) =>
-//               msg.eventType === EventType.LOGIN_SUCCESS ||
-//               msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
-//           )
-//         )
-//         .subscribe((msg: EventMessage) => {
-//           const payload = msg.payload as AuthenticationResult;
-//           authService.instance.setActiveAccount(payload.account);
-//           // Optionally stash the payload.idToken for later
-//         });
+      msalBroadcastService.msalSubject$
+        .pipe(
+          filter(
+            (msg: EventMessage) =>
+              msg.eventType === EventType.LOGIN_SUCCESS ||
+              msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
+          )
+        )
+        .subscribe((msg: EventMessage) => {
+          const payload = msg.payload as AuthenticationResult;
+          authService.instance.setActiveAccount(payload.account);
+          // Optionally stash the payload.idToken for later
+        });
 
-//       // Step 4: Handle redirect and exchange ID token with backend
-//       const response = await authService.handleRedirectObservable().toPromise();
-//       if (response) {
-//         authService.instance.setActiveAccount(response.account);
-//         checkAccount();
+      // Step 4: Handle redirect and exchange ID token with backend
+      const response = await authService.handleRedirectObservable().toPromise();
+      if (response) {
+        authService.instance.setActiveAccount(response.account);
+        checkAccount();
 
-//         const headers = new HttpHeaders({
-//           Authorization: `Bearer ${response.idToken}`, // backend expects ID token
-//         });
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${response.idToken}`, // backend expects ID token
+        });
 
-//         http.get(`${environment.authBackend}/auth/exchange`, { headers }).subscribe({
-//           next: (r: any) => {
-//             if (r?.status === 'OK' || r?.data?.access_token) {
-//               cookieService.set(
-//                 'mis_ta',
-//                 r.data.access_token,
-//                 undefined, // session cookie
-//                 '/',       // path
-//                 'localhost', // domain
-//                 true,      // secure
-//                 'None'     // sameSite
-//               );
-//               router.navigate(['home']);
-//             } else {
-//               router.navigate(['**']);
-//             }
-//           },
-//           error: () => router.navigate(['**']),
-//         });
-//       }
+        http
+          .get(`${environment.authBackend}/auth/exchange`, { headers })
+          .subscribe({
+            next: (r: any) => {
+              if (r?.status === 'OK' || r?.data?.access_token) {
+                cookieService.set(
+                  'mis_ta',
+                  r.data.access_token,
+                  undefined, // session cookie
+                  '/', // path
+                  'localhost', // domain
+                  true, // secure
+                  'None' // sameSite
+                );
+                router.navigate(['home']);
+              } else {
+                router.navigate(['**']);
+              }
+            },
+            error: () => router.navigate(['**']),
+          });
+      }
 
-//       checkAndSetActiveAccount();
-//     } catch (err) {
-//       console.error('MSAL initialization failed:', err);
-//     }
-//   };
-// }
+      checkAndSetActiveAccount();
+    } catch (err) {
+      console.error('MSAL initialization failed:', err);
+    }
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -178,27 +187,33 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withHashLocation()),
     provideNoopAnimations(),
     CookieService,
-
     // Enable DI-based interceptors (MsalInterceptor)
     provideHttpClient(withInterceptorsFromDi()),
-
     providePrimeNG({
       theme: { preset: Aura },
       zIndex: { modal: 1100, overlay: 1000, menu: 1000, tooltip: 1100 },
     }),
-
-    // { provide: MSAL_INSTANCE, useFactory: msalInstanceFactory },
-    // { provide: MSAL_GUARD_CONFIG, useFactory: msalGuardConfigFactory },
-    // { provide: MSAL_INTERCEPTOR_CONFIG, useFactory: msalInterceptorConfigFactory },
-    // { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
-    // MsalService,
-    // MsalGuard,
-    // MsalBroadcastService,
-    // {
-    //   provide: APP_INITIALIZER,
-    //   multi: true,
-    //   useFactory: initMsal,
-    //   deps: [MsalService, MsalBroadcastService, HttpClient, Router, CookieService],
-    // },
+    { provide: MSAL_INSTANCE, useFactory: msalInstanceFactory },
+    { provide: MSAL_GUARD_CONFIG, useFactory: msalGuardConfigFactory },
+    {
+      provide: MSAL_INTERCEPTOR_CONFIG,
+      useFactory: msalInterceptorConfigFactory,
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
+    MsalService,
+    MsalGuard,
+    MsalBroadcastService,
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: initMsal,
+      deps: [
+        MsalService,
+        MsalBroadcastService,
+        HttpClient,
+        Router,
+        CookieService,
+      ],
+    },
   ],
 };
