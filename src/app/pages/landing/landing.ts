@@ -10,10 +10,18 @@ import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterModule, ButtonModule, CommonModule, CardModule, DividerModule, ProgressSpinnerModule],
+  imports: [
+    RouterModule,
+    ButtonModule,
+    CommonModule,
+    CardModule,
+    DividerModule,
+    ProgressSpinnerModule,
+  ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
   providers: [DialogService],
@@ -28,7 +36,6 @@ export class Landing implements OnDestroy {
 
   constructor(public dialogService: DialogService) {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
     }
@@ -45,7 +52,6 @@ export class Landing implements OnDestroy {
         '400px': '350px',
       },
     });
-
     this.ref.onClose.subscribe((event: any) => {
       console.log(event);
     });
