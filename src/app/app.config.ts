@@ -138,14 +138,14 @@ function initMsal(
             next: (r: any) => {
               if (r?.status === 'OK' || r?.data?.access_token) {
                 cookieService.set(
-  'mis_ta',
-  r.data.access_token,
-  undefined, // expires (use undefined = session cookie, or set a number of days)
-  '/',       // path
-  'localhost', // domain for all subdomains
-  true,      // secure
-  'None'     // sameSite
-);
+                  'mis_ta',
+                  r.data.access_token,
+                  undefined, // expires (use undefined = session cookie, or set a number of days)
+                  '/',       // path
+                  'localhost', // domain for all subdomains
+                  true,      // secure
+                  'None'     // sameSite
+                );
 
                 router.navigate(['home']);
               } else {
