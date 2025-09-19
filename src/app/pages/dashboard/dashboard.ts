@@ -17,7 +17,7 @@ export class Dashboard {
       {
         label: 'Dashboard',
         link: environment.portals.master,
-        icon: 'fas fa-chart-line',
+        icon: 'fas fa-dashboard',
       },
       {
         label: 'Beneficiary',
@@ -33,7 +33,7 @@ export class Dashboard {
       {
         label: 'Report',
         link: environment.portals.report,
-        icon: 'fas fa-chart-bar',
+        icon: 'fas fa-chart-line',
       },
     ];
   }

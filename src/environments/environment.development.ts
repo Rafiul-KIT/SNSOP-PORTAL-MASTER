@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
-  domain: "localhost",
-  globalApi: 'http://api.snsopmis.com:8000/services',
+  domain: 'localhost', // or 'snsopmis.local' if you use hosts file trick
+  globalApi: 'http://devteam.karoothitbd.com:8088/mis_server', // your Spring Boot backend in dev
   portals: {
     master: "http://localhost:4010/",
     beneficiary: "http://localhost:4020/",
