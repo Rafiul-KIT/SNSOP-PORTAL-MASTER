@@ -1,9 +1,13 @@
+
 <div class="header">
+  
   <div class="portals" (click)="showPortalOptions = !showPortalOptions">
+    <img src="SNSOP_logo.png" style="height: 30px; width: auto;" /> &nbsp;&nbsp;&nbsp;
     <i class="fas fa-braille hand"></i>
     <div><small>Portal</small><span class="name">Admin</span></div>
     <!-- <i class="fas fa-angle-down hand"></i> -->
     <span class="vertical-line"></span>
+
   </div>
   <!-- @if(menuList && menuList.length > 0){
   <div class="menues">
@@ -23,6 +27,8 @@
     severity="info"
     (onClick)="showUsermenu = !showUsermenu"
   />
+
+
 
   <!-- <div
     class="portals-option-wrapper {{showPortalOptions ? 'show' : ''}}"

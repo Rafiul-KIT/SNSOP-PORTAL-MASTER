@@ -6,6 +6,9 @@
   align-items: center;
   justify-content: center;
 
+  background: url("/Background.png") no-repeat center center fixed;
+  background-size: cover;
+
   .portal-items {
     display: flex;
     flex-direction: row;
@@ -33,7 +36,7 @@
 
       i {
         font-size: 50px;
-        color: #999999;
+        color: #4fcaeb;
       }
 
       span {
