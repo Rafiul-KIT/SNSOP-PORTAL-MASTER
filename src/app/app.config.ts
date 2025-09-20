@@ -154,13 +154,13 @@ function initMsal(
           .get(`${environment.authBackend}/auth/exchange`, { headers })
           .subscribe({
             next: (r: any) => {
-              if (r?.status === 'OK' || r?.data?.access_token) {
+              if (r?.status === 'OK' && r?.data?.access_token) {
                 cookieService.set(
                   'mis_ta',
                   r.data.access_token,
                   undefined, // session cookie
                   '/', // path
-                  'localhost', // domain
+                  `${environment.domain}`, // domain
                   true, // secure
                   'None' // sameSite
                 );
