@@ -17,8 +17,8 @@ export const environment = {
       postLogoutRedirectUri: 'https://devportalmaster.southsudansafetynet.info/master/'
     },
     cache: {
-      cacheLocation: 'localStorage',
-      storeAuthStateInCookie: false,
+      cacheLocation: 'cookie',
+      storeAuthStateInCookie: true,
     }
   },
   authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',

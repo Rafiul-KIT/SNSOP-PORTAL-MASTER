@@ -90,6 +90,7 @@ function initMsal(
   router: Router,
   cookieService: CookieService
 ) {
+  console.log('initMsal', authService);
   return async () => {
     try {
       // Step 1: Wait for MSAL initialization to complete and handle the redirect
@@ -142,6 +143,7 @@ function initMsal(
 
       // Step 4: Handle redirect and exchange ID token with backend
       const response = await authService.handleRedirectObservable().toPromise();
+      console.log('authService.handleRedirectObservable() response', response);
       if (response) {
         authService.instance.setActiveAccount(response.account);
         checkAccount();
@@ -159,11 +161,9 @@ function initMsal(
                 cookieService.set(
                   environment.cookie_name,
                   r.data.access_token,
-                  undefined, // session cookie
+                  1, // session cookie
                   '/', // path
-                  `${environment.domain}`, // domain
-                  true, // secure
-                  'None' // sameSite
+                  `${environment.domain}`
                 );
                 router.navigate(['home']);
               } else {
