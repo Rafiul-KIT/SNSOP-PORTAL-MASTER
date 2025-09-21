@@ -4,6 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
 import { environment } from '../../../environments/environment';
+import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,10 @@ export class Header {
   menuList: any = [];
   userMenuList: any = [];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private azureService: AzureAdAuthService
+  ) {
     this.portalList = [
       {
         label: 'Dashboard',
@@ -47,5 +51,8 @@ export class Header {
   goToProfile = () => {
     this.router.navigateByUrl('/home/profile');
   };
-  logout = () => {};
+
+  logout = () => {
+    this.azureService.logout();
+  };
 }

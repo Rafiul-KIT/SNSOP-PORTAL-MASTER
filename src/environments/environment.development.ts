@@ -1,25 +1,27 @@
 export const environment = {
   production: false,
-  domain: 'https://devportalmaster.southsudansafetynet.info',
-  globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
+  domain: 'http://localhost',
+  globalApi: 'http://devteam.karoothitbd.com:8088/mis_server/',
   portals: {
-    master: 'https://devportalmaster.southsudansafetynet.info/master/',
-    beneficiary: 'https://devportalmaster.southsudansafetynet.info/beneficiary',
-    payment: 'https://devportalmaster.southsudansafetynet.info/payment',
-    grm: 'https://devportalmaster.southsudansafetynet.info/grm',
-    report: 'https://devportalmaster.southsudansafetynet.info/report',
+    master: 'http://localhost:4010',
+    beneficiary: 'http://localhost:4020',
+    payment: 'http://localhost:4030',
+    grm: 'http://localhost:4040',
+    report: 'http://localhost:4050',
   },
   msalConfig: {
     auth: {
       clientId: 'f33243cb-5b62-4850-984b-96f75e9cdce4',
-      authority: 'https://login.microsoftonline.com/4a9fe01e-5c9c-4cb8-b299-fb5211533420',
-      redirectUri: 'https://devportalmaster.southsudansafetynet.info/master/',
-      postLogoutRedirectUri: 'https://devportalmaster.southsudansafetynet.info/master/'
+      authority:
+        'https://login.microsoftonline.com/4a9fe01e-5c9c-4cb8-b299-fb5211533420',
+      redirectUri: 'http://localhost:4010',
+      postLogoutRedirectUri: 'http://localhost:4010',
     },
     cache: {
       cacheLocation: 'localStorage',
       storeAuthStateInCookie: false,
-    }
+    },
   },
-  authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth'
+  authBackend: 'http://devteam.karoothitbd.com:8088/mis_auth/',
+  cookie_name:'mis_ta'
 };

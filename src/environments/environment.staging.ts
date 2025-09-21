@@ -21,5 +21,6 @@ export const environment = {
       storeAuthStateInCookie: false,
     }
   },
-  authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth'
+  authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
+  cookie_name:'mis_ta'
 };
