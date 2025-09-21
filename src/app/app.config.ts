@@ -42,7 +42,7 @@ import {
 } from '@azure/msal-browser';
 import { filter } from 'rxjs/operators';
 
-import { environment } from '../environments/environment.development';
+import { environment } from '../environments/environment';
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
 function msalInstanceFactory() {
@@ -154,9 +154,10 @@ function initMsal(
           .get(`${environment.authBackend}/auth/exchange`, { headers })
           .subscribe({
             next: (r: any) => {
+              console.log('/auth/exchange', r);
               if (r?.status === 'OK' && r?.data?.access_token) {
                 cookieService.set(
-                  'mis_ta',
+                  environment.cookie_name,
                   r.data.access_token,
                   undefined, // session cookie
                   '/', // path
@@ -166,10 +167,10 @@ function initMsal(
                 );
                 router.navigate(['home']);
               } else {
-                router.navigate(['**']);
+                router.navigate(['landing']);
               }
             },
-            error: () => router.navigate(['**']),
+            error: () => router.navigate(['landing']),
           });
       }
 
