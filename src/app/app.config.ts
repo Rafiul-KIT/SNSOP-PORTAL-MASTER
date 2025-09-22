@@ -42,7 +42,7 @@ import {
 } from '@azure/msal-browser';
 import { filter } from 'rxjs/operators';
 
-import { environment } from '../environments/environment.development';
+import { environment } from '../environments/environment';
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
 function msalInstanceFactory() {
@@ -90,6 +90,7 @@ function initMsal(
   router: Router,
   cookieService: CookieService
 ) {
+  console.log('initMsal', authService);
   return async () => {
     try {
       // Step 1: Wait for MSAL initialization to complete and handle the redirect
@@ -142,6 +143,7 @@ function initMsal(
 
       // Step 4: Handle redirect and exchange ID token with backend
       const response = await authService.handleRedirectObservable().toPromise();
+      console.log('authService.handleRedirectObservable() response', response);
       if (response) {
         authService.instance.setActiveAccount(response.account);
         checkAccount();
@@ -154,22 +156,21 @@ function initMsal(
           .get(`${environment.authBackend}/auth/exchange`, { headers })
           .subscribe({
             next: (r: any) => {
-              if (r?.status === 'OK' || r?.data?.access_token) {
+              console.log('/auth/exchange', r);
+              if (r?.status === 'OK' && r?.data?.access_token) {
                 cookieService.set(
-                  'mis_ta',
+                  environment.cookie_name,
                   r.data.access_token,
-                  undefined, // session cookie
+                  1, // session cookie
                   '/', // path
-                  'localhost', // domain
-                  true, // secure
-                  'None' // sameSite
+                  `${environment.domain}`
                 );
                 router.navigate(['home']);
               } else {
-                router.navigate(['**']);
+                router.navigate(['landing']);
               }
             },
-            error: () => router.navigate(['**']),
+            error: () => router.navigate(['landing']),
           });
       }
 
