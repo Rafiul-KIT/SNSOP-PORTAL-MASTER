@@ -1,27 +1,27 @@
 export const environment = {
   production: false,
-  domain: 'http://localhost',
-  globalApi: 'http://devteam.karoothitbd.com:8088/mis_server/',
+  domain: 'https://localhost',
+  globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
   portals: {
-    master: 'http://localhost:4010',
-    beneficiary: 'http://localhost:4020',
-    payment: 'http://localhost:4030',
-    grm: 'http://localhost:4040',
-    report: 'http://localhost:4050',
+    master: 'https://localhost:4010',
+    beneficiary: 'https://localhost:4020',
+    payment: 'https://localhost:4030',
+    grm: 'https://localhost:4040',
+    report: 'https://localhost:4050',
   },
   msalConfig: {
     auth: {
-      clientId: 'f33243cb-5b62-4850-984b-96f75e9cdce4',
+      clientId: 'bcb572c3-15d2-4575-9dfc-edae57b125b9',
       authority:
         'https://login.microsoftonline.com/4a9fe01e-5c9c-4cb8-b299-fb5211533420',
-      redirectUri: 'http://localhost:4010',
-      postLogoutRedirectUri: 'http://localhost:4010',
+      redirectUri: 'https://localhost:4010/',
+      postLogoutRedirectUri: 'https://localhost:4010',
     },
     cache: {
       cacheLocation: 'localStorage',
       storeAuthStateInCookie: false,
     },
   },
-  authBackend: 'http://devteam.karoothitbd.com:8088/mis_auth/',
+  authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
   cookie_name:'mis_ta'
 };
