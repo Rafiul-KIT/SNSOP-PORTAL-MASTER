@@ -42,7 +42,7 @@ import {
 } from '@azure/msal-browser';
 import { filter } from 'rxjs/operators';
 
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.staging';
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
 function msalInstanceFactory() {
@@ -149,7 +149,9 @@ function initMsal(
         checkAccount();
 
         const headers = new HttpHeaders({
-          Authorization: `Bearer ${response.idToken}`, // backend expects ID token
+          Authorization: `Bearer ${response.idToken}`, 
+          'X-ENV': environment.env
+        
         });
 
         http
