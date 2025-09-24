@@ -10,7 +10,8 @@ import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
-import { environment } from '../../../environments/environment';
+import { Loader } from '../../components/loader/loader';
+
 
 @Component({
   selector: 'app-landing',
@@ -21,6 +22,7 @@ import { environment } from '../../../environments/environment';
     CardModule,
     DividerModule,
     ProgressSpinnerModule,
+    Loader
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
@@ -30,7 +32,7 @@ export class Landing implements OnDestroy {
   private authService = inject(AzureAdAuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  loading = false;
+  isLoading = false;
   ref: DynamicDialogRef | undefined;
   returnUrl: string = '/';
 
@@ -58,9 +60,14 @@ export class Landing implements OnDestroy {
   }
 
   loginWithAzureAD(): void {
-    this.loading = false;
-    this.authService.login();
+    this.isLoading = true; // Show the loading spinner when login starts
+    this.authService.login(); // Just call login if it doesn't return a Promise
+
+    // Optionally, you can check authentication status here or call a success/failure handler
+    this.isLoading = false; // Hide the loading spinner when login finishes
   }
+
+
 
   ngOnDestroy() {
     if (this.ref) {
