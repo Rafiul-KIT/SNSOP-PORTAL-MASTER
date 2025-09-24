@@ -44,6 +44,7 @@ import { filter } from 'rxjs/operators';
 
 import { environment } from '../environments/environment';
 
+
 // ---------- MSAL factories (use environment.msalConfig) ----------
 function msalInstanceFactory() {
   const cfg = environment.msalConfig;
@@ -149,7 +150,9 @@ function initMsal(
         checkAccount();
 
         const headers = new HttpHeaders({
-          Authorization: `Bearer ${response.idToken}`, // backend expects ID token
+          Authorization: `Bearer ${response.idToken}`,
+          'X-ENV': environment.env
+
         });
 
         http
@@ -158,13 +161,26 @@ function initMsal(
             next: (r: any) => {
               console.log('/auth/exchange', r);
               if (r?.status === 'OK' && r?.data?.access_token) {
+                // derive bare hostname from environment.domain
+                const host = (() => {
+                  try { return new URL(environment.domain).hostname; }
+                  catch { return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, ''); }
+                })();
+
+                // If you want a session cookie (clears on browser close):
                 cookieService.set(
-                  environment.cookie_name,
-                  r.data.access_token,
-                  1, // session cookie
-                  '/', // path
-                  `${environment.domain}`
+                  environment.cookie_name,          // 'mis_ta'
+                  r.data.access_token,              // token from backend
+                  undefined,                        // no expires => session cookie
+                  '/',                              // path
+                  host,                             // domain WITHOUT protocol
+                  true,                             // secure (required on HTTPS)
+                  'Lax'                             // sameSite ('None' if used inside iframes/cross-site)
                 );
+
+                // If you *do* want a fixed lifetime instead (e.g., 1 day):
+                // cookieService.set(environment.cookie_name, r.data.access_token, 1, '/', host, true, 'Lax');
+
                 router.navigate(['home']);
               } else {
                 router.navigate(['landing']);
