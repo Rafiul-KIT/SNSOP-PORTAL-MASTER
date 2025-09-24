@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, effect, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
@@ -18,11 +18,17 @@ export class Header {
   portalList: any = [];
   menuList: any = [];
   userMenuList: any = [];
+  userInfo: any = null;
 
   constructor(
     private router: Router,
     private azureService: AzureAdAuthService
   ) {
+
+    effect(() => {
+      this.userInfo = this.azureService.loginState()?.user;
+    });
+    
     this.portalList = [
       {
         label: 'Dashboard',
