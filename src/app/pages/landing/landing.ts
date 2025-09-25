@@ -12,7 +12,6 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 import { Loader } from '../../components/loader/loader';
 
-
 @Component({
   selector: 'app-landing',
   imports: [
@@ -22,7 +21,7 @@ import { Loader } from '../../components/loader/loader';
     CardModule,
     DividerModule,
     ProgressSpinnerModule,
-    Loader
+    Loader,
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
@@ -37,10 +36,10 @@ export class Landing implements OnDestroy {
   returnUrl: string = '/';
 
   constructor(public dialogService: DialogService) {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate([this.returnUrl]);
-    }
+    // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    // if (this.authService.isAuthenticated()) {
+    //   this.router.navigate([this.returnUrl]);
+    // }
   }
 
   showLogin() {
@@ -62,12 +61,9 @@ export class Landing implements OnDestroy {
   loginWithAzureAD(): void {
     this.isLoading = true; // Show the loading spinner when login starts
     this.authService.login(); // Just call login if it doesn't return a Promise
-
     // Optionally, you can check authentication status here or call a success/failure handler
     this.isLoading = false; // Hide the loading spinner when login finishes
   }
-
-
 
   ngOnDestroy() {
     if (this.ref) {

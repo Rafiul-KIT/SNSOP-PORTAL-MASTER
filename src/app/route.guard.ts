@@ -9,11 +9,11 @@ export const routeGuard: CanActivateChildFn = (route: any) => {
   let lState: boolean = true;
   const ACCESS_TOKEN = environment.cookie_name;
   const isLoggedIn = cookieService.get(ACCESS_TOKEN) ? true : false;
-  // console.log('routeGuard', isLoggedIn);
+  console.log('routeGuard', isLoggedIn);
   // console.log('routeGuard', route.routeConfig.path);
   if (!isLoggedIn) {
     lState = false;
-    router.navigateByUrl('/landing');
+    router.navigateByUrl('/login');
   }
   return lState;
 };

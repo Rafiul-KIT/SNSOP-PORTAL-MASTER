@@ -9,11 +9,12 @@ export const authGuard: CanActivateFn = (route: any) => {
   let lState: boolean = true;
   const ACCESS_TOKEN = environment.cookie_name;
   const isLoggedIn = cookieService.get(ACCESS_TOKEN) ? true : false;
-  // console.log('authGuard', isLoggedIn);
+  console.log('authGuard isLoggedIn', isLoggedIn);
   // console.log('authGuard', route.routeConfig.path);
   if (isLoggedIn) {
     lState = false;
     router.navigateByUrl('/home');
   }
+  console.log('authGuard lState', lState);
   return lState;
 };
