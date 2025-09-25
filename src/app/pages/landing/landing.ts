@@ -11,6 +11,9 @@ import { DividerModule } from 'primeng/divider';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 import { Loader } from '../../components/loader/loader';
+import { MsalBroadcastService } from '@azure/msal-angular';
+import { InteractionStatus } from '@azure/msal-browser';
+import { Subject, filter, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-landing',
@@ -31,9 +34,11 @@ export class Landing implements OnDestroy {
   private authService = inject(AzureAdAuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private msalBroadcastService = inject(MsalBroadcastService);
   isLoading = false;
   ref: DynamicDialogRef | undefined;
   returnUrl: string = '/';
+  private readonly _destroying$ = new Subject<void>();
 
   constructor(public dialogService: DialogService) {
     // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
@@ -69,5 +74,7 @@ export class Landing implements OnDestroy {
     if (this.ref) {
       this.ref.close();
     }
+    this._destroying$.next(undefined);
+    this._destroying$.complete();
   }
 }
