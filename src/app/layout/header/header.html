@@ -7,7 +7,6 @@
     <div><small>Portal</small><span class="name">Admin</span></div>
     <!-- <i class="fas fa-angle-down hand"></i> -->
     <span class="vertical-line"></span>
-
   </div>
   <!-- @if(menuList && menuList.length > 0){
   <div class="menues">
@@ -21,40 +20,29 @@
     }
   </div>
   } -->
+  
+  <!-- Logged In User -->
+  @if(userInfo){
   <p-button
-    variant="text"
+    [text]="true"
     icon="fas fa-user-circle fa-lg"
     severity="info"
     (onClick)="showUsermenu = !showUsermenu"
-  />
-
-
-
-  <!-- <div
-    class="portals-option-wrapper {{showPortalOptions ? 'show' : ''}}"
-    (mouseleave)="showPortalOptions = false"
-  >
-    <div class="portal-items">
-      @for(portal of portalList;track portal){
-      <a class="item" [href]="portal.link">
-        <i class="{{ portal.icon }}" class="w-50"></i>
-        <span>{{ portal.label }}</span>
-      </a>
-      }
-    </div>
-  </div> -->
+  ></p-button>
 
   <div
-    class="user-menu {{showUsermenu ? 'show' : ''}}"
+    class="user-menu {{ showUsermenu ? 'show' : '' }}"
     (mouseleave)="showUsermenu = false"
   >
     <div class="item" (click)="goToProfile()">
       <i class="fas fa-user me-2"></i>
-      Profile
+      Profile ({{userInfo.sub}})
     </div>
     <div class="item" (click)="logout()">
       <i class="fas fa-sign-out-alt me-2"></i>
       Logout
     </div>
   </div>
+  }
+
 </div>
