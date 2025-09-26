@@ -67,7 +67,7 @@ export class Landing implements OnDestroy {
     this.isLoading = true; // Show the loading spinner when login starts
     this.authService.login(); // Just call login if it doesn't return a Promise
     // Optionally, you can check authentication status here or call a success/failure handler
-    this.isLoading = false; // Hide the loading spinner when login finishes
+    // this.isLoading = true; // Hide the loading spinner when login finishes
   }
 
   ngOnDestroy() {

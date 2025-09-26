@@ -2,11 +2,12 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh; /* Ensure the home container takes up the full height */
-  background-image: url('../../../../public/Background.png'); /* Set your background image */
+  background-image: url('../../../../public/bg_loginpage.png'); /* Set your background image */
   background-size: cover; /* Make the background cover the entire container */
   background-position: center; /* Center the background image */
   background-repeat: no-repeat; /* Prevent repeating the image */
 }
+
 
 .header {
   position: fixed;
@@ -30,21 +31,23 @@
 
 .wrapper {
   position: absolute;
-  top: 60px; /* Space below the fixed header */
+  top: 60px;
   left: 0;
   right: 0;
   bottom: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: rgba(241, 241, 241, 0.8); /* Semi-transparent background */
+  background-color: rgba(241, 241, 241, 0.8);
   padding: 20px;
   box-sizing: border-box;
   z-index: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* 👈 push items to the left */
+  align-items: flex-start;    /* 👈 push items to the top */
   flex-direction: column;
+  padding-left: 100px;
 }
+
 
 /* Styling for the loader */
 app-loader {
@@ -69,3 +72,28 @@ app-loader {
 .col-12 {
   width: 100%;
 }
+
+
+.login-card {
+  width: 400px;        /* fixed width */
+  max-width: 50%;      /* responsive on small screens */
+  height: 200px;       /* fixed height */
+  min-height: 300px;   /* optional: ensures it never gets too small */
+  padding: 20px;       /* inner spacing */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  display: flex;       /* optional: to control inner layout */
+  flex-direction: column;
+  justify-content: center; /* center form vertically inside */
+}
+
+.title-large {
+  font-size: 3rem;    /* controls size (3rem ≈ 48px) */
+  font-weight: 600;   /* keeps it bold */
+  line-height: 1.2;   /* tighter spacing between lines */
+  margin: 1rem 0;  
+  text-align: left;
+  color: #555555;   /* some spacing above/below */
+}
+
+
