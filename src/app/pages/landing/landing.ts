@@ -14,6 +14,7 @@ import { Loader } from '../../components/loader/loader';
 import { MsalBroadcastService } from '@azure/msal-angular';
 import { InteractionStatus } from '@azure/msal-browser';
 import { Subject, filter, takeUntil } from 'rxjs';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-landing',
@@ -25,6 +26,8 @@ import { Subject, filter, takeUntil } from 'rxjs';
     DividerModule,
     ProgressSpinnerModule,
     Loader,
+    ToastModule
+    
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
