@@ -9,7 +9,7 @@
     <!-- Loader component shown when loading is true, it will overlay on the card -->
     @if (isLoading) { <app-loader></app-loader> }
     @else {
-    <p-card class="text-center">
+    <!-- <p-card class="login-card text-center">
       <ng-template pTemplate="content">
         <form>
           <h1 class="m-0">Login</h1>
@@ -17,13 +17,29 @@
           <div class="grid mt-3">
             <div class="col-12">
               <p-button styleClass="w-full" icon="fas fa-sign-in" [loading]="isLoading" (onClick)="loginWithAzureAD()"
-                [label]="isLoading ? 'Logging in...' : 'Login with Microsoft Azure AD'">
+                [label]="isLoading ? 'Logging in...' : 'Login With Microsoft Account'">
               </p-button>
             </div>
           </div>
         </form>
       </ng-template>
-    </p-card>
+    </p-card> -->
+    <form class="text-left">
+      <img src="SNSOP_logo.png" alt="SNSOP Logo" style="height: 25%;">
+      <p class="text-600 mt-2 title-large ">
+        Management <br>
+        Information <br>
+        System
+      </p>
+
+      <div class="grid mt-3">
+        <div class="col-12">
+          <p-button styleClass="w-full" icon="fas fa-sign-in" [loading]="isLoading" (onClick)="loginWithAzureAD()"
+            [label]="isLoading ? 'Logging in...' : 'Login With Microsoft Account'">
+          </p-button>
+        </div>
+      </div>
+    </form>
     }
   </div>
 </div>
