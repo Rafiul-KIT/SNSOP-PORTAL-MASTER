@@ -6,6 +6,7 @@ import { Profile } from './pages/profile/profile';
 import { Landing } from './pages/landing/landing';
 import { routeGuard } from './route.guard';
 import { authGuard } from './auth.guard';
+import { UserManagement } from './pages/user-management/user-management';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,10 @@ export const routes: Routes = [
     ],
   },
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
+  { path: 'user-management',
+    component: UserManagement,
+    canActivate: [routeGuard],
+  },
   {
     path: '**',
     component: NotFound,

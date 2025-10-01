@@ -1,5 +1,5 @@
 import { Component, effect, ViewChild } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
@@ -28,7 +28,7 @@ export class Header {
     effect(() => {
       this.userInfo = this.azureService.loginState()?.user;
     });
-    
+
     this.portalList = [
       {
         label: 'Dashboard',
@@ -51,6 +51,10 @@ export class Header {
         link: environment.portals.report,
         icon: 'fas fa-chart-line',
       },
+    ];
+
+    this.menuList = [
+      { name: 'User Management', icon: 'fas fa-user', routerLink: '/user-management' },
     ];
   }
 
