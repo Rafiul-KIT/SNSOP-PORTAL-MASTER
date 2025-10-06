@@ -30,11 +30,11 @@ export class Header {
     });
 
     this.portalList = [
-      {
-        label: 'Dashboard',
-        link: environment.portals.master,
-        icon: 'fas fa-dashboard',
-      },
+      // {
+      //   label: 'Dashboard',
+      //   link: environment.portals.master,
+      //   icon: 'fas fa-dashboard',
+      // },
       {
         label: 'Beneficiary',
         link: environment.portals.beneficiary,

@@ -43,6 +43,7 @@ import {
 import { filter } from 'rxjs/operators';
 
 import { environment } from '../environments/environment';
+import { MessageService } from 'primeng/api';
 
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
@@ -89,7 +90,8 @@ function initMsal(
   msalBroadcastService: MsalBroadcastService,
   http: HttpClient,
   router: Router,
-  cookieService: CookieService
+  cookieService: CookieService,
+  messageService: MessageService,
 ) {
   console.log('initMsal', authService);
   return async () => {
@@ -183,11 +185,23 @@ function initMsal(
 
                 router.navigate(['home']);
               } else {
-                router.navigate(['landing']);
-              }
-            },
-            error: () => router.navigate(['landing']),
-          });
+        messageService.add({
+          severity: 'error',
+          summary: 'Login Failed',
+          detail: 'User not found'
+        });
+        router.navigate(['landing']);
+      }
+    },
+    error: () => {
+      messageService.add({
+        severity: 'error',
+        summary: 'Login Failed',
+        detail: 'User not found'
+      });
+      router.navigate(['landing']);
+    },
+  });
       }
 
       checkAndSetActiveAccount();
@@ -220,6 +234,7 @@ export const appConfig: ApplicationConfig = {
     MsalService,
     MsalGuard,
     MsalBroadcastService,
+    MessageService,
     {
       provide: APP_INITIALIZER,
       multi: true,
@@ -230,6 +245,7 @@ export const appConfig: ApplicationConfig = {
         HttpClient,
         Router,
         CookieService,
+        MessageService,
       ],
     },
   ],
