@@ -14,11 +14,11 @@ export class Dashboard {
 
   constructor(private router: Router) {
         this.portalList = [
-      {
-        label: 'Dashboard',
-        link: environment.portals.master,
-        icon: 'fas fa-dashboard',
-      },
+      // {
+      //   label: 'Dashboard',
+      //   link: environment.portals.master,
+      //   icon: 'fas fa-dashboard',
+      // },
       {
         label: 'Beneficiary',
         link: environment.portals.beneficiary,
@@ -34,6 +34,14 @@ export class Dashboard {
         label: 'Report',
         link: environment.portals.report,
         icon: 'fas fa-chart-line',
+      },
+      {
+        label: 'Settings',
+        icon: 'fas fa-cog',
+      },
+      {
+        label: 'Survey CTO',
+        icon: 'fas fa-poll',
       },
     ];
   }

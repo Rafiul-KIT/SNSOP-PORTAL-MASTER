@@ -11,7 +11,6 @@ import { UserManagement } from './pages/user-management/user-management';
 export const routes: Routes = [
   {
     path: 'landing',
-    canActivate: [authGuard],
     component: Landing,
   },
   {
