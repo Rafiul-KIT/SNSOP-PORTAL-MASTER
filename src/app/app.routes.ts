@@ -6,7 +6,9 @@ import { Profile } from './pages/profile/profile';
 import { Landing } from './pages/landing/landing';
 import { routeGuard } from './route.guard';
 import { authGuard } from './auth.guard';
-import { UserManagement } from './pages/user-management/user-management';
+import {Users} from './pages/user-management/users/users';
+import {Role} from './pages/user-management/role/role';
+import {Register} from './pages/user-management/register/register';
 
 export const routes: Routes = [
   {
@@ -30,8 +32,16 @@ export const routes: Routes = [
     ],
   },
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
-  { path: 'user-management',
-    component: UserManagement,
+  { path: 'users',
+    component: Users,
+    canActivate: [routeGuard],
+  },
+  { path: 'roles',
+    component: Role,
+    canActivate: [routeGuard],
+  },
+  { path: 'register',
+    component: Register,
     canActivate: [routeGuard],
   },
   {
