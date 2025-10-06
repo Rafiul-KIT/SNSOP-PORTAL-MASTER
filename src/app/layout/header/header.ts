@@ -5,6 +5,7 @@ import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
 import { environment } from '../../../environments/environment';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-header',
@@ -16,8 +17,7 @@ export class Header {
   showPortalOptions: boolean = false;
   showUsermenu: boolean = false;
   portalList: any = [];
-  menuList: any = [];
-  userMenuList: any = [];
+  menuList: MenuItem[] = [];
   userInfo: any = null;
 
   constructor(
@@ -54,7 +54,17 @@ export class Header {
     ];
 
     this.menuList = [
-      { name: 'User Management', icon: 'fas fa-user', routerLink: '/user-management' },
+      {
+        label: 'User & Role Management',
+        icon: 'pi pi-users',
+        items: [
+          { label: 'User List', icon: 'pi pi-list', routerLink: ['/user-management/users'] },
+          { label: 'Register User', icon: 'pi pi-user-plus', routerLink: ['/user-management/register'] },
+          { separator: true },
+          { label: 'Role List', icon: 'pi pi-shield', routerLink: ['/user-management/roles'] },
+        ],
+      },
+      // ...other top-level items if you want (Settings, Report, etc.)
     ];
   }
 
