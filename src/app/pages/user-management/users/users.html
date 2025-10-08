@@ -1,1 +1,179 @@
-<p>users works!</p>
+<p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
+
+<app-loader *ngIf="isLoading"></app-loader>
+
+<div class="card mt-3 shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+    <h5 class="mb-0 fw-semibold">
+      <i class="pi pi-users me-2"></i> User List
+    </h5>
+    <button
+      pButton
+      label="Register New User"
+      icon="pi pi-user-plus"
+      class="p-button-success p-button-sm mt-2 mt-md-0"
+      (click)="goToRegister()"
+    ></button>
+  </div>
+
+  <div class="card-body">
+
+    <!-- 🔍 Filter Section -->
+    <div class="filter-container border rounded bg-light p-3 mb-3">
+      <div class="row g-2">
+
+        <!-- Email -->
+        <div class="col-md-3 col-sm-6">
+          <label class="fw-semibold small mb-1">Email</label>
+          <input
+            pInputText
+            [(ngModel)]="filters.email"
+            placeholder="Search by Email"
+            class="form-control form-control-sm"
+          />
+        </div>
+
+        <!-- Username -->
+        <div class="col-md-3 col-sm-6">
+          <label class="fw-semibold small mb-1">Username</label>
+          <input
+            pInputText
+            [(ngModel)]="filters.username"
+            placeholder="Search by Username"
+            class="form-control form-control-sm"
+          />
+        </div>
+
+        <!-- Role -->
+        <div class="col-md-3 col-sm-6">
+          <label class="fw-semibold small mb-1">Role</label>
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="filters.roleId"
+          >
+            <option value="">All Roles</option>
+            <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
+          </select>
+        </div>
+
+        <!-- Email Receiver -->
+        <div class="col-md-2 col-sm-6">
+          <label class="fw-semibold small mb-1">Email Receiver</label>
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="filters.emailReceiver"
+          >
+            <option value="">All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-md-1 text-end d-flex justify-content-end align-items-end">
+          <button
+            pButton
+            icon="fas fa-search"
+            class="p-button-sm p-button-primary me-2"
+            (click)="applyFilters()"
+            tooltip="Search"
+          ></button>
+          <button
+            pButton
+            icon="fas fa-refresh"
+            class="p-button-sm p-button-secondary"
+            (click)="resetFilters()"
+            tooltip="Reset"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <p-table
+      [value]="users"
+      responsiveLayout="scroll"
+      [loading]="isLoading"
+      styleClass="p-datatable-sm compact-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Role</th>
+          <th>Email Receiver</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user let-i="rowIndex">
+        <tr>
+          <td>{{ (currentPage * pageSize) + (i + 1) }}</td>
+          <td>{{ user.fullName }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-success': user.statusText === 'ACTIVE',
+                  'bg-danger': user.statusText === 'INACTIVE'
+                }"
+              >
+                {{ user.statusText }}
+              </span>
+          </td>
+          <td>{{ user.roleName }}</td>
+          <td>{{ user.emailReceiverText }}</td>
+
+          <td>{{ user.role?.name || '-' }}</td>
+          <td>{{ user.emailReceiver ? 'Yes' : 'No' }}</td>
+          <td class="text-center">
+            <button
+              pButton
+              icon="fas fa-eye"
+              class="p-button-rounded p-button-text p-button-info me-1"
+              (click)="viewUser(user)"
+              tooltip="View"
+            ></button>
+            <button
+              pButton
+              icon="fas fa-pencil"
+              class="p-button-rounded p-button-text p-button-warning me-1"
+              (click)="editUser(user)"
+              tooltip="Edit"
+            ></button>
+            <button
+              pButton
+              icon="fas fa-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              tooltip="Delete"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center text-muted">
+            No users found.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- ✅ Custom paginator (fixes always-0 issue) -->
+    <p-paginator
+      class="paginator-sticky mt-3"
+      [rows]="pageSize"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      (onPageChange)="onPageChange($event)"
+      [first]="currentPage * pageSize"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    ></p-paginator>
+  </div>
+</div>
+
+<p-toast></p-toast>

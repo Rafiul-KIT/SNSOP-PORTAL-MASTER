@@ -32,17 +32,14 @@ export const routes: Routes = [
     ],
   },
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
-  { path: 'users',
-    component: Users,
-    canActivate: [routeGuard],
-  },
-  { path: 'roles',
-    component: Role,
-    canActivate: [routeGuard],
-  },
-  { path: 'register',
-    component: Register,
-    canActivate: [routeGuard],
+  {
+    path: 'pages/user-management',
+    children: [
+      { path: 'users', component: Users },
+      { path: 'register', component: Register },
+      { path: 'roles', component: Role },
+      { path: '', redirectTo: '/users', pathMatch: 'full' }
+    ],
   },
   {
     path: '**',

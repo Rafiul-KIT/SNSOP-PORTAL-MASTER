@@ -56,12 +56,11 @@ export class Header {
     this.menuList = [
       {
         label: 'User & Role Management',
-        icon: 'pi pi-users',
+        icon: 'fas fa-users',
         items: [
-          { label: 'User List', icon: 'pi pi-list', routerLink: ['/user-management/users'] },
-          { label: 'Register User', icon: 'pi pi-user-plus', routerLink: ['/user-management/register'] },
-          { separator: true },
-          { label: 'Role List', icon: 'pi pi-shield', routerLink: ['/user-management/roles'] },
+          { label: 'User List', icon: 'fas fa-list', routerLink: ['/pages/user-management/users'] },
+          { label: 'Register User', icon: 'fas fa-user-plus', routerLink: ['/pages/user-management/register'] },
+          { label: 'Role List', icon: 'fas fa-shield', routerLink: ['/pages/user-management/roles'] },
         ],
       },
       // ...other top-level items if you want (Settings, Report, etc.)
@@ -75,4 +74,9 @@ export class Header {
   logout = () => {
     this.azureService.logout();
   };
+
+  trackByFn(index: number, item: any): any {
+    return item.label;  // You can change this depending on the uniqueness of the item
+  }
+
 }
