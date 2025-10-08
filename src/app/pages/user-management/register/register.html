@@ -1,1 +1,251 @@
-<p>register works!</p>
+<div class="breadcrumb-wrapper">
+  <p-breadcrumb class="w-100" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+
+<p-toast position="top-right"></p-toast>
+
+@if (isLoading) {
+  <app-loader />
+} @else {
+  <div class="mt-1 wrapper-scroller">
+    <form novalidate [formGroup]="userRegistrationForm">
+      <div class="container user-form">
+
+        <!-- Single card -->
+        <div class="row g-3 align-items-stretch">
+          <div class="col-12 d-flex">
+            <div class="card mt-2 h-100 flex-fill">
+              <h5 class="card-header p-3">User Registration</h5>
+
+              <div class="card-body">
+                <div class="row">
+                  <!-- Username -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3">
+                      <label class="fw-bold d-block mb-1" for="username">
+                        User Name <b class="fw-bold text-danger">*</b>
+                      </label>
+                      <input
+                        id="username"
+                        type="text"
+                        formControlName="username"
+                        class="form-control"
+                        minlength="3"
+                        maxlength="100"
+                        placeholder="Enter User Name"
+                        [class.is-invalid]="nonEmpty('username') && (has('username','minlength') || has('username','maxlength') || has('username','required'))"
+                      />
+                      @if (has('username','required')) {
+                        <div class="invalid-feedback">User Name is required</div>
+                      } @else if (nonEmpty('username') && (has('username','minlength') || has('username','maxlength'))) {
+                        <div class="invalid-feedback">User Name length should be between 3 and 100</div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Full Name -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3">
+                      <label class="fw-bold d-block mb-1" for="fullName">
+                        Full Name <b class="fw-bold text-danger">*</b>
+                      </label>
+                      <input
+                        id="fullName"
+                        type="text"
+                        formControlName="fullName"
+                        class="form-control"
+                        minlength="3"
+                        maxlength="150"
+                        placeholder="Enter Full Name"
+                        [class.is-invalid]="has('fullName','required') || (nonEmpty('fullName') && (has('fullName','minlength') || has('fullName','maxlength')))"
+                      />
+                      @if (has('fullName','required')) {
+                        <div class="invalid-feedback">Full Name is required</div>
+                      } @else if (nonEmpty('fullName') && (has('fullName','minlength') || has('fullName','maxlength'))) {
+                        <div class="invalid-feedback">Full Name length should be between 3 and 150</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <!-- Email -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3">
+                      <label class="fw-bold d-block mb-1" for="email">
+                        Email <b class="fw-bold text-danger">*</b>
+                      </label>
+                      <input
+                        id="email"
+                        type="text"
+                        formControlName="email"
+                        class="form-control"
+                        placeholder="Enter Email"
+                        [class.is-invalid]="has('email','required') || has('email','pattern')"
+                      />
+                      @if (has('email','required')) {
+                        <div class="invalid-feedback">Email is required</div>
+                      } @else if (has('email','pattern')) {
+                        <div class="invalid-feedback">Invalid Email Address</div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Password (conditionally required when Is Mobile = true) -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3">
+                      <label class="fw-bold d-block mb-1" for="password">
+                        Password
+                        @if (val('isMobile')) {
+                          <b class="fw-bold text-danger">*</b>
+                        }
+                      </label>
+                      <input
+                        id="password"
+                        type="password"
+                        formControlName="password"
+                        class="form-control"
+                        placeholder="Enter Password"
+                        [class.is-invalid]="has('password','required') || has('password','minlength') || has('password','maxlength')"
+                      />
+                      @if (has('password','required')) {
+                        <div class="invalid-feedback">Password is required when “Is Mobile” is checked</div>
+                      } @else if (has('password','minlength') || has('password','maxlength')) {
+                        <div class="invalid-feedback">Password length should be between 6 and 100</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row: Role + Status (side by side) -->
+                <div class="row">
+                  <!-- Role -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3">
+                      <label class="fw-bold d-block mb-1" for="roleId">
+                        Role <b class="fw-bold text-danger">*</b>
+                      </label>
+                      <select
+                        id="roleId"
+                        class="form-select"
+                        formControlName="roleId"
+                        [class.is-invalid]="has('roleId','required')">
+                        <option [ngValue]="null">Select Role</option>
+                        @for (r of roles; track r.id) {
+                          <option [ngValue]="r.id">{{ r.name }}</option>
+                        }
+                      </select>
+                      @if (has('roleId','required')) {
+                        <div class="invalid-feedback">Role is required</div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Status -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3">
+                      <label class="fw-bold d-block mb-1" for="status">
+                        Status <b class="fw-bold text-danger">*</b>
+                      </label>
+                      <select
+                        id="status"
+                        class="form-select"
+                        formControlName="status"
+                        [class.is-invalid]="has('status','required')">
+                        @for (s of statusOptions; track s.value) {
+                          <option [ngValue]="s.value">{{ s.label }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row: Is Mobile + Email Receiver (side by side) -->
+                <div class="row">
+                  <!-- Is Mobile -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3 form-check mt-2 d-flex align-items-center">
+                      <input
+                        id="isMobile"
+                        type="checkbox"
+                        class="form-check-input me-2"
+                        formControlName="isMobile"
+                        style="transform: scale(1.25); transform-origin: left center;"
+                      />
+                      <label class="form-check-label mb-0 fs-6" for="isMobile" style="line-height: 0.8;">
+                        Is Mobile
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Email Receiver -->
+                  <div class="col-12 col-md-6">
+                    <div class="mb-3 form-check mt-2 d-flex align-items-center">
+                      <input
+                        id="emailReceiver"
+                        type="checkbox"
+                        class="form-check-input me-2"
+                        formControlName="emailReceiver"
+                        style="transform: scale(1.25); transform-origin: left center;"
+                      />
+                      <label class="form-check-label mb-0 fs-6" for="emailReceiver" style="line-height: 0.8;">
+                        Email Receiver
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+&nbsp;
+        <!-- Footer -->
+        <div class="row">
+          <div class="col-12">
+            <div class="card mt-2">
+              @if (userDetails == null) {
+                <div class="card-body d-flex align-items-center justify-content-between">
+                  <span class="text-warning">
+                    <b class="fw-bold text-danger">*</b>&nbsp; Marked Fields are Mandatory
+                  </span>
+                  <div>
+                    <button
+                      class="btn btn-success btn-sm rounded-0 me-2"
+                      (click)="formHandler(1)"
+                      [disabled]="userRegistrationForm.invalid || isLoading">
+                      <i class="fas fa-save me-2"></i>Save &amp; Go To List
+                    </button>
+                    <button
+                      class="btn btn-success btn-sm rounded-0"
+                      (click)="formHandler(2)"
+                      [disabled]="userRegistrationForm.invalid || isLoading">
+                      <i class="fas fa-save me-2"></i>Save &amp; Reset
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div class="card-body d-flex justify-content-between align-items-center">
+                  <span>
+                    <i class="text-primary">Status:</i>&nbsp;
+                    <b class="text-{{ userDetails.status == 'ACTIVE' ? 'success' : (userDetails.status == 'INACTIVE' ? 'danger' : 'warning') }}">
+                      {{ userDetails.status }}
+                    </b>
+                  </span>
+                  <button
+                    class="btn btn-success btn-sm rounded-0"
+                    (click)="formHandler(null)"
+                    [disabled]="userRegistrationForm.invalid || isLoading">
+                    <i class="fas fa-save me-2"></i>Update
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+}

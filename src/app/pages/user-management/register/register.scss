@@ -1,0 +1,90 @@
+.register-wrapper {
+  padding: 0 .75rem 2rem .75rem;
+}
+
+.section-card {
+  .section-title {
+    font-weight: 600;
+    font-size: 1.15rem;
+  }
+
+  .form-grid {
+    margin-top: .75rem;
+
+    label {
+      display: inline-block;
+      margin-bottom: .35rem;
+      font-weight: 600;
+
+      &.req::after {
+        content: ' *';
+        color: #e55353;
+        font-weight: 700;
+      }
+    }
+
+    .err {
+      color: #e55353;
+      font-size: .8rem;
+    }
+  }
+}
+
+.footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: .75rem;
+
+  .note {
+    color: #d97706; // amber-ish
+    font-weight: 600;
+
+    span {
+      color: #e55353;
+      margin-right: 4px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: .5rem;
+  }
+}
+
+.breadcrumb-wrapper {
+  background: #f8f9fa; // same as Bootstrap card header
+  color: #212529;      // standard dark text
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); // light, matching the card's subtle depth
+  font-weight: 500;
+
+  p-breadcrumb {
+    ::ng-deep .p-breadcrumb {
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+
+      a {
+        color: #6c757d; // Bootstrap primary blue for links
+        font-weight: 600;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .p-breadcrumb-label {
+        color: #212529; // matches the card header text
+        font-weight: 600;
+      }
+
+      .p-breadcrumb-chevron {
+        color: #6c757d; // subtle gray arrows
+        margin: 0 0.4rem;
+      }
+    }
+  }
+}
