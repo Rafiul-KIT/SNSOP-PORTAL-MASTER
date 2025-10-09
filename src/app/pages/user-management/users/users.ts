@@ -10,6 +10,12 @@ import { Loader } from '../../../components/loader/loader';
 import { ApiService } from '../../../../services/api.service';
 import { FormsModule } from '@angular/forms';
 import {Paginator} from 'primeng/paginator';
+import {InputText} from 'primeng/inputtext';
+import {Tooltip} from 'primeng/tooltip';
+import {FloatLabel} from 'primeng/floatlabel';
+import {Select} from 'primeng/select';
+import {Dialog} from 'primeng/dialog';
+
 
 @Component({
   selector: 'app-users',
@@ -26,6 +32,11 @@ import {Paginator} from 'primeng/paginator';
     ToastModule,
     Loader,
     Paginator,
+    InputText,
+    Tooltip,
+    FloatLabel,
+    Select,
+    Dialog,
   ],
   providers: [MessageService],
 })
@@ -38,6 +49,8 @@ export class Users implements OnInit {
   totalRecords = 0;
   currentPage = 0;
   pageSize = 10;
+  selectedUser: any;
+  showUserDetailsDialog = false;
 
   filters = {
     email: '',
@@ -94,7 +107,7 @@ export class Users implements OnInit {
         ? data.content.map((u: any) => ({
           ...u,
           statusText: u.status ? 'ACTIVE' : 'INACTIVE',
-          roleName: u.role?.name || '-',
+          roleName: u.role || '-',
           emailReceiverText: u.emailReceiver ? 'Yes' : 'No'
         }))
         : [];
@@ -137,7 +150,7 @@ export class Users implements OnInit {
       emailReceiver: ''
     };
     this.currentPage = 0;
-    this.loadUsers();
+    //this.loadUsers();
   }
 
   /** ✅ Navigation methods */
@@ -145,15 +158,33 @@ export class Users implements OnInit {
     this.router.navigate(['/pages/user-management/register']);
   }
 
-  viewUser(user: any) {
-    this.router.navigate(['/pages/user-management/register', user.id], {
-      queryParams: { mode: 'view' },
-    });
+  /** View User in Popup */
+  async viewUser(user: any) {
+    try {
+      const res = await this.api.GET(`/api/users/findOne`, { id: user.id }, 'alt');
+      if (res.data) {
+        this.selectedUser = res.data;
+        this.showUserDetailsDialog = true; // Show the dialog with user details
+        this.cdr.detectChanges();
+      }
+    } catch (err) {
+      console.error('Failed to load user details', err);
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load user details.',
+      });
+    }
+  }
+
+  /** Close user details dialog */
+  closeUserDetailsDialog() {
+    this.showUserDetailsDialog = false;
   }
 
   editUser(user: any) {
-    this.router.navigate(['/pages/user-management/register', user.id], {
-      queryParams: { mode: 'edit' },
+    this.router.navigate(['/pages/user-management/register'], {
+      queryParams: { id: user.id},
     });
   }
 }
