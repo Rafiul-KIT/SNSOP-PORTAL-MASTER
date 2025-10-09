@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -42,7 +42,7 @@ export class Register implements OnInit {
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items: MenuItem[] = [
-    { label: 'User List', routerLink: ['/users'], icon: 'fas fa-users' },
+    { label: 'User List', routerLink: ['/pages/user-management/users'], icon: 'fas fa-users' },
     { label: 'Register New User', icon: 'fas fa-user-plus' },
   ];
 
@@ -64,6 +64,7 @@ export class Register implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private api: ApiService,
     private cdr: ChangeDetectorRef,
     private msg: MessageService
@@ -72,6 +73,12 @@ export class Register implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.loadRoles();
+
+    const userId = this.activatedRoute.snapshot.queryParamMap.get('id');
+
+    if (userId) {
+      this.loadUserDetails(userId); // If an ID is present, load user details
+    }
     // set initial password validators depending on initial isMobile value
     this.updatePasswordValidators(this.userRegistrationForm.value.isMobile);
     // react to changes of isMobile
@@ -110,6 +117,41 @@ export class Register implements OnInit {
     }
   }
 
+
+  async loadUserDetails(userId: string): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+
+      // Call API to get user details by ID
+      const res = await this.api.GET(`/api/users/findOne/${userId}`, {}, 'alt');
+
+      if (res.data) {
+        const user = res.data;
+        // Populate the form with the retrieved user details
+        this.userRegistrationForm.patchValue({
+          username: user.username,
+          fullName: user.fullName,
+          email: user.email,
+          roleId: user.roleId,
+          status: user.status === 'ACTIVE' ? 1 : 0,
+          isMobile: user.isMobile,
+          emailReceiver: user.emailReceiver,
+        });
+      }
+
+    } catch (err: any) {
+      console.error('Failed to load user details', err);
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load user details from server.'
+      });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
 
   private buildForm(): void {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

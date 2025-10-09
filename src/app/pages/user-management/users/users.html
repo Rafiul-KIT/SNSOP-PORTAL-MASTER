@@ -1,102 +1,116 @@
-<p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
+@if (isLoading) {
+  <app-loader></app-loader>
+} @else {
 
-<app-loader *ngIf="isLoading"></app-loader>
-
-<div class="card mt-3 shadow-sm">
-  <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-    <h5 class="mb-0 fw-semibold">
-      <i class="pi pi-users me-2"></i> User List
-    </h5>
-    <button
-      pButton
-      label="Register New User"
-      icon="pi pi-user-plus"
-      class="p-button-success p-button-sm mt-2 mt-md-0"
-      (click)="goToRegister()"
-    ></button>
+  <!-- 🧭 Breadcrumb -->
+  <div class="breadcrumb-wrapper mb-2">
+    <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
   </div>
 
-  <div class="card-body">
+  <!-- 🔍 Search & Filter Section -->
+  <div class="card p-3 mb-3 shadow-sm">
+    <form class="row g-3 align-items-end">
 
-    <!-- 🔍 Filter Section -->
-    <div class="filter-container border rounded bg-light p-3 mb-3">
-      <div class="row g-2">
-
-        <!-- Email -->
-        <div class="col-md-3 col-sm-6">
-          <label class="fw-semibold small mb-1">Email</label>
-          <input
-            pInputText
-            [(ngModel)]="filters.email"
-            placeholder="Search by Email"
-            class="form-control form-control-sm"
-          />
-        </div>
-
-        <!-- Username -->
-        <div class="col-md-3 col-sm-6">
-          <label class="fw-semibold small mb-1">Username</label>
-          <input
-            pInputText
-            [(ngModel)]="filters.username"
-            placeholder="Search by Username"
-            class="form-control form-control-sm"
-          />
-        </div>
-
-        <!-- Role -->
-        <div class="col-md-3 col-sm-6">
-          <label class="fw-semibold small mb-1">Role</label>
-          <select
-            class="form-select form-select-sm"
-            [(ngModel)]="filters.roleId"
-          >
-            <option value="">All Roles</option>
-            <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
-          </select>
-        </div>
-
-        <!-- Email Receiver -->
-        <div class="col-md-2 col-sm-6">
-          <label class="fw-semibold small mb-1">Email Receiver</label>
-          <select
-            class="form-select form-select-sm"
-            [(ngModel)]="filters.emailReceiver"
-          >
-            <option value="">All</option>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </select>
-        </div>
-
-        <!-- Buttons -->
-        <div class="col-md-1 text-end d-flex justify-content-end align-items-end">
-          <button
-            pButton
-            icon="fas fa-search"
-            class="p-button-sm p-button-primary me-2"
-            (click)="applyFilters()"
-            tooltip="Search"
-          ></button>
-          <button
-            pButton
-            icon="fas fa-refresh"
-            class="p-button-sm p-button-secondary"
-            (click)="resetFilters()"
-            tooltip="Reset"
-          ></button>
-        </div>
+      <!-- Email -->
+      <div class="col-md-3">
+        <p-floatlabel variant="on">
+          <input pInputText class="form-control" [(ngModel)]="filters.email" name="email" />
+          <label>Email</label>
+        </p-floatlabel>
       </div>
+
+      <!-- Username -->
+      <div class="col-md-3">
+        <p-floatlabel variant="on">
+          <input pInputText class="form-control" [(ngModel)]="filters.username" name="username" />
+          <label>Username</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="roles"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="filters.roleId"
+            name="roleId"
+            class="w-100"
+          ></p-select>
+          <label>Role</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-2">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="[
+              { label: 'Yes', value: 'true' },
+              { label: 'No', value: 'false' }
+            ]"
+            [(ngModel)]="filters.emailReceiver"
+            name="emailReceiver"
+            class="w-100"
+          ></p-select>
+          <label>Email Receiver</label>
+        </p-floatlabel>
+      </div>
+
+      <!-- Buttons -->
+      <div class="col-md-12 text-end">
+        <p-button
+          label="Search"
+          icon="fas fa-search"
+          severity="primary"
+          size="small"
+          class="me-2"
+          (onClick)="applyFilters()"
+        ></p-button>
+
+        <p-button
+          label="Reset"
+          icon="fas fa-refresh"
+          severity="danger"
+          size="small"
+          outlined="true"
+          (onClick)="resetFilters()"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 👥 User Table -->
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+      <h5 class="mb-0 fw-semibold">
+        <i class="pi pi-users me-2"></i> User List
+      </h5>
+      <p-button
+        label="Register New User"
+        icon="pi pi-user-plus"
+        severity="success"
+        size="small"
+        (onClick)="goToRegister()"
+      ></p-button>
     </div>
 
-    <!-- Table -->
     <p-table
       [value]="users"
-      responsiveLayout="scroll"
-      [loading]="isLoading"
-      styleClass="p-datatable-sm compact-table"
+      [scrollable]="true"
+      [scrollHeight]="'60vh'"
+      [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
+      dataKey="id"
+      size="small"
     >
       <ng-template pTemplate="header">
+        <tr>
+          <th colspan="7" class="text-end">
+            <p class="fw-bold mb-2">
+              Showing <kbd>{{ users.length }}</kbd> of
+              <kbd>{{ totalRecords }}</kbd> users
+            </p>
+          </th>
+        </tr>
         <tr>
           <th>#</th>
           <th>Full Name</th>
@@ -104,7 +118,7 @@
           <th>Status</th>
           <th>Role</th>
           <th>Email Receiver</th>
-          <th class="text-center">Actions</th>
+          <th class="text-center" [style]="{ width: '185px' }">Action</th>
         </tr>
       </ng-template>
 
@@ -114,66 +128,102 @@
           <td>{{ user.fullName }}</td>
           <td>{{ user.email }}</td>
           <td>
-              <span
-                class="badge"
-                [ngClass]="{
-                  'bg-success': user.statusText === 'ACTIVE',
-                  'bg-danger': user.statusText === 'INACTIVE'
-                }"
-              >
-                {{ user.statusText }}
-              </span>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': user.statusText === 'ACTIVE',
+                'bg-danger': user.statusText === 'INACTIVE'
+              }"
+            >
+              {{ user.statusText }}
+            </span>
           </td>
           <td>{{ user.roleName }}</td>
           <td>{{ user.emailReceiverText }}</td>
 
-          <td>{{ user.role?.name || '-' }}</td>
-          <td>{{ user.emailReceiver ? 'Yes' : 'No' }}</td>
+          <!-- 🔧 Fixed vertical spacing -->
           <td class="text-center">
-            <button
-              pButton
+            <p-button
+              type="button"
               icon="fas fa-eye"
-              class="p-button-rounded p-button-text p-button-info me-1"
-              (click)="viewUser(user)"
-              tooltip="View"
-            ></button>
-            <button
-              pButton
+              pTooltip="View"
+              tooltipPosition="top"
+              appendTo="body"
+              (onClick)="viewUser(user)"
+              size="small"
+              outlined="true"
+              severity="info"
+              class="me-2"
+            ></p-button>
+
+            <p-button
+              type="button"
               icon="fas fa-pencil"
-              class="p-button-rounded p-button-text p-button-warning me-1"
-              (click)="editUser(user)"
-              tooltip="Edit"
-            ></button>
-            <button
-              pButton
+              pTooltip="Edit"
+              tooltipPosition="top"
+              appendTo="body"
+              (onClick)="editUser(user)"
+              size="small"
+              outlined="true"
+              severity="secondary"
+              class="me-2"
+            ></p-button>
+
+            <p-button
+              type="button"
               icon="fas fa-trash"
-              class="p-button-rounded p-button-text p-button-danger"
-              tooltip="Delete"
-            ></button>
+              pTooltip="Delete"
+              tooltipPosition="top"
+              appendTo="body"
+              size="small"
+              outlined="true"
+              severity="danger"
+              class="me-2"
+            ></p-button>
           </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center text-muted">
-            No users found.
+          <td colspan="7" class="text-center text-danger">
+            <b>No users found!</b>
           </td>
         </tr>
       </ng-template>
     </p-table>
 
-    <!-- ✅ Custom paginator (fixes always-0 issue) -->
-    <p-paginator
-      class="paginator-sticky mt-3"
-      [rows]="pageSize"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      (onPageChange)="onPageChange($event)"
-      [first]="currentPage * pageSize"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    ></p-paginator>
-  </div>
-</div>
+  <p-dialog header="User Details" [(visible)]="showUserDetailsDialog" [modal]="true" [closable]="true" [style]="{ width: '50vw' }" closeOnEscape="true">
+    <div *ngIf="selectedUser">
+      <p><strong>Full Name: </strong>{{ selectedUser.fullName }}</p>
+      <p><strong>Email: </strong>{{ selectedUser.email }}</p>
+      <p><strong>Status: </strong>{{ selectedUser.status }}</p>
+      <p><strong>Role: </strong>{{ selectedUser.role }}</p>
+      <p><strong>Email Receiver: </strong>{{ selectedUser.emailReceiver ? 'Yes': 'No'}}</p>
+      <p><strong>Is Mobile: </strong>{{ selectedUser.isMobile ? 'Yes' : 'No' }}</p>
+      <!-- Add more user details as needed -->
+    </div>
 
-<p-toast></p-toast>
+    <p-footer>
+      <button type="button" pButtonLabel="Close" pButtonIcon="fas fa-times" (click)="closeUserDetailsDialog()"></button>
+    </p-footer>
+  </p-dialog>
+
+
+    <!-- 🧮 Paginator -->
+    <div class="border-top">
+      <p-paginator
+        class="paginator-sticky"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        (onPageChange)="onPageChange($event)"
+        [first]="(currentPage) * pageSize"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      >
+      </p-paginator>
+    </div>
+  </div>
+}
+
+<p-toast position="bottom-right"></p-toast>
