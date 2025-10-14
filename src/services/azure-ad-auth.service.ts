@@ -84,14 +84,6 @@ export class AzureAdAuthService {
   }*/
 
   logout(): void {
-    const landingPath = environment.useHash ? '/#/landing' : '/landing';
-    // Clear authentication-related cookies
-    // document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear token cookie
-    // document.cookie = 'tokenExpiry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear expiry cookie
-    // document.cookie = 'mis_ta=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';  // Clear any session cookie (e.g., mis_ta)
-    // Perform MSAL logout (to end the user's session in MSAL)
-    // Redirect to the login page of the master portal
-    // window.location.href = `${environment.portals.master}/landing`;  // Update the login page path if needed
     console.log('Logging out...');
 
     // 1. Clear cookies for your domain
@@ -101,9 +93,7 @@ export class AzureAdAuthService {
     this.isAuthenticatedSubject.next(false);
 
     // 3. Perform MSAL logout with redirect to landing
-    this.msalService.logoutRedirect({
-      postLogoutRedirectUri: `${environment.portals.master}${landingPath}`
-    });
+    this.msalService.logoutRedirect();
   }
 
   isAuthenticated(): boolean {

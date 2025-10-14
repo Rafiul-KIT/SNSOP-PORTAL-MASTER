@@ -1,229 +1,187 @@
+<!-- 🧭 Breadcrumb -->
+<div class="breadcrumb-wrapper mb-2">
+  <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
+</div>
+
 @if (isLoading) {
-  <app-loader></app-loader>
+<app-loader></app-loader>
 } @else {
 
-  <!-- 🧭 Breadcrumb -->
-  <div class="breadcrumb-wrapper mb-2">
-    <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
-  </div>
 
-  <!-- 🔍 Search & Filter Section -->
-  <div class="card p-3 mb-3 shadow-sm">
-    <form class="row g-3 align-items-end">
 
-      <!-- Email -->
-      <div class="col-md-3">
-        <p-floatlabel variant="on">
-          <input pInputText class="form-control" [(ngModel)]="filters.email" name="email" />
-          <label>Email</label>
-        </p-floatlabel>
-      </div>
+<!-- 🔍 Search & Filter Section -->
+<div class="card p-3 mb-3 shadow-sm">
+  <form class="row g-3 align-items-end">
 
-      <!-- Username -->
-      <div class="col-md-3">
-        <p-floatlabel variant="on">
-          <input pInputText class="form-control" [(ngModel)]="filters.username" name="username" />
-          <label>Username</label>
-        </p-floatlabel>
-      </div>
+    <!-- Email -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <input pInputText class="form-control" [(ngModel)]="filters.email" name="email" />
+        <label>Email</label>
+      </p-floatlabel>
+    </div>
 
-      <div class="col-md-3">
-        <p-floatlabel variant="on" class="w-100">
-          <p-select
-            [options]="roles"
-            optionLabel="name"
-            optionValue="id"
-            [(ngModel)]="filters.roleId"
-            name="roleId"
-            class="w-100"
-          ></p-select>
-          <label>Role</label>
-        </p-floatlabel>
-      </div>
+    <!-- Username -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on">
+        <input pInputText class="form-control" [(ngModel)]="filters.username" name="username" />
+        <label>Username</label>
+      </p-floatlabel>
+    </div>
 
-      <div class="col-md-2">
-        <p-floatlabel variant="on" class="w-100">
-          <p-select
-            [options]="[
+    <!-- <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="roles" optionLabel="name" optionValue="id" [(ngModel)]="filters.roleId" name="roleId"
+          class="w-100"></p-select>
+        <label>Role</label>
+      </p-floatlabel>
+    </div> -->
+
+    <!-- <div class="col-md-2">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="[
               { label: 'Yes', value: 'true' },
               { label: 'No', value: 'false' }
-            ]"
-            [(ngModel)]="filters.emailReceiver"
-            name="emailReceiver"
-            class="w-100"
-          ></p-select>
-          <label>Email Receiver</label>
-        </p-floatlabel>
-      </div>
+            ]" [(ngModel)]="filters.emailReceiver" name="emailReceiver" class="w-100"></p-select>
+        <label>Email Receiver</label>
+      </p-floatlabel>
+    </div> -->
 
-      <!-- Buttons -->
-      <div class="col-md-12 text-end">
-        <p-button
-          label="Search"
-          icon="fas fa-search"
-          severity="primary"
-          size="small"
-          class="me-2"
-          (onClick)="applyFilters()"
-        ></p-button>
+    <!-- Buttons -->
+    <div class="col-md-12 text-end">
+      <p-button label="Search" icon="fas fa-search" severity="primary" size="small" class="me-2"
+        (onClick)="applyFilters()"></p-button>
 
-        <p-button
-          label="Reset"
-          icon="fas fa-refresh"
-          severity="danger"
-          size="small"
-          outlined="true"
-          (onClick)="resetFilters()"
-        ></p-button>
-      </div>
-    </form>
+      <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" outlined="true"
+        (onClick)="resetFilters()"></p-button>
+    </div>
+  </form>
+</div>
+
+<!-- 👥 User Table -->
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+    <h5 class="mb-0 fw-semibold">
+      <i class="pi pi-users me-2"></i> User List
+    </h5>
+    <p-button label="Register New User" icon="pi pi-user-plus" severity="success" size="small"
+      (onClick)="goToRegister()"></p-button>
   </div>
 
-  <!-- 👥 User Table -->
-  <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-      <h5 class="mb-0 fw-semibold">
-        <i class="pi pi-users me-2"></i> User List
-      </h5>
-      <p-button
-        label="Register New User"
-        icon="pi pi-user-plus"
-        severity="success"
-        size="small"
-        (onClick)="goToRegister()"
-      ></p-button>
-    </div>
+  <p-table [value]="users" [scrollHeight]="'60vh'" [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
+    dataKey="id" size="small">
+    <ng-template pTemplate="header">
+      <tr>
+        <th colspan="7" class="text-end">
+          <p class="fw-bold mb-2">
+            Showing <kbd>{{ users.length }}</kbd> of
+            <kbd>{{ totalRecords }}</kbd> users
+          </p>
+        </th>
+      </tr>
+      <tr>
+        <th>Serial</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Role</th>
+        <th>Email Receiver</th>
+        <th class="text-center" [style]="{ width: '185px' }">Action</th>
+      </tr>
+    </ng-template>
 
-    <p-table
-      [value]="users"
-      [scrollable]="true"
-      [scrollHeight]="'60vh'"
-      [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }"
-      dataKey="id"
-      size="small"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th colspan="7" class="text-end">
-            <p class="fw-bold mb-2">
-              Showing <kbd>{{ users.length }}</kbd> of
-              <kbd>{{ totalRecords }}</kbd> users
-            </p>
-          </th>
-        </tr>
-        <tr>
-          <th>#</th>
-          <th>Full Name</th>
-          <th>Email</th>
-          <th>Status</th>
-          <th>Role</th>
-          <th>Email Receiver</th>
-          <th class="text-center" [style]="{ width: '185px' }">Action</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-user let-i="rowIndex">
-        <tr>
-          <td>{{ (currentPage * pageSize) + (i + 1) }}</td>
-          <td>{{ user.fullName }}</td>
-          <td>{{ user.email }}</td>
-          <td>
-            <span
-              class="badge"
-              [ngClass]="{
+    <ng-template pTemplate="body" let-user let-i="rowIndex">
+      <tr>
+        <td>{{ (currentPage * pageSize) + (i + 1) }}</td>
+        <td>{{ user.fullName }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <span class="badge" [ngClass]="{
                 'bg-success': user.statusText === 'ACTIVE',
                 'bg-danger': user.statusText === 'INACTIVE'
-              }"
-            >
-              {{ user.statusText }}
-            </span>
-          </td>
-          <td>{{ user.roleName }}</td>
-          <td>{{ user.emailReceiverText }}</td>
+              }">
+            {{ user.statusText }}
+          </span>
+        </td>
+        <td>{{ user.roleName }}</td>
+        <td>{{ user.emailReceiverText }}</td>
 
-          <!-- 🔧 Fixed vertical spacing -->
-          <td class="text-center">
-            <p-button
-              type="button"
-              icon="fas fa-eye"
-              pTooltip="View"
-              tooltipPosition="top"
-              appendTo="body"
-              (onClick)="viewUser(user)"
-              size="small"
-              outlined="true"
-              severity="info"
-              class="me-2"
-            ></p-button>
+        <!-- 🔧 Fixed vertical spacing -->
+        <td class="text-center">
+          <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
+            icon="fas fa-eye" pTooltip="Details" tooltipPosition="top" appendTo="body" (onClick)="viewUser(user)"
+            size="small" outlined="true" severity="info" class="me-2 action-btn" />
+          <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
+            icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body" (onClick)="editUser(user)"
+            size="small" outlined="true" severity="secondary" class="me-2 action-btn" />
+          <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
+            icon="fas fa-archive" pTooltip="Archive" tooltipPosition="top" appendTo="body" size="small" outlined="true"
+            severity="danger" class="action-btn" />
+        </td>
+      </tr>
+    </ng-template>
 
-            <p-button
-              type="button"
-              icon="fas fa-pencil"
-              pTooltip="Edit"
-              tooltipPosition="top"
-              appendTo="body"
-              (onClick)="editUser(user)"
-              size="small"
-              outlined="true"
-              severity="secondary"
-              class="me-2"
-            ></p-button>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center text-danger">
+          <b>No users found!</b>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 
-            <p-button
-              type="button"
-              icon="fas fa-trash"
-              pTooltip="Delete"
-              tooltipPosition="top"
-              appendTo="body"
-              size="small"
-              outlined="true"
-              severity="danger"
-              class="me-2"
-            ></p-button>
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="7" class="text-center text-danger">
-            <b>No users found!</b>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-
-  <p-dialog header="User Details" [(visible)]="showUserDetailsDialog" [modal]="true" [closable]="true" [style]="{ width: '50vw' }" closeOnEscape="true">
-    <div *ngIf="selectedUser">
-      <p><strong>Full Name: </strong>{{ selectedUser.fullName }}</p>
-      <p><strong>Email: </strong>{{ selectedUser.email }}</p>
-      <p><strong>Status: </strong>{{ selectedUser.status }}</p>
-      <p><strong>Role: </strong>{{ selectedUser.role }}</p>
-      <p><strong>Email Receiver: </strong>{{ selectedUser.emailReceiver ? 'Yes': 'No'}}</p>
-      <p><strong>Is Mobile: </strong>{{ selectedUser.isMobile ? 'Yes' : 'No' }}</p>
-      <!-- Add more user details as needed -->
+  <p-dialog header="User Details" [(visible)]="showUserDetailsDialog" [modal]="true" [closable]="true"
+    [style]="{ width: '50vw' }" closeOnEscape="true">
+    @if (selectedUser) {
+    <div class="table-responsive">
+      <table class="table table-sm table-striped align-middle mb-0">
+        <tbody>
+          <tr>
+            <th style="width: 30%">Full Name</th>
+            <td>{{ selectedUser.fullName || '—' }}</td>
+          </tr>
+          <tr>
+            <th>Email</th>
+            <td>{{ selectedUser.email || '—' }}</td>
+          </tr>
+          <tr>
+            <th>Status</th>
+            <td>{{ selectedUser.status ? 'ACTIVE' : 'INACTIVE' }}</td>
+          </tr>
+          <tr>
+            <th>Role</th>
+            <td>{{ selectedUser.role || '—' }}</td>
+          </tr>
+          <tr>
+            <th>Email Receiver</th>
+            <td>{{ selectedUser.emailReceiver ? 'Yes' : 'No' }}</td>
+          </tr>
+          <tr>
+            <th>Is Mobile</th>
+            <td>{{ selectedUser.isMobile ? 'Yes' : 'No' }}</td>
+          </tr>
+          <!-- Add more rows as needed -->
+        </tbody>
+      </table>
     </div>
+    }
 
-    <p-footer>
-      <button type="button" pButtonLabel="Close" pButtonIcon="fas fa-times" (click)="closeUserDetailsDialog()"></button>
-    </p-footer>
+    <ng-template pTemplate="footer">
+      <button pButton class="p-button-danger" type="button" label="Close" icon="fas fa-times" (click)="closeUserDetailsDialog()"></button>
+
+    </ng-template>
   </p-dialog>
 
 
-    <!-- 🧮 Paginator -->
-    <div class="border-top">
-      <p-paginator
-        class="paginator-sticky"
-        [rows]="pageSize"
-        [totalRecords]="totalRecords"
-        [rowsPerPageOptions]="[10, 25, 50]"
-        (onPageChange)="onPageChange($event)"
-        [first]="(currentPage) * pageSize"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-      >
-      </p-paginator>
-    </div>
+
+  <!-- 🧮 Paginator -->
+  <div class="border-top">
+    <p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="(currentPage) * pageSize"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    </p-paginator>
   </div>
+</div>
 }
 
 <p-toast position="bottom-right"></p-toast>

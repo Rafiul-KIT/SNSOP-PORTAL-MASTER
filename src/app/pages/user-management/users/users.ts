@@ -4,17 +4,18 @@ import { CommonModule } from '@angular/common';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Loader } from '../../../components/loader/loader';
 import { ApiService } from '../../../../services/api.service';
 import { FormsModule } from '@angular/forms';
-import {Paginator} from 'primeng/paginator';
-import {InputText} from 'primeng/inputtext';
-import {Tooltip} from 'primeng/tooltip';
-import {FloatLabel} from 'primeng/floatlabel';
-import {Select} from 'primeng/select';
-import {Dialog} from 'primeng/dialog';
+import { Paginator } from 'primeng/paginator';
+import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
+import { FloatLabel } from 'primeng/floatlabel';
+import { Select } from 'primeng/select';
+import { Dialog } from 'primeng/dialog';
 
 
 @Component({
@@ -29,6 +30,7 @@ import {Dialog} from 'primeng/dialog';
     BreadcrumbModule,
     TableModule,
     ButtonModule,
+    ButtonGroupModule,
     ToastModule,
     Loader,
     Paginator,
@@ -68,7 +70,7 @@ export class Users implements OnInit {
     private cdr: ChangeDetectorRef,
     private msg: MessageService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadRoles();
@@ -86,46 +88,117 @@ export class Users implements OnInit {
     }
   }
 
-  async loadUsers(): Promise<void> {
-    try {
-      this.isLoading = true;
-      this.cdr.detectChanges();
+private normalizeUsers(raw: any[]): any[] {
+  return (raw || []).map((u: any) => {
+    // status can be boolean or string like "Active"/"Inactive"
+    const isActive =
+      typeof u?.status === 'boolean'
+        ? u.status
+        : (String(u?.status || '').toLowerCase() === 'active');
 
-      const params = {
-        page: this.currentPage,
-        size: this.pageSize,
-        email: this.filters.email || undefined,
-        username: this.filters.username || undefined,
-        roleId: this.filters.roleId || undefined,
-        emailReceiver: this.filters.emailReceiver || undefined,
-      };
+    return {
+      ...u,
+      statusText: isActive ? 'ACTIVE' : 'INACTIVE',
+      roleName: u?.role ?? '-',                               // role is already a string in your response
+      emailReceiverText: u?.emailReceiver === true ? 'Yes'
+                        : u?.emailReceiver === false ? 'No'
+                        : '—',                                 // handle null/undefined
+    };
+  });
+}
 
-      const res = await this.api.GET('/api/users/findAllUsers', params, 'alt');
-      const data = res.data || {};
+// Add this helper to your class
+private buildCriteriaFromFilters(): any[] {
+  const criteria: any[] = [];
 
-      this.users = Array.isArray(data.content)
-        ? data.content.map((u: any) => ({
-          ...u,
-          statusText: u.status ? 'ACTIVE' : 'INACTIVE',
-          roleName: u.role || '-',
-          emailReceiverText: u.emailReceiver ? 'Yes' : 'No'
-        }))
-        : [];
-
-      this.totalRecords = data.totalElements ?? this.users.length;
-
-    } catch (err: any) {
-      console.error('Failed to load users', err);
-      this.msg.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Unable to load user list from server.',
-      });
-    } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }
+  // EMAIL (LIKE)
+  if (this.filters.email?.trim()) {
+    criteria.push({
+      fieldName: 'EMAIL',
+      operator: 'LIKE',
+      value: this.filters.email.trim(),
+    });
   }
+
+  // USERNAME (LIKE)
+  if (this.filters.username?.trim()) {
+    criteria.push({
+      fieldName: 'USERNAME',
+      operator: 'LIKE',
+      value: this.filters.username.trim(),
+    });
+  }
+
+  // ROLE_ID (EQUAL)
+  if (this.filters.roleId !== '' && this.filters.roleId !== null && this.filters.roleId !== undefined) {
+    criteria.push({
+      fieldName: 'ROLE_ID',
+      operator: 'EQUAL',
+      value: String(this.filters.roleId),
+    });
+  }
+
+  // EMAIL_RECEIVER (EQUAL) — accepts '', boolean, 'true' | 'false'
+  const er = this.filters.emailReceiver;
+  if (er !== '' && er != null) {
+    const boolString = (typeof er === 'boolean' ? er : String(er).toLowerCase() === 'true')
+      ? 'true'
+      : 'false';
+
+    criteria.push({
+      fieldName: 'EMAIL_RECEIVER',
+      operator: 'EQUAL',
+      value: boolString,
+    });
+  }
+
+  return criteria;
+}
+
+
+
+// Replace your loadUsers() with this version
+async loadUsers(): Promise<void> {
+  try {
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    const payload = {
+      criteria: this.buildCriteriaFromFilters(), // <-- required criteria array
+      sortColumn: 'ID',                          // or make this dynamic if you add UI controls
+      sortOrder: 'DESC',                         // 'ASC' | 'DESC'
+      page: this.currentPage,                    // zero-based
+      size: this.pageSize,                       // rows per page
+    };
+
+    const res = await this.api.POST('/api/users/search', payload, 'alt');
+    const data = res?.data ?? res ?? {};
+
+    // Support pageable or flat responses
+    const list =
+      Array.isArray(data.content) ? data.content :
+      Array.isArray(data.users)   ? data.users   :
+      Array.isArray(data)         ? data         :
+      [];
+
+    this.users = this.normalizeUsers(list);
+    this.totalRecords =
+      typeof data.totalElements === 'number' ? data.totalElements : this.users.length;
+
+  } catch (err) {
+    console.error('Failed to load users', err);
+    this.msg.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Unable to load user list from server.',
+    });
+  } finally {
+    this.isLoading = false;
+    this.cdr.detectChanges();
+  }
+}
+
+
 
 
   /** ✅ Custom paginator handling */
@@ -160,12 +233,26 @@ export class Users implements OnInit {
 
   /** View User in Popup */
   async viewUser(user: any) {
+    if (!user?.id) return;
+
+    this.isLoading = true;
+    // Optional: clear previous selection while loading
+    this.selectedUser = null;
+    this.showUserDetailsDialog = false;
+    this.cdr.detectChanges();
+
     try {
       const res = await this.api.GET(`/api/users/findOne`, { id: user.id }, 'alt');
-      if (res.data) {
+      if (res?.data) {
         this.selectedUser = res.data;
-        this.showUserDetailsDialog = true; // Show the dialog with user details
+        this.showUserDetailsDialog = true;
         this.cdr.detectChanges();
+      } else {
+        this.msg.add({
+          severity: 'warn',
+          summary: 'Not found',
+          detail: 'User details were not returned by the server.',
+        });
       }
     } catch (err) {
       console.error('Failed to load user details', err);
@@ -174,8 +261,12 @@ export class Users implements OnInit {
         summary: 'Error',
         detail: 'Unable to load user details.',
       });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
+
 
   /** Close user details dialog */
   closeUserDetailsDialog() {
@@ -184,7 +275,7 @@ export class Users implements OnInit {
 
   editUser(user: any) {
     this.router.navigate(['/pages/user-management/register'], {
-      queryParams: { id: user.id},
+      queryParams: { id: user.id },
     });
   }
 }
