@@ -9,6 +9,7 @@ import { authGuard } from './auth.guard';
 import {Users} from './pages/user-management/users/users';
 import {Role} from './pages/user-management/role/role';
 import {Register} from './pages/user-management/register/register';
+import {RoleLink} from './pages/user-management/role-link/role-link';
 
 export const routes: Routes = [
   {
@@ -39,6 +40,7 @@ export const routes: Routes = [
       { path: 'users', component: Users },
       { path: 'register', component: Register },
       { path: 'roles', component: Role },
+      { path: 'role-link', component: RoleLink },
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
   },

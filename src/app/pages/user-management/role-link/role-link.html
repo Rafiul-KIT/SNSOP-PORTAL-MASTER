@@ -1,0 +1,47 @@
+@if (isLoading) {
+  <app-loader></app-loader>
+} @else {
+  <div class="row" [formGroup]="roleLinkForm">
+    <div class="col-12 col-md-6">
+      <div class="mb-3">
+        <label for="userId" class="fw-bold d-block mb-1">User</label>
+        <select
+          id="userId"
+          class="form-select"
+          #userSel
+          (change)="getUserDetail(userSel.value)">
+          <option value="">Select User</option>
+          @for (user of userList; track user.userId) {
+            <option [value]="user.userId + '-' + user.userName">
+              {{ user.userName }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="mb-3">
+        <label for="roleId" class="fw-bold d-block mb-1">Role</label>
+        <select
+          id="roleId"
+          class="form-select"
+          #roleSel
+          (change)="getRoleDetail(roleSel.value)">
+          <option value="">Select Role</option>
+          @for (role of roleList; track role.id) {
+            <option [value]="role.id">
+              {{ role.roleName }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+    <hr />
+    <div class="col-12 col-md-12 text-end">
+      <button class="btn btn-success btn-sm rounded-0" (click)="roleLinkFormHandler()"
+              [disabled]="roleLinkForm.invalid">
+        <i class="fas fa-save me-2"></i>Link Role to User
+      </button>
+    </div>
+  </div>
+}
