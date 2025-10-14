@@ -34,11 +34,12 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
   {
     path: 'pages/user-management',
+    canActivate: [routeGuard],
     children: [
       { path: 'users', component: Users },
       { path: 'register', component: Register },
       { path: 'roles', component: Role },
-      { path: '', redirectTo: '/users', pathMatch: 'full' }
+      { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
   },
   {

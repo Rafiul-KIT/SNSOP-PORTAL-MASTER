@@ -39,6 +39,7 @@ interface RoleInfo {
 
 export class Register implements OnInit {
   isLoading = false;
+  private routeUserId: number | null = null;
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items: MenuItem[] = [
@@ -68,24 +69,41 @@ export class Register implements OnInit {
     private api: ApiService,
     private cdr: ChangeDetectorRef,
     private msg: MessageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.buildForm();
     this.loadRoles();
 
-    const userId = this.activatedRoute.snapshot.queryParamMap.get('id');
+    const idParam = this.activatedRoute.snapshot.queryParamMap.get('id');
+    this.routeUserId = idParam !== null ? Number(idParam) : null;
 
-    if (userId) {
-      this.loadUserDetails(userId); // If an ID is present, load user details
+    if (this.routeUserId !== null && !Number.isNaN(this.routeUserId)) {
+      this.loadUserDetails(this.routeUserId);
     }
-    // set initial password validators depending on initial isMobile value
+
     this.updatePasswordValidators(this.userRegistrationForm.value.isMobile);
-    // react to changes of isMobile
     this.ctrl('isMobile')!.valueChanges.subscribe((val: boolean) =>
       this.updatePasswordValidators(val)
     );
   }
+
+
+  private statusToNumber(s: string | null | undefined): 0 | 1 {
+    const v = (s ?? '').toString().trim().toUpperCase();
+    return v === 'ACTIVE' ? 1 : 0;
+  }
+
+
+  private normalizeStatus(s: string | null | undefined): 'ACTIVE' | 'INACTIVE' | 'PENDING' {
+    const v = (s ?? '').toString().trim().toUpperCase();
+    if (v === 'ACTIVE' || v === 'INACTIVE' || v === 'PENDING') return v as any;
+    // map common variants
+    if (v === 'ACTIVE') return 'ACTIVE';
+    if (v === 'INACTIVE') return 'INACTIVE';
+    return 'PENDING';
+  }
+
 
   async loadRoles(): Promise<void> {
     try {
@@ -118,40 +136,65 @@ export class Register implements OnInit {
   }
 
 
-  async loadUserDetails(userId: string): Promise<void> {
+  async loadUserDetails(userId: number): Promise<void> {
     try {
       this.isLoading = true;
       this.cdr.detectChanges();
 
-      // Call API to get user details by ID
-      const res = await this.api.GET(`/api/users/findOne/${userId}`, {}, 'alt');
+      // query-param version: /api/users/findOne?id=123
+      const res = await this.api.GET('/api/users/findOne', { id: userId }, 'alt');
 
-      if (res.data) {
-        const user = res.data;
-        // Populate the form with the retrieved user details
+      if (res?.data) {
+        const user = res.data as {
+          id: number;
+          fullName: string;
+          email: string;
+          role?: string;       // e.g., "IpApprover"
+          status?: string;     // e.g., "Active"
+          emailReceiver?: boolean;
+          isMobile?: boolean;
+          username?: string;
+          roleId?: number;     // backend might or might not send this
+        };
+
+        // map role name -> roleId (case-insensitive)
+        let mappedRoleId: number | null = null;
+        if (typeof user.roleId === 'number') {
+          mappedRoleId = user.roleId;
+        } else if (user.role) {
+          const byName = this.roles.find(
+            r => r.name?.trim().toLowerCase() === user.role!.trim().toLowerCase()
+          );
+          mappedRoleId = byName ? byName.id : null;
+        }
+
+        // form patch
         this.userRegistrationForm.patchValue({
-          username: user.username,
-          fullName: user.fullName,
-          email: user.email,
-          roleId: user.roleId,
-          status: user.status === 'ACTIVE' ? 1 : 0,
-          isMobile: user.isMobile,
-          emailReceiver: user.emailReceiver,
+          username: user.username ?? (user.email ? user.email.split('@')[0] : ''),
+          fullName: user.fullName ?? '',
+          email: user.email ?? '',
+          roleId: mappedRoleId,
+          status: this.statusToNumber(user.status),
+          isMobile: !!user.isMobile,
+          emailReceiver: !!user.emailReceiver,
+          // password stays blank; validators are handled by isMobile
         });
-      }
 
+        // set footer status info
+        this.userDetails = {
+          status: this.normalizeStatus(user.status),
+        };
+      }
     } catch (err: any) {
       console.error('Failed to load user details', err);
-      this.msg.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Unable to load user details from server.'
-      });
+      this.msg.add({ severity: 'error', summary: 'Error', detail: 'Unable to load user details from server.' });
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
     }
   }
+
+
 
   private buildForm(): void {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -209,20 +252,17 @@ export class Register implements OnInit {
     this.cdr.detectChanges();
 
     try {
-      // 🔐 Decode token to get current user ID
       const token = this.api['cookies'].get(this.api.ACCESS_TOKEN);
       let currentUserId: number | null = null;
-
       if (token) {
         try {
           const decoded: any = jwtDecode(token);
-          currentUserId = decoded?.sub ? Number(decoded.sub) : null; // 👈 'sub' = user id
+          currentUserId = decoded?.sub ? Number(decoded.sub) : null;
         } catch (e) {
           console.warn('Failed to decode token:', e);
         }
       }
 
-      // 🧾 Add custom headers for this request only
       const specialHeaders = {
         headers: {
           'X-Current-User': currentUserId ?? 0,
@@ -230,49 +270,35 @@ export class Register implements OnInit {
         },
       };
 
-      // 🚀 Make API call
-      const res = await this.api.POST('/api/users/new', payload, 'alt', specialHeaders);
+      // ✅ use parsed query id to decide insert vs update
+      const isInsert = this.routeUserId === null;
 
-      // ✅ Extract backend response fields
+      const res = await this.api.POST(
+        `/api/users/new?isInsert=${isInsert}`,
+        payload,
+        'alt',
+        specialHeaders
+      );
+
       const apiStatus = String(res.data?.status || '').toUpperCase();
       const apiMessage = res.data?.message || 'No message returned';
 
-      // ✅ Success condition (201 CREATED or OK)
       if (apiStatus.includes('201') || apiStatus === 'OK' || apiStatus === 'CREATED') {
-        this.msg.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: apiMessage || 'User created successfully.'
-        });
+        this.msg.add({ severity: 'success', summary: 'Success', detail: apiMessage || 'User saved.' });
 
         if (mode === 1) {
           setTimeout(() => this.router.navigate(['/users']), 500);
         } else if (mode === 2) {
           this.resetForm();
         }
+      } else {
+        this.msg.add({ severity: 'warn', summary: 'Warning', detail: apiMessage || `Request failed: ${apiStatus}` });
       }
-      // ⚠️ Any other status from backend
-      else {
-        this.msg.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: apiMessage || `Request failed with status: ${apiStatus}`
-        });
-      }
-
     } catch (err: any) {
       console.error('Registration failed', err);
-
-      // 🧩 Handle network or server error
       const status = err?.response?.status || 'N/A';
       const message = err?.response?.data?.message || err.message || 'Unexpected error occurred';
-
-      this.msg.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: `Failed: ${status} - ${message}`,
-        life: 7000
-      });
+      this.msg.add({ severity: 'error', summary: 'Error', detail: `Failed: ${status} - ${message}`, life: 7000 });
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -296,7 +322,6 @@ export class Register implements OnInit {
 
   private buildPayload() {
     const v = this.userRegistrationForm.value;
-    // match swagger DTO fields (without mobile)
     return {
       roleId: Number(v.roleId),
       fullName: v.fullName,
@@ -304,7 +329,7 @@ export class Register implements OnInit {
       status: Number(v.status),
       emailReceiver: !!v.emailReceiver,
       username: v.username,
-      password: v.password || null, // optional when isMobile=false
+      password: v.password || null,
       isMobile: !!v.isMobile,
     };
   }

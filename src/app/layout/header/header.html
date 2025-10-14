@@ -1,12 +1,23 @@
 
 <div class="header">
 
-  <div class="portals" (click)="showPortalOptions = !showPortalOptions">
-    <img src="SNSOP_logo.png" style="height: 30px; width: auto;" /> &nbsp;&nbsp;&nbsp;
-    <i class="fas fa-braille hand"></i>
-    <div><small>Portal</small><span class="name">Admin</span></div>
-    <!-- <i class="fas fa-angle-down hand"></i> -->
-    <span class="vertical-line"></span>
+  @if (isPortalsPage) {
+    <div class="portals" (click)="showPortalOptions = !showPortalOptions">
+      <i class="fas fa-braille hand"></i>
+      <div><small>Portal</small><span class="name">Admin</span></div>
+     <i class="fas fa-angle-{{ showPortalOptions ? 'down' : 'right' }} hand"></i>
+      <span class="vertical-line"></span>
+    </div>
+  }
+  <div class="portals-option-wrapper {{ showPortalOptions ? 'show' : '' }}" (mouseleave)="showPortalOptions = false">
+    <div class="portal-items">
+      @for (portal of portalList; track portal) {
+      <a class="item" [href]="portal.link">
+        <i class="{{ portal.icon }} w-50"></i>
+        <span>{{ portal.label }}</span>
+      </a>
+      }
+    </div>
   </div>
    <!--@if(menuList && menuList.length > 0){
   <div class="menues">

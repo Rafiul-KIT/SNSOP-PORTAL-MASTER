@@ -174,8 +174,10 @@ export class ApiService {
     this.cookies.deleteAll('/', environment.domain, false);
     this.loginState.set({ token: null, user: null });
 
+    // Build redirect URL dynamically
     const landingPath = environment.useHash ? '/#/landing' : '/landing';
     const redirectUrl = `${environment.portals.master}${landingPath}`;
+
     window.location.href = redirectUrl;
   };
 

@@ -1,54 +1,54 @@
-/* --- Filters Section Styling --- */
-.filter-container {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-}
+// /* --- Filters Section Styling --- */
+// .filter-container {
+//   background-color: #f8f9fa;
+//   border: 1px solid #dee2e6;
+//   border-radius: 6px;
+// }
 
-.filter-container input,
-.filter-container select {
-  height: 38px !important;
-  font-size: 0.9rem;
-}
+// .filter-container input,
+// .filter-container select {
+//   height: 38px !important;
+//   font-size: 0.9rem;
+// }
 
-/* --- Table Compact Look --- */
-.compact-table .p-datatable-thead > tr > th {
-  padding: 0.55rem 0.75rem !important;
-  font-size: 0.85rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
+// /* --- Table Compact Look --- */
+// .compact-table .p-datatable-thead > tr > th {
+//   padding: 0.55rem 0.75rem !important;
+//   font-size: 0.85rem;
+//   font-weight: 600;
+//   white-space: nowrap;
+// }
 
-.compact-table .p-datatable-tbody > tr > td {
-  padding: 0.45rem 0.75rem !important;
-  vertical-align: middle !important;
-  font-size: 0.88rem;
-}
+// .compact-table .p-datatable-tbody > tr > td {
+//   padding: 0.45rem 0.75rem !important;
+//   vertical-align: middle !important;
+//   font-size: 0.88rem;
+// }
 
-/* --- Badges --- */
-.badge {
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 0.75rem;
-}
+// /* --- Badges --- */
+// .badge {
+//   padding: 4px 8px;
+//   border-radius: 5px;
+//   font-size: 0.75rem;
+// }
 
-/* --- Action Buttons --- */
-.p-button-rounded {
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-  border-radius: 50% !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+// /* --- Action Buttons --- */
+// .p-button-rounded {
+//   width: 32px !important;
+//   height: 32px !important;
+//   min-width: 32px !important;
+//   border-radius: 50% !important;
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+// }
 
-/* --- Table Header Alignment --- */
-.text-center {
-  text-align: center !important;
-}
+// /* --- Table Header Alignment --- */
+// .text-center {
+//   text-align: center !important;
+// }
 
-/* --- Fix button alignment in filter bar --- */
-.p-button-sm {
-  height: 38px !important;
-}
+// /* --- Fix button alignment in filter bar --- */
+// form .p-button-sm {
+//   height: 38px !important;
+// }

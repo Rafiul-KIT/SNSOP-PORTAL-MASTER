@@ -1,11 +1,12 @@
 import { Component, effect, ViewChild } from '@angular/core';
-import { Router, RouterLink, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterModule, NavigationEnd } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
 import { MenubarModule } from 'primeng/menubar';
 import { environment } from '../../../environments/environment';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 import { MenuItem } from 'primeng/api';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -19,14 +20,24 @@ export class Header {
   portalList: any = [];
   menuList: MenuItem[] = [];
   userInfo: any = null;
+  isPortalsPage: boolean = false;
+  isLandingPage: boolean = false;
 
   constructor(
     private router: Router,
     private azureService: AzureAdAuthService
   ) {
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.isPortalsPage = event.urlAfterRedirects !== '/landing';
+      this.isLandingPage = event.urlAfterRedirects === '/landing';
+      this.updateMenuList();
+    });
 
     effect(() => {
       this.userInfo = this.azureService.loginState()?.user;
+      this.updateMenuList();
     });
 
     this.portalList = [
@@ -51,20 +62,33 @@ export class Header {
         link: environment.portals.report,
         icon: 'fas fa-chart-line',
       },
-    ];
-
-    this.menuList = [
       {
-        label: 'User & Role Management',
-        icon: 'fas fa-users',
-        items: [
-          { label: 'User List', icon: 'fas fa-list', routerLink: ['/pages/user-management/users'] },
-          { label: 'Register User', icon: 'fas fa-user-plus', routerLink: ['/pages/user-management/register'] },
-          { label: 'Role List', icon: 'fas fa-shield', routerLink: ['/pages/user-management/roles'] },
-        ],
+        label: 'Settings',
+        icon: 'fas fa-cog',
       },
-      // ...other top-level items if you want (Settings, Report, etc.)
+      {
+        label: 'Survey CTO',
+        icon: 'fas fa-poll',
+      },
     ];
+  }
+
+  updateMenuList() {
+    if (this.userInfo && !this.isLandingPage) {
+      this.menuList = [
+        {
+          label: 'User & Role Management',
+          icon: 'fas fa-users',
+          items: [
+            { label: 'User List', icon: 'fas fa-list', routerLink: ['/pages/user-management/users'] },
+            { label: 'Register User', icon: 'fas fa-user-plus', routerLink: ['/pages/user-management/register'] },
+            { label: 'Role List', icon: 'fas fa-shield', routerLink: ['/pages/user-management/roles'] },
+          ],
+        },
+      ];
+    } else {
+      this.menuList = [];
+    }
   }
 
   goToProfile = () => {
