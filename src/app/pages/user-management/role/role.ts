@@ -8,6 +8,7 @@ import { Loader } from "../../../components/loader/loader";
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TableModule } from "primeng/table";
 import { PaginatorModule } from "primeng/paginator";
+import {RoleLink} from '../role-link/role-link';
 
 @Component({
   selector: 'app-role',
@@ -151,11 +152,11 @@ export class Role implements OnInit, OnDestroy {
   }
 
   linkRoleModal() {
-    // this.ref = this.dialogService.open(LinkRoleComponent, {
-    //   header: 'Link User Role',
-    //   width: '50%',
-    //   contentStyle: { overflow: 'auto' },
-    // });
+    this.ref = this.dialogService.open(RoleLink, {
+      header: 'Link User Role',
+      width: '50%',
+      contentStyle: { overflow: 'auto' },
+    });
   }
 
   ngOnDestroy() {

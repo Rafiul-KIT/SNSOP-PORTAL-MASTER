@@ -137,4 +137,35 @@ export class LookupService {
     // If it's an array, pick the first or the one you need.
     return String(user?.roleId ?? (Array.isArray(user?.roles) ? user.roles[0] : '') ?? '');
   }
+
+  UserPermissionEnum = [
+    { id: 0, value: 'ALL', label: "All" },
+    { id: 1, value: 'REGISTRATION', label: "Beneficiary Registration" },
+    { id: 2, value: 'UPLOADER', label: "Uploader" },
+    { id: 3, value: 'HOUSEHOLD_VIEW', label: "View Household Information" },
+    { id: 4, value: 'HOUSEHOLD_EDIT', label: "Edit Household Information" },
+    { id: 5, value: 'HOUSEHOLD_DELETE', label: "Delete Household Information" },
+    { id: 6, value: 'HOUSEHOLD_APPROVAL', label: "Approve Household Information" },
+    { id: 7, value: 'MATCH_LIST_VIEW', label: "View Match List" },
+    { id: 8, value: 'MATCH_LIST_EDIT', label: "Edit Match List" },
+    { id: 9, value: 'MATCH_LIST_DELETE', label: "Delete Match List" },
+    { id: 10, value: 'ADJUDICATION', label: "Adjudicate" },
+    { id: 11, value: 'USER_VIEW', label: "View User" },
+    { id: 12, value: 'USER_EDIT', label: "Edit User" },
+    { id: 13, value: 'USER_DELETE', label: "Delete User" },
+    { id: 14, value: 'AUDIT_TRAIL_VIEW', label: "View Audit Trail" },
+    { id: 15, value: 'DEVICE_MANAGEMENT', label: "Manage Device" },
+    { id: 16, value: 'REPORT_VIEW', label: "Report View" },
+  ];
+  getUserPermissionEnum = () => {
+    return this.UserPermissionEnum;
+  }
+  getUserPermissionEnumByValue = (value: any) => {
+    const dataFpund = this.UserPermissionEnum.find((sce: any) => sce.value == value);
+    if (dataFpund) {
+      return dataFpund.label;
+    } else {
+      return '--';
+    }
+  }
 }

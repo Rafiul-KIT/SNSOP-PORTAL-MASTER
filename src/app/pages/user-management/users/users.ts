@@ -14,7 +14,6 @@ import { Paginator } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
 import { FloatLabel } from 'primeng/floatlabel';
-import { Select } from 'primeng/select';
 import { Dialog } from 'primeng/dialog';
 
 
@@ -37,7 +36,6 @@ import { Dialog } from 'primeng/dialog';
     InputText,
     Tooltip,
     FloatLabel,
-    Select,
     Dialog,
   ],
   providers: [MessageService],
