@@ -8,11 +8,12 @@ import { Loader } from "../../../components/loader/loader";
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TableModule } from "primeng/table";
 import { PaginatorModule } from "primeng/paginator";
+import { Button } from "primeng/button";
 
 @Component({
   selector: 'app-role',
   standalone: true,
-  imports: [ReactiveFormsModule, Loader, BreadcrumbModule, TableModule, PaginatorModule],
+  imports: [ReactiveFormsModule, Loader, BreadcrumbModule, TableModule, PaginatorModule, Button],
   templateUrl: './role.html',
   styleUrl: './role.scss',
   providers: [MessageService, DialogService],

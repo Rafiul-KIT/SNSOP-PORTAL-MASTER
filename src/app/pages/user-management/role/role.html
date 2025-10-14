@@ -1,17 +1,26 @@
-<div class="breadcrumb-wrapper">
-    <p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
-</div>
+<div class="breadcrumb-wrapper d-flex justify-content-between align-items-center">
+  <!-- Breadcrumb on the left -->
+  <p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
 
-<div class="d-flex me-2">
-        <button class="btn btn-warning btn-sm rounded-0 me-2" (click)="linkRoleModal()">
-            <i class="fas fa-id-card-clip me-2"></i>
-            Link Role
-        </button>
-        <button class="btn btn-success btn-sm rounded-0" (click)="manageRoleModal(null)">
-            <i class="fas fa-user-check me-2"></i>
-            Add New Role
-        </button>
-    </div>
+  <div class="d-flex pt-2">
+    <p-button
+      label="Link Role"
+      icon="fas fa-id-card-clip"
+      severity="warn"
+      size="small"
+      class="me-2"
+      (onClick)="linkRoleModal()">
+    </p-button>
+
+    <p-button
+      label="Add New Role"
+      icon="fas fa-user-check"
+      severity="primary"
+      size="small"
+      (onClick)="manageRoleModal(null)">
+    </p-button>
+  </div>
+</div>
 
 
 @if (isLoading) {
@@ -40,16 +49,12 @@
         </div>
         <div class="row">
             <div class="col-12 text-end">
-                <!-- <button class="btn btn-link btn-sm me-2" type="button" (click)="showHideAdvanceFilter()">
-                        <i class="fas fa-filter me-2"></i>
-                        {{showAdvanceFilter ? 'Basic Filter':'Advance Filter'}}
-                    </button> -->
-                <button class="btn btn-danger btn-sm me-2" (click)="criteriaForm.reset();submitSearchForm()">
-                    <i class="fas fa-times me-2"></i>Reset
-                </button>
-                <button class="btn btn-primary btn-sm" (click)="submitSearchForm()">
-                    <i class="fas fa-search me-2"></i>Search
-                </button>
+                <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" [outlined]="true"
+                    class="me-2" (onClick)="criteriaForm.reset(); submitSearchForm()">
+                </p-button>
+                <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
+                    (onClick)="submitSearchForm()">
+                </p-button>
             </div>
         </div>
     </div>
