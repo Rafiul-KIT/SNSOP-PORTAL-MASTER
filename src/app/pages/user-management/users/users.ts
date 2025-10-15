@@ -5,7 +5,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
-import { ToastModule } from 'primeng/toast';
+import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Loader } from '../../../components/loader/loader';
 import { ApiService } from '../../../../services/api.service';
@@ -30,7 +30,7 @@ import { Dialog } from 'primeng/dialog';
     TableModule,
     ButtonModule,
     ButtonGroupModule,
-    ToastModule,
+    Toast,
     Loader,
     Paginator,
     InputText,

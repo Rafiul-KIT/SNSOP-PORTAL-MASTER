@@ -10,11 +10,13 @@ import { TableModule } from "primeng/table";
 import { PaginatorModule } from "primeng/paginator";
 import {RoleLink} from '../role-link/role-link';
 import {AddNewRole} from '../add-new-role/add-new-role';
+import { Button } from "primeng/button";
+import { Toast } from 'primeng/toast';
 
 @Component({
   selector: 'app-role',
   standalone: true,
-  imports: [ReactiveFormsModule, Loader, BreadcrumbModule, TableModule, PaginatorModule],
+  imports: [ReactiveFormsModule, Loader, BreadcrumbModule, TableModule, PaginatorModule, Button, Toast],
   templateUrl: './role.html',
   styleUrl: './role.scss',
   providers: [MessageService, DialogService],
@@ -138,25 +140,26 @@ export class Role implements OnInit, OnDestroy {
 
   manageRoleModal(roleDetails: any) {
     this.ref = this.dialogService.open(AddNewRole, {
-    data: roleDetails,
-    header: 'Update Role',
-    width: '70%',
-    position: 'bottom',
-    contentStyle: { overflow: 'auto' },
+      data: roleDetails,
+      width: '70%',
+      position: 'bottom',
+      contentStyle: { background: 'transparent', border: 'none', overflow: 'auto' },
+      style: { 'background-color': 'transparent', 'box-shadow': 'none' },
+      showHeader: false,
     });
 
     this.ref.onClose.subscribe((added: boolean) => {
-    if (added) {
-    this.fetchUserRoleList(this.searchForm.value);
-    }
+      if (added) {
+        this.fetchUserRoleList(this.searchForm.value);
+      }
     });
   }
 
   linkRoleModal() {
     this.ref = this.dialogService.open(RoleLink, {
-      header: 'Link User Role',
       width: '50%',
-      contentStyle: { overflow: 'auto' },
+      contentStyle: { background: 'transparent', border: 'none', overflow: 'auto' },
+      showHeader: false,
     });
   }
 

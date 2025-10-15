@@ -13,7 +13,7 @@ import { MenuItem } from 'primeng/api';
 import { ApiService } from '../../../../services/api.service';
 import { Loader } from '../../../components/loader/loader';
 import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
+import { Toast } from 'primeng/toast';
 import { jwtDecode } from 'jwt-decode';
 
 interface RoleInfo {
@@ -33,7 +33,7 @@ interface RoleInfo {
   standalone: true,
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
-  imports: [RouterModule, ReactiveFormsModule, BreadcrumbModule, Loader, ToastModule],
+  imports: [RouterModule, ReactiveFormsModule, BreadcrumbModule, Loader, Toast],
   providers: [MessageService]
 })
 
