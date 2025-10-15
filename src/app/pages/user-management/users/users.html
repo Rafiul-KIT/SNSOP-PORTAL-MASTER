@@ -48,12 +48,14 @@
     </div> -->
 
     <!-- Buttons -->
+     
+<div class="row">
     <div class="col-md-12 text-end">
-      <p-button label="Search" icon="fas fa-search" severity="primary" size="small" class="me-2"
+      <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" outlined="true" 
+        (onClick)="resetFilters()" class="me-2"></p-button>
+      <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
         (onClick)="applyFilters()"></p-button>
-
-      <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" outlined="true"
-        (onClick)="resetFilters()"></p-button>
+    </div>
     </div>
   </form>
 </div>
@@ -64,7 +66,7 @@
     <h5 class="mb-0 fw-semibold">
       <i class="pi pi-users me-2"></i> User List
     </h5>
-    <p-button label="Register New User" icon="pi pi-user-plus" severity="success" size="small"
+    <p-button label="Register New User" icon="pi pi-user-plus" severity="primary" size="small"
       (onClick)="goToRegister()"></p-button>
   </div>
 

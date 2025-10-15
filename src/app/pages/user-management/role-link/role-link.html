@@ -1,11 +1,15 @@
-@if (isLoading) {
-  <div tabindex="0" role="alert" aria-busy="true">
-    <app-loader></app-loader>
-  </div>
-} @else {
-  <div class="card mt-2 p-3 shadow-sm">
-    <h5 class="mb-3 fw-bold">Link User Role</h5>
 
+<div class="card mt-2 p-3 shadow-sm">
+  <div class="d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Link User Role</h5>
+    <button type="button" class="btn-close" (click)="closeDialog()" aria-label="Close"></button>
+  </div>
+  <hr/>
+  @if (isLoading) {
+    <div tabindex="0" role="alert" aria-busy="true">
+      <app-loader></app-loader>
+    </div>
+  } @else {
     <div class="row" [formGroup]="roleLinkForm">
       <!-- User Dropdown -->
       <div class="col-12 col-md-6">
@@ -48,9 +52,6 @@
           </select>
         </div>
       </div>
-
-      <hr />
-
       <!-- Submit -->
       <div class="col-12 text-end">
         <button
@@ -62,5 +63,6 @@
         </button>
       </div>
     </div>
-  </div>
-}
+  }
+  
+</div>

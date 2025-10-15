@@ -5,11 +5,12 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
 import { Loader } from '../../../components/loader/loader';
 import { CommonModule } from "@angular/common";
+import { Toast } from 'primeng/toast';
 
 @Component({
   selector: 'app-role-link',
   standalone: true,
-  imports: [ReactiveFormsModule, Loader, CommonModule],
+  imports: [ReactiveFormsModule, Loader, CommonModule, Toast],
   templateUrl: './role-link.html',
   styleUrls: ['./role-link.scss']
 })
@@ -22,7 +23,7 @@ export class RoleLink implements OnInit {
   roleLinkForm = new FormGroup({
     roleId: new FormControl('', Validators.required),
     userId: new FormControl('', Validators.required),
-    userName: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]),
+    userName: new FormControl(''),
     email: new FormControl(''),
   });
 
@@ -44,6 +45,10 @@ export class RoleLink implements OnInit {
       this.isLoading = false;
       this.cdr.detectChanges();
     }
+  }
+
+  closeDialog(): void {
+    this.ref.close();
   }
 
   // ✅ Fetch roles from /api/role/searchRole

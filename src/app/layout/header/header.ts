@@ -74,7 +74,7 @@ export class Header {
   }
 
   updateMenuList() {
-    if (this.userInfo && !this.isLandingPage) {
+    if (!this.isLandingPage) {
       this.menuList = [
         {
           label: 'User & Role Management',

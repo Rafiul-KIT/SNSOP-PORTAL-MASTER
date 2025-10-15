@@ -147,6 +147,10 @@ export class AddNewRole {
       });
   }
 
+  closeDialog(): void {
+    this.ref.close();
+  }
+
   ngOnInit(): void {
     this.home = { label: 'Dashboard', icon: 'fas fa-home me-2', routerLink: '/admin/dashboard' };
 
