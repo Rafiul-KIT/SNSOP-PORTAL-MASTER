@@ -1,73 +1,114 @@
-<!-- <div class="flex justify-content-center">
-    <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
-</div> -->
+<!-- Breadcrumb (kept as-is if you need it elsewhere)
+<div class="flex justify-content-center">
+  <p-breadcrumb class="max-w-full" [model]="items" [home]="home"></p-breadcrumb>
+</div>
+-->
 
 @if (isLoading) {
   <app-loader></app-loader>
 } @else {
-<ng-template #mainContent>
   <div class="mt-1">
     <div class="container">
       <div class="row justify-content-center">
+        <!-- Left: Basic info -->
         <div class="col-12 col-md-5 col-lg-4" [formGroup]="userRoleForm">
           <div class="card mt-2">
             <h5 class="card-header p-3">Basic Information</h5>
             <div class="card-body">
+              <!-- Role Name -->
               <div class="mb-3">
                 <label for="roleName" class="fw-bold d-block mb-1">Role Name</label>
-                <input type="text" formControlName="roleName" minlength="3"
-                       class="form-control {{userRoleForm.get('roleName')!.hasError('pattern') || (userRoleForm.value.roleName != '' && userRoleForm.value.roleName!.length < 3) ? 'is-invalid':''}}"
-                       id="roleName" placeholder="Enter Role Name">
-                <div *ngIf="userRoleForm.get('roleName')!.hasError('pattern')" class="invalid-feedback">
-                  Only Characters are allowed!
-                </div>
+
+                <input
+                  type="text"
+                  id="roleName"
+                  formControlName="roleName"
+                  placeholder="Enter Role Name"
+                  class="form-control"
+                  [ngClass]="{ 'is-invalid': roleNameCtrl?.touched && roleNameCtrl?.invalid }"
+                />
+
+                @if (roleNameCtrl?.touched && roleNameCtrl?.invalid) {
+                  <div class="invalid-feedback d-block">
+                    @if (roleNameErrors['required']) {
+                      <div>Role name is required.</div>
+                    }
+                    @if (roleNameErrors['minlength']) {
+                      <div>Minimum 3 characters.</div>
+                    }
+                    @if (roleNameErrors['pattern']) {
+                      <div>Use letters, numbers, space, hyphen (-), underscore (_); must start with a letter.</div>
+                    }
+                  </div>
+                }
               </div>
+
+              <!-- Role Description -->
               <div class="mb-3">
                 <label for="roleDescription" class="fw-bold d-block mb-1">Role Description</label>
-                <textarea formControlName="roleDescription" class="form-control" rows="9"
-                          id="roleDescription" placeholder="Enter Role Description"></textarea>
+                <textarea
+                  id="roleDescription"
+                  formControlName="roleDescription"
+                  class="form-control"
+                  rows="9"
+                  placeholder="Enter Role Description">
+                </textarea>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Right: Permission List -->
         <div class="col-12 col-md-7 col-lg-8">
           <div class="card mt-2">
             <h5 class="card-header p-3">Permission List</h5>
             <div class="card-body">
-              <div class="d-flex align-items-center gap-1 mb-1"
-                   *ngFor="let permission of availabaleRoleList">
-                <p-checkbox [value]="permission.value" [ngModel]="permission.checked" [binary]="true"
-                            (onChange)="getSelectedPermission($event.checked, permission.value)"
-                            inputId="{{permission.value}}_{{permission.id}}"></p-checkbox>
-                <label for="{{permission.value}}_{{permission.id}}">{{permission.label}}</label>
-              </div>
+              @for (permission of availabaleRoleList; track permission.value) {
+                <div class="d-flex align-items-center gap-1 mb-1">
+                  <p-checkbox
+                    [value]="permission.value"
+                    [ngModel]="permission.checked"
+                    [ngModelOptions]="{ standalone: true }"
+                    [binary]="true"
+                    (onChange)="getSelectedPermission($event.checked, permission.value)"
+                    [inputId]="permission.value + '_' + permission.id">
+                  </p-checkbox>
+                  <label [for]="permission.value + '_' + permission.id">{{ permission.label }}</label>
+                </div>
+              }
             </div>
           </div>
         </div>
+
+        <!-- Footer buttons -->
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card mt-2">
-            <div class="card-body text-end" *ngIf="userRoleDetails == null;else profileUpdateFooter">
-              <button class="btn btn-success btn-sm rounded-0 me-2" (click)="formHandler(1)"
-                      [disabled]="userRoleForm.invalid">
-                <i class="fas fa-save me-2"></i>Save &amp; Close
-              </button>
-              <button class="btn btn-success btn-sm rounded-0" (click)="formHandler(2)"
-                      [disabled]="userRoleForm.invalid">
-                <i class="fas fa-save me-2"></i>Save &amp; Add New
-              </button>
-            </div>
-            <ng-template #profileUpdateFooter>
+            @if (userRoleDetails == null) {
+              <div class="card-body text-end">
+                <button class="btn btn-success btn-sm rounded-0 me-2"
+                        (click)="formHandler(1)"
+                        [disabled]="userRoleForm.invalid">
+                  <i class="fas fa-save me-2"></i>Save &amp; Close
+                </button>
+                <button class="btn btn-success btn-sm rounded-0"
+                        (click)="formHandler(2)"
+                        [disabled]="userRoleForm.invalid">
+                  <i class="fas fa-save me-2"></i>Save &amp; Add New
+                </button>
+              </div>
+            } @else {
               <div class="card-body d-flex justify-content-end">
-                <button class="btn btn-success btn-sm rounded-0" (click)="formHandler(null)"
+                <button class="btn btn-success btn-sm rounded-0"
+                        (click)="formHandler(null)"
                         [disabled]="userRoleForm.invalid">
                   <i class="fas fa-save me-2"></i>Update
                 </button>
               </div>
-            </ng-template>
+            }
           </div>
         </div>
+
       </div>
     </div>
   </div>
-</ng-template>
 }

@@ -1,47 +1,66 @@
 @if (isLoading) {
-  <app-loader></app-loader>
+  <div tabindex="0" role="alert" aria-busy="true">
+    <app-loader></app-loader>
+  </div>
 } @else {
-  <div class="row" [formGroup]="roleLinkForm">
-    <div class="col-12 col-md-6">
-      <div class="mb-3">
-        <label for="userId" class="fw-bold d-block mb-1">User</label>
-        <select
-          id="userId"
-          class="form-select"
-          #userSel
-          (change)="getUserDetail(userSel.value)">
-          <option value="">Select User</option>
-          @for (user of userList; track user.userId) {
-            <option [value]="user.userId + '-' + user.userName">
-              {{ user.userName }}
-            </option>
-          }
-        </select>
+  <div class="card mt-2 p-3 shadow-sm">
+    <h5 class="mb-3 fw-bold">Link User Role</h5>
+
+    <div class="row" [formGroup]="roleLinkForm">
+      <!-- User Dropdown -->
+      <div class="col-12 col-md-6">
+        <div class="mb-3">
+          <label for="userId" class="fw-bold d-block mb-1">User</label>
+          <select
+            id="userId"
+            class="form-select"
+            #userSel
+            (change)="getUserDetail(userSel.value)"
+            formControlName="userId"
+          >
+            <option value="">Select User</option>
+            @for (user of userList; track user.id) {
+              <option [value]="user.id">
+                {{ user.fullName }} ({{ user.email }})
+              </option>
+            }
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="col-12 col-md-6">
-      <div class="mb-3">
-        <label for="roleId" class="fw-bold d-block mb-1">Role</label>
-        <select
-          id="roleId"
-          class="form-select"
-          #roleSel
-          (change)="getRoleDetail(roleSel.value)">
-          <option value="">Select Role</option>
-          @for (role of roleList; track role.id) {
-            <option [value]="role.id">
-              {{ role.roleName }}
-            </option>
-          }
-        </select>
+
+      <!-- Role Dropdown -->
+      <div class="col-12 col-md-6">
+        <div class="mb-3">
+          <label for="roleId" class="fw-bold d-block mb-1">Role</label>
+          <select
+            id="roleId"
+            class="form-select"
+            #roleSel
+            (change)="getRoleDetail(roleSel.value)"
+            formControlName="roleId"
+          >
+            <option value="">Select Role</option>
+            @for (role of roleList; track role.id) {
+              <option [value]="role.id">
+                {{ role.roleName }}
+              </option>
+            }
+          </select>
+        </div>
       </div>
-    </div>
-    <hr />
-    <div class="col-12 col-md-12 text-end">
-      <button class="btn btn-success btn-sm rounded-0" (click)="roleLinkFormHandler()"
-              [disabled]="roleLinkForm.invalid">
-        <i class="fas fa-save me-2"></i>Link Role to User
-      </button>
+
+      <hr />
+
+      <!-- Submit -->
+      <div class="col-12 text-end">
+        <button
+          class="btn btn-success btn-sm rounded-0"
+          (click)="roleLinkFormHandler()"
+        >
+          <i class="fas fa-lock me-2"></i>
+          Link Role to User
+        </button>
+      </div>
     </div>
   </div>
 }
