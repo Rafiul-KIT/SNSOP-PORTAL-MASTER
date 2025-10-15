@@ -10,6 +10,7 @@ import {Users} from './pages/user-management/users/users';
 import {Role} from './pages/user-management/role/role';
 import {Register} from './pages/user-management/register/register';
 import {RoleLink} from './pages/user-management/role-link/role-link';
+import {AddNewRole} from './pages/user-management/add-new-role/add-new-role';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,7 @@ export const routes: Routes = [
       { path: 'register', component: Register },
       { path: 'roles', component: Role },
       { path: 'role-link', component: RoleLink },
+      { path: 'add-new-role', component: AddNewRole },
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
   },

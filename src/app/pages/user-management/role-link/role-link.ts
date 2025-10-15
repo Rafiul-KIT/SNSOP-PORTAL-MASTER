@@ -1,115 +1,166 @@
-import {Component, OnInit} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {ApiService} from '../../../../services/api.service';
-import {DynamicDialogRef} from 'primeng/dynamicdialog';
-import {MessageService} from 'primeng/api';
-import {Loader} from '../../../components/loader/loader';
-import {CommonModule} from "@angular/common";
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ApiService } from '../../../../services/api.service';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
+import { Loader } from '../../../components/loader/loader';
+import { CommonModule } from "@angular/common";
 
 @Component({
   selector: 'app-role-link',
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    Loader,
-    CommonModule
-  ],
+  imports: [ReactiveFormsModule, Loader, CommonModule],
   templateUrl: './role-link.html',
   styleUrls: ['./role-link.scss']
 })
-export class RoleLink  implements OnInit {
+export class RoleLink implements OnInit {
 
-  isLoading: boolean = true;
-  roleList: any = [];
-  userList: any = [];
+  isLoading: boolean = false;
+  roleList: any[] = [];
+  userList: any[] = [];
 
-  roleLinkForm: any = new FormGroup({
-    roleId: new FormControl(''),
-    userId: new FormControl(''),
-    userName: new FormControl('')
+  roleLinkForm = new FormGroup({
+    roleId: new FormControl('', Validators.required),
+    userId: new FormControl('', Validators.required),
+    userName: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]),
+    email: new FormControl(''),
   });
 
-  constructor(private apiService: ApiService, public ref: DynamicDialogRef, private messageService: MessageService) { }
+  constructor(
+    private apiService: ApiService,
+    public ref: DynamicDialogRef,
+    private messageService: MessageService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  fetchRoleList = async () => {
+  async ngOnInit(): Promise<void> {
     this.isLoading = true;
+    this.cdr.detectChanges();
     try {
-      const res = await this.apiService.POST('api/role/searchRole', { size: 100 }, 'alt');
-      if (res.status === 200) {
-        this.roleList = res.data?.roles ?? [];
-        await this.fetchUserList();
+      await Promise.all([this.fetchRoleList(), this.fetchUserList()]);
+    } catch (error) {
+      console.error('Error fetching initial data:', error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ✅ Fetch roles from /api/role/searchRole
+  fetchRoleList = async () => {
+    try {
+      const res = await this.apiService.POST('api/roles/searchRole', { size: 100 }, 'alt');
+      console.log('Role API Response:', res);
+      if (res.status === 200 && res.data) {
+        this.roleList = res.data.roles || res.data.roleList || (Array.isArray(res.data) ? res.data : []);
       } else {
         this.roleList = [];
-        this.isLoading = false;
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching roles:', err);
       this.roleList = [];
-      this.isLoading = false;
+      throw err; // Re-throw to be caught by Promise.all
     }
   };
 
+  // ✅ Fetch users from /api/user/search
   fetchUserList = async () => {
     try {
       const res = await this.apiService.POST(
-        'api/user/search',
+        'api/users/search',
         {
           size: 100,
-          criteria: [{ fieldName: 'STATUS', operator: 'EQUAL', value: '0' }],
+          /*criteria: [{ fieldName: 'STATUS', operator: 'EQUAL', value: '0' }],*/
         },
         'alt'
       );
-      if (res.status === 200) {
-        this.userList = res.data?.users ?? [];
+      console.log('User API Response:', res);
+
+      if (res.status === 200 && res.data) {
+        this.userList = res.data.users || res.data.userList || (Array.isArray(res.data) ? res.data : []);
       } else {
         this.userList = [];
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching users:', err);
       this.userList = [];
-    } finally {
-      this.isLoading = false;
+      throw err; // Re-throw to be caught by Promise.all
     }
   };
 
-
+  // ✅ Handle role selection
   getRoleDetail = (roleId: string) => {
-    this.roleLinkForm.patchValue({
-      roleId: roleId,
-    })
-  }
+    this.roleLinkForm.patchValue({ roleId: roleId });
+  };
 
-  getUserDetail = (user: string) => {
-    const userInfo = user.split('-');
-    this.roleLinkForm.patchValue({
-      userId: userInfo[0],
-      userName: userInfo[1]
-    })
-  }
-
-  roleLinkFormHandler = () => {
-    this.isLoading = true;
-    // console.log(this.roleLinkForm.value);
-    this.apiService
-      .POST('api/role/linkUserRole', this.roleLinkForm.value)
-      .then((res) => {
-        // console.log('linkUserRole -----------> ', res);
-        if (res.status === 200) {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Role Linked with User Successfully.', life: 2000 });
-          this.isLoading = false;
-          this.ref.close(true);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.response.data.errors[0], life: 2000 });
-        this.isLoading = false;
+  // ✅ Handle user selection (id-name-email format)
+  getUserDetail = (userId: string) => {
+    if (!userId) {
+      this.roleLinkForm.patchValue({ userName: '', email: '' });
+      return;
+    }
+    const selectedUser = this.userList.find(user => user.id === userId);
+    if (selectedUser) {
+      this.roleLinkForm.patchValue({
+        userName: selectedUser.fullName,
+        email: selectedUser.email
       });
-  }
+    }
+  };
 
-  ngOnInit(): void {
-    this.fetchRoleList();
-  }
+  // ✅ Submit user-role linking
+  roleLinkFormHandler = async () => {
+    if (this.roleLinkForm.invalid) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation',
+        detail: 'Please select both user and role.',
+        life: 2000
+      });
+      return;
+    }
 
+    this.isLoading = true;
+    this.cdr.detectChanges();
+    const payload = this.roleLinkForm.value;
+    console.log('Link Payload:', payload);
 
+    try {
+      const res: any = await this.apiService.POST('api/roles/linkUserRole', payload, 'alt');
+      const body = res?.data || {}; // body holds the actual response payload
+
+      if (res.status === 200) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Role linked with user successfully!',
+          life: 2000
+        });
+        this.ref.close(true);
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: body.message || 'Failed to link role.',
+          life: 2000
+        });
+      }
+    } catch (err: any) {
+      console.error('Error linking role:', err);
+      const detail =
+        err?.response?.data?.message ||
+        err?.response?.data?.errors?.[0] ||
+        'Unknown error occurred.';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail,
+        life: 2000
+      });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+
+  };
 }

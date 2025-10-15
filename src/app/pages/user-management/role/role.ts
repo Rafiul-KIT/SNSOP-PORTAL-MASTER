@@ -9,6 +9,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TableModule } from "primeng/table";
 import { PaginatorModule } from "primeng/paginator";
 import {RoleLink} from '../role-link/role-link';
+import {AddNewRole} from '../add-new-role/add-new-role';
 
 @Component({
   selector: 'app-role',
@@ -136,19 +137,19 @@ export class Role implements OnInit, OnDestroy {
   }
 
   manageRoleModal(roleDetails: any) {
-    // this.ref = this.dialogService.open(RoleManageComponent, {
-    //   data: roleDetails,
-    //   header: 'Update Role',
-    //   width: '70%',
-    //   // position: 'bottom',
-    //   contentStyle: { overflow: 'auto' },
-    // });
+    this.ref = this.dialogService.open(AddNewRole, {
+    data: roleDetails,
+    header: 'Update Role',
+    width: '70%',
+    position: 'bottom',
+    contentStyle: { overflow: 'auto' },
+    });
 
-    // this.ref.onClose.subscribe((added: boolean) => {
-    //   if (added) {
-    //     this.fetchUserRoleList(this.searchForm.value);
-    //   }
-    // });
+    this.ref.onClose.subscribe((added: boolean) => {
+    if (added) {
+    this.fetchUserRoleList(this.searchForm.value);
+    }
+    });
   }
 
   linkRoleModal() {
