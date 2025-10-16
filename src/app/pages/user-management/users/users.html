@@ -117,8 +117,8 @@
             icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body" (onClick)="editUser(user)"
             size="small" outlined="true" severity="secondary" class="me-2 action-btn" />
           <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
-            icon="fas fa-archive" pTooltip="Archive" tooltipPosition="top" appendTo="body" size="small" outlined="true"
-            severity="danger" class="action-btn" />
+            icon="fas fa-archive" pTooltip="Archive" tooltipPosition="top" appendTo="body" (onClick)="deleteUser(user)"
+             size="small" outlined="true" severity="danger" class="action-btn"  />
         </td>
       </tr>
     </ng-template>
@@ -187,3 +187,4 @@
 }
 
 <p-toast position="bottom-right"></p-toast>
+<p-confirmDialog [style]="{width: '30vw'}"></p-confirmDialog>

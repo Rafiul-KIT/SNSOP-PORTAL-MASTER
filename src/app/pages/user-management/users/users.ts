@@ -6,7 +6,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { Toast } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { Loader } from '../../../components/loader/loader';
 import { ApiService } from '../../../../services/api.service';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Dialog } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 @Component({
@@ -37,8 +38,9 @@ import { Dialog } from 'primeng/dialog';
     Tooltip,
     FloatLabel,
     Dialog,
+    ConfirmDialogModule,
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
 export class Users implements OnInit {
   isLoading = false;
@@ -67,7 +69,8 @@ export class Users implements OnInit {
     private api: ApiService,
     private cdr: ChangeDetectorRef,
     private msg: MessageService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -181,7 +184,7 @@ async loadUsers(): Promise<void> {
 
     this.users = this.normalizeUsers(list);
     this.totalRecords =
-      typeof data.totalElements === 'number' ? data.totalElements : this.users.length;
+      typeof data.total === 'number' ? data.total : this.users.length;
 
   } catch (err) {
     console.error('Failed to load users', err);
@@ -201,7 +204,7 @@ async loadUsers(): Promise<void> {
 
   /** ✅ Custom paginator handling */
   onPageChange(event: any) {
-    this.currentPage = Math.floor(event.first / event.rows); // fix index
+    this.currentPage = event.page;
     this.pageSize = event.rows;
     this.loadUsers();
   }
@@ -221,7 +224,7 @@ async loadUsers(): Promise<void> {
       emailReceiver: ''
     };
     this.currentPage = 0;
-    //this.loadUsers();
+    this.loadUsers();
   }
 
   /** ✅ Navigation methods */
@@ -274,6 +277,41 @@ async loadUsers(): Promise<void> {
   editUser(user: any) {
     this.router.navigate(['/pages/user-management/register'], {
       queryParams: { id: user.id },
+    });
+  }
+
+  deleteUser(user: any) {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this user?',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-info-circle',
+      accept: async () => {
+        if (!user?.id) return;
+        this.isLoading = true;
+        this.cdr.detectChanges();
+        try {
+          await this.api.DELETE(`/api/users/delete/${user.id}`, 'alt');
+          this.msg.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: `User '${user.fullName}' has been deleted.`,
+          });
+          this.loadUsers(); // Refresh user list
+        } catch (err) {
+          console.error('Failed to delete user:', err);
+          this.msg.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Could not delete the user. Please try again.',
+          });
+        } finally {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      },
+      reject: () => {},
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
     });
   }
 }

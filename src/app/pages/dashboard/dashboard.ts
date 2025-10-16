@@ -38,6 +38,8 @@ export class Dashboard {
       {
         label: 'Settings',
         icon: 'fas fa-cog',
+        routerLink: '/pages/user-management/users',
+        tooltipText: 'User & Role Management'
       },
       {
         label: 'Survey CTO',
