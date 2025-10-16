@@ -5,12 +5,12 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageService } from 'primeng/api';
 import { Loader } from '../../../components/loader/loader';
 import { CommonModule } from "@angular/common";
-import { Toast } from 'primeng/toast';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-role-link',
   standalone: true,
-  imports: [ReactiveFormsModule, Loader, CommonModule, Toast],
+  imports: [ReactiveFormsModule, Loader, CommonModule, ToastModule],
   templateUrl: './role-link.html',
   styleUrls: ['./role-link.scss']
 })

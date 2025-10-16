@@ -134,7 +134,7 @@ export class Role implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.items = [{ icon: 'fas fa-users-rays me-2', label: 'Role List' }];
-    this.home = { label: 'Dashboard', icon: 'fas fa-home me-2', routerLink: '/home/portals' };
+    this.home = { icon: 'fas fa-home me-2', routerLink: '/home/portals' };
     this.fetchUserRoleList(this.searchForm.value);
   }
 

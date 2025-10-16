@@ -23,6 +23,7 @@ export class Header {
   isPortalsPage: boolean = false;
   isLandingPage: boolean = false;
 
+
   constructor(
     private router: Router,
     private azureService: AzureAdAuthService
@@ -32,12 +33,14 @@ export class Header {
     ).subscribe((event: NavigationEnd) => {
       this.isPortalsPage = event.urlAfterRedirects !== '/landing';
       this.isLandingPage = event.urlAfterRedirects === '/landing';
-      this.updateMenuList();
+      const isUserManagementPage = event.urlAfterRedirects.startsWith('/pages/user-management/');
+      this.updateMenuList(isUserManagementPage);
     });
 
     effect(() => {
       this.userInfo = this.azureService.loginState()?.user;
-      this.updateMenuList();
+      const isUserManagementPage = this.router.url.startsWith('/pages/user-management/');
+      this.updateMenuList(isUserManagementPage);
     });
 
     this.portalList = [
@@ -65,6 +68,10 @@ export class Header {
       {
         label: 'Settings',
         icon: 'fas fa-cog',
+        command: () => {
+          this.router.navigate(['/pages/user-management/users']);
+          this.showPortalOptions = false;
+        },
       },
       {
         label: 'Survey CTO',
@@ -73,8 +80,8 @@ export class Header {
     ];
   }
 
-  updateMenuList() {
-    if (!this.isLandingPage) {
+  updateMenuList(isUserManagementPage: boolean) {
+    if (!this.isLandingPage && isUserManagementPage) {
       this.menuList = [
         {
           label: 'User & Role Management',
