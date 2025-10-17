@@ -7,7 +7,7 @@ import {
   MsalGuardConfiguration,
 } from '@azure/msal-angular';
 import { InteractionStatus, RedirectRequest } from '@azure/msal-browser';
-import { BehaviorSubject, Observable, filter, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, filter, take, takeUntil } from 'rxjs';
 import { environment } from '../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
@@ -21,8 +21,8 @@ export class AzureAdAuthService {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   public ACCESS_TOKEN = environment.cookie_name;
   public loginState = signal({
-    token: null,
-    user: null,
+    token: null as string | null,
+    user: null as any | null, 
   });
 
   constructor(
@@ -33,11 +33,26 @@ export class AzureAdAuthService {
   ) {
     const accessToken: any = this.cookieService.get(this.ACCESS_TOKEN);
     if (accessToken) {
-      const userData: any = jwtDecode(accessToken);
-      this.loginState.set({
-        token: accessToken,
-        user: userData,
-      });
+      try {
+        const userData: any = jwtDecode(accessToken);
+        this.loginState.set({
+          token: accessToken,
+          user: userData,
+        });
+      } catch (error) {
+        console.error('Failed to decode token from cookie:', error);
+        const host = (() => {
+          try {
+            return new URL(environment.domain).hostname;
+          } catch {
+            // Robust fallback for various domain formats
+            const domain = environment.domain.replace(/^https?:\/\//, ''); // remove protocol
+            const hostOnly = domain.split('/')[0].split(':')[0]; // remove path and port
+            return hostOnly;
+          }
+        })();
+        this.cookieService.delete(this.ACCESS_TOKEN, '/', host, true, 'Lax');
+      }
     }
     this.msalBroadcastService.inProgress$
       .pipe(
@@ -79,20 +94,34 @@ export class AzureAdAuthService {
     this.msalService.loginRedirect(loginRequest);
   }
 
-  /*logout(): void {
-    this.msalService.logoutRedirect();
-  }*/
+  public updateLoginState(accessToken: string): void {
+    if (accessToken) {
+      try {
+        const userData: any = jwtDecode(accessToken);
+        this.loginState.set({
+          token: accessToken,
+          user: userData,
+        });
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+        this.loginState.set({ token: null, user: null });
+      }
+    }
+  }
 
   logout(): void {
-    console.log('Logging out...');
+    const host = (() => {
+      try {
+        return new URL(environment.domain).hostname;
+      } catch {
+        return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+      }
+    })();
+    this.cookieService.delete(this.ACCESS_TOKEN, '/', host, true, 'Lax');
 
-    // 1. Clear cookies for your domain
-    this.cookieService.deleteAll('/', environment.domain, false);
-
-    // 2. Update app auth state
     this.isAuthenticatedSubject.next(false);
+    this.loginState.set({ token: null, user: null });
 
-    // 3. Perform MSAL logout with redirect to landing
     this.msalService.logoutRedirect();
   }
 
