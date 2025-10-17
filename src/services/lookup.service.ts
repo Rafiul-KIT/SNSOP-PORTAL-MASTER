@@ -156,6 +156,12 @@ export class LookupService {
     { id: 14, value: 'AUDIT_TRAIL_VIEW', label: "View Audit Trail" },
     { id: 15, value: 'DEVICE_MANAGEMENT', label: "Manage Device" },
     { id: 16, value: 'REPORT_VIEW', label: "Report View" },
+    { id: 17, value: '', label: "User Management" },
+    { id: 18, value: '/pages/user-management/roles', label: "Role List" },
+    { id: 19, value: '/pages/user-management/role-link', label: "Role Link" },
+    { id: 20, value: '/pages/user-management/add-new-role', label: "Add New Role" },
+    { id: 21, value: '/pages/user-management/users', label: "User List" },
+    { id: 22, value: '/pages/user-management/register', label: "Register User" },
   ];
   getUserPermissionEnum = () => {
     return this.UserPermissionEnum;

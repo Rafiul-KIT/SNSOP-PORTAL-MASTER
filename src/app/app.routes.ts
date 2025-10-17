@@ -11,6 +11,7 @@ import {Role} from './pages/user-management/role/role';
 import {Register} from './pages/user-management/register/register';
 import {RoleLink} from './pages/user-management/role-link/role-link';
 import {AddNewRole} from './pages/user-management/add-new-role/add-new-role';
+import { Unauthorized} from './components/unauthorized/unauthorized';
 
 export const routes: Routes = [
   {
@@ -20,7 +21,7 @@ export const routes: Routes = [
   {
     path: 'home',
     component: Home,
-    canActivate: [routeGuard],
+    canActivateChild: [routeGuard],
     children: [
       {
         path: 'portals',
@@ -36,7 +37,7 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
   {
     path: 'pages/user-management',
-    canActivate: [routeGuard],
+    canActivateChild: [routeGuard],
     children: [
       { path: 'users', component: Users },
       { path: 'register', component: Register },
@@ -46,6 +47,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
   },
+  { path: 'unauthorized', component: Unauthorized },
   {
     path: '**',
     component: NotFound,
