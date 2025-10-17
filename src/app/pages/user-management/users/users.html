@@ -29,6 +29,17 @@
       </p-floatlabel>
     </div>
 
+    <!-- Status Dropdown -->
+    <div class="col-md-3">
+      
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="statusOptions"  [(ngModel)]="filters.status"  optionLabel="label" optionValue="value" name="status">
+        </p-select>
+        <label>Status</label>
+      </p-floatlabel>
+    </div>
+
+
     <!-- <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="roles" optionLabel="name" optionValue="id" [(ngModel)]="filters.roleId" name="roleId"
@@ -83,6 +94,7 @@
       </tr>
       <tr>
         <th>Serial</th>
+        <th>user Name</th>
         <th>Full Name</th>
         <th>Email</th>
         <th>Status</th>
@@ -95,6 +107,7 @@
     <ng-template pTemplate="body" let-user let-i="rowIndex">
       <tr>
         <td>{{ (currentPage * pageSize) + (i + 1) }}</td>
+        <td>{{ user.username }}</td>
         <td>{{ user.fullName }}</td>
         <td>{{ user.email }}</td>
         <td>
