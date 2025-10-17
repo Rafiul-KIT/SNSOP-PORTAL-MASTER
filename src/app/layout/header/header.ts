@@ -80,7 +80,7 @@ export class Header {
     ];
   }
 
-  updateMenuList(isUserManagementPage: boolean) {
+  /*updateMenuList(isUserManagementPage: boolean) {
     if (!this.isLandingPage && isUserManagementPage) {
       this.menuList = [
         {
@@ -96,7 +96,86 @@ export class Header {
     } else {
       this.menuList = [];
     }
+  }*/
+
+  /*updateMenuList(isUserManagementPage: boolean) {
+    if (this.isLandingPage) {
+      this.menuList = [];
+      return;
+    }
+
+    const state = this.azureService.loginState();
+    const permittedMenus = state?.menus || [];
+
+    const parentMenus = permittedMenus.filter((m: any) => !m.parentMenu);
+    const menuList: MenuItem[] = [];
+
+    parentMenus.forEach((p: any) => {
+      const children = permittedMenus
+        .filter((c: any) => c.parentMenu && c.parentMenu.id === p.id)
+        .map((child: any) => ({
+          label: child.name,
+          icon: 'fas fa-angle-right',
+          routerLink: [`/${child.url}`],
+        }));
+
+      menuList.push({
+        label: p.name,
+        icon: 'fas fa-folder',
+        routerLink: children.length === 0 ? [`/${p.url}`] : undefined,
+        items: children.length > 0 ? children : undefined,
+      });
+    });
+
+    this.menuList = menuList;
+  }*/
+
+  updateMenuList(isUserManagementPage: boolean) {
+    if (this.isLandingPage) {
+      this.menuList = [];
+      return;
+    }
+
+    const state = this.azureService.loginState();
+    const permittedMenus = state?.menus || [];
+
+    const parentMenus = permittedMenus.filter((m: any) => !m.parentMenu);
+    const menuList: MenuItem[] = [];
+
+    parentMenus.forEach((p: any) => {
+      // Child menus
+      const children = permittedMenus
+        .filter((c: any) => c.parentMenu && c.parentMenu.id === p.id)
+        .map((child: any) => ({
+          label: child.name,
+          icon: 'fas fa-angle-right',
+          routerLink: [`/${child.url}`],  // Assign URL to child menus
+        }));
+
+      // If the parent menu has a URL
+      if (p.url) {
+        // Parent menu has its own routerLink
+        menuList.push({
+          label: p.name,
+          icon: 'fas fa-folder',
+          routerLink: [`/${p.url}`],  // Parent has URL
+          items: children.length > 0 ? children : undefined, // Child menus if exist
+        });
+      } else {
+        // If parent menu doesn't have URL, add it as a folder with children
+        menuList.push({
+          label: p.name,
+          icon: 'fas fa-folder',
+          items: children.length > 0 ? children : undefined, // Only child menus have URLs
+        });
+      }
+    });
+    console.log('Updated Menu List:', this.menuList);
+
+    this.menuList = menuList;
   }
+
+
 
   goToProfile = () => {
     this.router.navigateByUrl('/home/profile');

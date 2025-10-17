@@ -1,3 +1,4 @@
+/*
 // src/app/core/services/azure-ad-auth.service.ts
 import { Injectable, signal } from '@angular/core';
 import {
@@ -79,9 +80,9 @@ export class AzureAdAuthService {
     this.msalService.loginRedirect(loginRequest);
   }
 
-  /*logout(): void {
+  /!*logout(): void {
     this.msalService.logoutRedirect();
-  }*/
+  }*!/
 
   logout(): void {
     console.log('Logging out...');
@@ -129,5 +130,122 @@ export class AzureAdAuthService {
     } else {
       return null;
     }
+  }
+}
+*/
+
+
+// src/app/services/azure-ad-auth.service.ts
+import { Injectable, signal } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
+import { environment } from '../environments/environment';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+import {MsalService} from '@azure/msal-angular';
+import {RedirectRequest} from '@azure/msal-browser';
+
+@Injectable({ providedIn: 'root' })
+export class AzureAdAuthService {
+  public ACCESS_TOKEN = environment.cookie_name;
+
+  public loginState = signal<{
+    token: string | null;
+    user: any | null;
+    menus: any[] | null;
+  }>({
+    token: null,
+    user: null,
+    menus: null,
+  });
+
+  constructor(private cookieService: CookieService, private msalService: MsalService) {
+    this.initializeFromCookie();
+  }
+
+  private async initializeFromCookie() {
+    const token = this.cookieService.get(this.ACCESS_TOKEN);
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        console.log('Decoded mis_ta token:', decoded);
+
+        this.loginState.set({
+          token,
+          user: decoded,
+          menus: null,
+        });
+
+        await this.fetchMenusByRole(decoded.roleId);
+      } catch (err) {
+        console.error('Failed to decode token:', err);
+        this.clearState();
+      }
+    }
+  }
+
+  private async fetchMenusByRole(roleId: number) {
+    try {
+      // ✅ check cache first
+      const cached = sessionStorage.getItem(`menus_${roleId}`);
+      if (cached) {
+        const menus = JSON.parse(cached);
+        console.log('Loaded permitted menus from cache');
+        const current = this.loginState();
+        this.loginState.set({ ...current, menus });
+        return;
+      }
+
+      // ❌ if not cached, fetch from API
+      const resp = await axios.get(`${environment.authBackend}/api/menus/role/${roleId}`);
+      const menus = resp.data?.data || [];
+
+      // ✅ store in sessionStorage
+      sessionStorage.setItem(`menus_${roleId}`, JSON.stringify(menus));
+
+      const current = this.loginState();
+      this.loginState.set({ ...current, menus });
+      console.log('Fetched permitted menus from API');
+    } catch (err) {
+      console.error('Failed to fetch menus for role:', err);
+    }
+  }
+
+
+  public getUserRoleId(): number | null {
+    const user = this.loginState().user;
+    return user?.roleId || null;
+  }
+
+  public getMenus(): any[] {
+    return this.loginState().menus || [];
+  }
+
+  public getToken(): string | null {
+    return this.loginState().token;
+  }
+
+  login(): void {
+    const request: RedirectRequest = { scopes: ['user.read'] };
+    this.msalService.loginRedirect(request);
+  }
+
+  public logout(): void {
+    // Clear cookies
+    this.cookieService.deleteAll('/', environment.domain, false);
+
+    // Clear the entire sessionStorage to ensure no data persists
+    sessionStorage.clear();
+
+    // Clear the internal authentication state
+    this.clearState();
+
+    // Trigger MSAL logout and redirect to landing page
+    this.msalService.logoutRedirect({
+      postLogoutRedirectUri: '/landing'
+    });
+  }
+
+  private clearState() {
+    this.loginState.set({ token: null, user: null, menus: null });
   }
 }
