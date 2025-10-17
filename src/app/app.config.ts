@@ -44,6 +44,7 @@ import { filter } from 'rxjs/operators';
 
 import { environment } from '../environments/environment';
 import { MessageService } from 'primeng/api';
+import { AzureAdAuthService } from '../services/azure-ad-auth.service';
 
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
@@ -92,6 +93,7 @@ function initMsal(
   router: Router,
   cookieService: CookieService,
   messageService: MessageService,
+  azureAdAuthService: AzureAdAuthService,
 ) {
   console.log('initMsal', authService);
   return async () => {
@@ -183,6 +185,7 @@ function initMsal(
                 // If you *do* want a fixed lifetime instead (e.g., 1 day):
                 // cookieService.set(environment.cookie_name, r.data.access_token, 1, '/', host, true, 'Lax');
 
+                azureAdAuthService.updateLoginState(r.data.access_token);
                 router.navigate(['home']);
               } else {
         messageService.add({
@@ -246,6 +249,7 @@ export const appConfig: ApplicationConfig = {
         Router,
         CookieService,
         MessageService,
+        AzureAdAuthService,
       ],
     },
   ],

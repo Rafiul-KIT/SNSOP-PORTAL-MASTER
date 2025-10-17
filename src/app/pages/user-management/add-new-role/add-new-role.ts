@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuItem, MessageService } from 'primeng/api';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -37,10 +37,11 @@ export class AddNewRole {
     private apiService: ApiService,
     private messageService: MessageService,
     public ref: DynamicDialogRef,
-    private conf: DynamicDialogConfig
+    private conf: DynamicDialogConfig,
+    private cdr: ChangeDetectorRef
   ) {
     this.userRoleForm = this.fb.group({
-      // must start with a letter; allow letters/numbers/space/-/_
+      // must start with a letter; allow letters/numbers/space/-/_ 
       roleName: ['', [
         Validators.required,
         Validators.minLength(3),
@@ -81,7 +82,8 @@ export class AddNewRole {
         const checked = selectedRoleList.filter(arl => arl.checked);
         if (checked.length >= 15) selectedRoleList[0].checked = true;
       }
-    } else {
+    }
+    else {
       if (elm === 'ALL') {
         selectedRoleList.forEach(el => el.checked = false);
       } else {
@@ -94,58 +96,72 @@ export class AddNewRole {
     this.availabaleRoleList = [...selectedRoleList];
   }
 
-  formHandler = (type: 1 | 2 | null) => {
-    this.isLoading = true;
-    const checkedPermission = this.availabaleRoleList.filter((arl: any) => arl.checked);
+ formHandler = async (type: 1 | 2 | null) => {
+  this.isLoading = true;
+  const checkedPermission = this.availabaleRoleList.filter((arl: any) => arl.checked);
 
-    if (checkedPermission.length === 0) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No Permission is Selected.', life: 2000 });
-      this.isLoading = false;
-      return;
-    }
-
-    const payload: any = {
-      ...this.userRoleForm.value,
-      operationEnum: checkedPermission.map((cp: any) => cp.value)
-    };
-
-    let endpoint = 'api/role/createRole';
-    if (this.userRoleDetails) {
-      endpoint = 'api/role/updateRole';
-      payload.roleId = this.userRoleDetails.id;
-    }
-
-    this.apiService.POST(endpoint, payload, 'alt')
-      .then(res => {
-        if (res.status === 200) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: this.userRoleDetails ? 'Role Updated Successfully' : 'Role Added Successfully.',
-            life: 2000
-          });
-
-          if (type === 1) {
-            this.ref.close(true);
-          } else if (type === 2) {
-            this.userRoleForm.reset();
-          } else {
-            this.ref.close(true);
-          }
-        }
-        this.isLoading = false;
-      })
-      .catch(err => {
-        console.error(err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.response?.data?.errors?.[0] ?? 'Request failed',
-          life: 2000
-        });
-        this.isLoading = false;
-      });
+  if (checkedPermission.length === 0) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No Permission is Selected.',
+      life: 2000
+    });
+    this.isLoading = false;
+    return;
   }
+
+  const payload: any = {
+    ...this.userRoleForm.value,
+    operationEnum: checkedPermission.map((cp: any) => cp.value)
+  };
+
+  let endpoint = 'api/roles/createRole';
+  if (this.userRoleDetails) {
+    endpoint = 'api/roles/updateRole';
+    payload.roleId = this.userRoleDetails.id;
+  }
+
+  try {
+    const res = await this.apiService.POST(endpoint, payload, 'alt');
+    if (res.status === 200) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: this.userRoleDetails
+          ? 'Role Updated Successfully'
+          : 'Role Added Successfully.',
+        life: 2000
+      });
+
+      if (type === 1) {
+        this.ref.close(true);
+      } else if (type === 2) {
+        this.userRoleForm.reset();
+      }
+      else {
+        this.ref.close(true);
+      }
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail:'Something went wrong. Please try again.',
+        life: 2000
+      });
+    }
+  } catch (err: any) {
+    console.error(err);
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: err?.error?.message || err?.message || 'Request failed'
+    });
+  } finally {
+    this.isLoading = false;
+    this.cdr.detectChanges();
+  }
+}
 
   closeDialog(): void {
     this.ref.close();
