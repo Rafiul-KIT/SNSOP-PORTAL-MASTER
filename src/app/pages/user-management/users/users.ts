@@ -16,6 +16,10 @@ import { Tooltip } from 'primeng/tooltip';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Dialog } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { Select } from "primeng/select";
+
+
+
 
 
 @Component({
@@ -39,10 +43,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     FloatLabel,
     Dialog,
     ConfirmDialogModule,
-  ],
+    Select
+],
   providers: [MessageService, ConfirmationService],
 })
 export class Users implements OnInit {
+
   isLoading = false;
   users: any[] = [];
   roles: any[] = [];
@@ -57,9 +63,15 @@ export class Users implements OnInit {
   filters = {
     email: '',
     username: '',
+    status: '',
     roleId: '',
     emailReceiver: ''
   };
+
+  statusOptions = [
+    { label: 'Active', value: 1 },
+    { label: 'Inactive', value: 0 }
+  ];
 
   home = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items = [{ label: 'User List', icon: 'fas fa-users' }];
@@ -124,11 +136,21 @@ private buildCriteriaFromFilters(): any[] {
   // USERNAME (LIKE)
   if (this.filters.username?.trim()) {
     criteria.push({
-      fieldName: 'USERNAME',
+      fieldName: 'USER_NAME',
       operator: 'LIKE',
       value: this.filters.username.trim(),
     });
   }
+
+  // STATUS (EQUAL)
+  const statusValue = this.filters.status != null
+    ? String(this.filters.status) // Convert to string if it's a number
+    : '1'; // Default to '1' (Active) if no status is provided
+  criteria.push({
+    fieldName: 'STATUS',
+    operator: 'EQUAL',
+    value: statusValue,
+  });
 
   // ROLE_ID (EQUAL)
   if (this.filters.roleId !== '' && this.filters.roleId !== null && this.filters.roleId !== undefined) {
@@ -139,7 +161,7 @@ private buildCriteriaFromFilters(): any[] {
     });
   }
 
-  // EMAIL_RECEIVER (EQUAL) — accepts '', boolean, 'true' | 'false'
+  // EMAIL_RECEIVER (EQUAL)
   const er = this.filters.emailReceiver;
   if (er !== '' && er != null) {
     const boolString = (typeof er === 'boolean' ? er : String(er).toLowerCase() === 'true')
@@ -158,6 +180,7 @@ private buildCriteriaFromFilters(): any[] {
 
 
 
+
 // Replace your loadUsers() with this version
 async loadUsers(): Promise<void> {
   try {
@@ -170,6 +193,7 @@ async loadUsers(): Promise<void> {
       sortOrder: 'DESC',                         // 'ASC' | 'DESC'
       page: this.currentPage,                    // zero-based
       size: this.pageSize,                       // rows per page
+
     };
 
     const res = await this.api.POST('/api/users/search', payload, 'alt');
@@ -220,6 +244,7 @@ async loadUsers(): Promise<void> {
     this.filters = {
       email: '',
       username: '',
+      status: '',
       roleId: '',
       emailReceiver: ''
     };
