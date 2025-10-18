@@ -139,30 +139,26 @@ export class LookupService {
   }
 
   UserPermissionEnum = [
-    { id: 0, value: 'ALL', label: "All" },
-    { id: 1, value: 'REGISTRATION', label: "Beneficiary Registration" },
-    { id: 2, value: 'UPLOADER', label: "Uploader" },
-    { id: 3, value: 'HOUSEHOLD_VIEW', label: "View Household Information" },
-    { id: 4, value: 'HOUSEHOLD_EDIT', label: "Edit Household Information" },
-    { id: 5, value: 'HOUSEHOLD_DELETE', label: "Delete Household Information" },
-    { id: 6, value: 'HOUSEHOLD_APPROVAL', label: "Approve Household Information" },
-    { id: 7, value: 'MATCH_LIST_VIEW', label: "View Match List" },
-    { id: 8, value: 'MATCH_LIST_EDIT', label: "Edit Match List" },
-    { id: 9, value: 'MATCH_LIST_DELETE', label: "Delete Match List" },
-    { id: 10, value: 'ADJUDICATION', label: "Adjudicate" },
-    { id: 11, value: 'USER_VIEW', label: "View User" },
-    { id: 12, value: 'USER_EDIT', label: "Edit User" },
-    { id: 13, value: 'USER_DELETE', label: "Delete User" },
-    { id: 14, value: 'AUDIT_TRAIL_VIEW', label: "View Audit Trail" },
-    { id: 15, value: 'DEVICE_MANAGEMENT', label: "Manage Device" },
-    { id: 16, value: 'REPORT_VIEW', label: "Report View" },
-    { id: 17, value: '', label: "User Management" },
-    { id: 18, value: '/pages/user-management/roles', label: "Role List" },
-    { id: 19, value: '/pages/user-management/role-link', label: "Role Link" },
-    { id: 20, value: '/pages/user-management/add-new-role', label: "Add New Role" },
-    { id: 21, value: '/pages/user-management/users', label: "User List" },
-    { id: 22, value: '/pages/user-management/register', label: "Register User" },
+    { id: 1, value: '/pages/user-management/roles', label: "Role List" },
+    { id: 2, value: '/pages/user-management/role-link', label: "Role Link" },
+    { id: 3, value: '/pages/user-management/add-new-role', label: "Add New Role" },
+    { id: 4, value: '/pages/user-management/users', label: "User List" },
+    { id: 5, value: '/pages/user-management/register', label: "Register User" },
+
+    // New Menu Items
+    { id: 6, value: '/dashboard', label: "Dashboard", icon: 'fas fa-dashboard' },
+    { id: 7, value: '/beneficiary/list', label: "Beneficiary List", icon: 'fas fa-list' },
+    { id: 8, value: '/beneficiary-approval-list/edit', label: "Approval List", icon: 'fas fa-user-check' },
+    { id: 9, value: '/adjudication-list', label: "Adjudication", icon: 'fas fa-users-viewfinder' },
+    { id: 10, value: '/id-card', label: "Beneficiary ID Cards", icon: 'fas fa-id-card' },
+    { id: 11, value: '/id-card', label: "Job Card", icon: 'fas fa-id-card' },
+    { id: 12, value: '/id-card', label: "Work Progress", icon: 'fas fa-line-chart' },
+    { id: 13, value: '/id-card', label: "LIPW Export", icon: 'fas fa-file-export' },
+    { id: 14, value: '/report', label: "Report", icon: 'fas fa-file-alt' },
+    { id: 15, value: '/beneficiary/audit', label: "Beneficiary Audit", icon: 'fas fa-history' },
+    { id: 16, value: '/beneficiary/restore', label: "Archived Beneficiary", icon: 'fas fa-trash-restore' }
   ];
+
   getUserPermissionEnum = () => {
     return this.UserPermissionEnum;
   }
