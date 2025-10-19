@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuItem, MessageService } from 'primeng/api';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,7 +13,7 @@ import { Checkbox } from 'primeng/checkbox';
   selector: 'app-add-new-role',
   standalone: true,
   imports: [
-    CommonModule,            // ok to keep even with @if/@for (needed for things like [ngClass])
+    CommonModule,
     Loader,
     ReactiveFormsModule,
     Checkbox,
@@ -22,10 +22,8 @@ import { Checkbox } from 'primeng/checkbox';
   templateUrl: './add-new-role.html',
   styleUrl: './add-new-role.scss'
 })
-export class AddNewRole {
+export class AddNewRole implements OnInit {
   isLoading = true;
-  items: MenuItem[] | undefined;
-  home: MenuItem | undefined;
   userRoleDetails: any = null;
   availabaleRoleList: any[] = [];
   userRoleForm!: FormGroup;
@@ -37,11 +35,11 @@ export class AddNewRole {
     private apiService: ApiService,
     private messageService: MessageService,
     public ref: DynamicDialogRef,
-    private conf: DynamicDialogConfig,
+    public conf: DynamicDialogConfig,
     private cdr: ChangeDetectorRef
   ) {
     this.userRoleForm = this.fb.group({
-      // must start with a letter; allow letters/numbers/space/-/_ 
+      // field names consistent with template
       roleName: ['', [
         Validators.required,
         Validators.minLength(3),
@@ -51,26 +49,33 @@ export class AddNewRole {
     });
   }
 
-  // safe getters for template
   get roleNameCtrl() { return this.userRoleForm.get('roleName'); }
   get roleNameErrors() { return this.roleNameCtrl?.errors || {}; }
 
+  /** ✅ Prefill form and checkbox states when editing */
   renderEditForm = (userRoleDetails: any) => {
+    if (!userRoleDetails) return;
+
+    // Some APIs return 'name' and 'description', not 'roleName'
     this.userRoleForm.patchValue({
-      roleName: userRoleDetails.roleName,
-      roleDescription: userRoleDetails.roleDescription
+      roleName: userRoleDetails.name || userRoleDetails.roleName || '',
+      roleDescription: userRoleDetails.description || userRoleDetails.roleDescription || ''
     });
 
-    if (userRoleDetails?.operationEnum?.length) {
+    // pre-check permissions if any
+    if (userRoleDetails.operationEnum?.length) {
       userRoleDetails.operationEnum.forEach((permission: any) => {
         this.availabaleRoleList.forEach((elm: any) => {
           if (elm.value === permission) elm.checked = true;
         });
       });
     }
+
     this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
+  /** ✅ Checkbox logic */
   getSelectedPermission = (state: boolean, elm: any) => {
     const selectedRoleList = [...this.availabaleRoleList];
 
@@ -82,8 +87,7 @@ export class AddNewRole {
         const checked = selectedRoleList.filter(arl => arl.checked);
         if (checked.length >= 15) selectedRoleList[0].checked = true;
       }
-    }
-    else {
+    } else {
       if (elm === 'ALL') {
         selectedRoleList.forEach(el => el.checked = false);
       } else {
@@ -96,87 +100,82 @@ export class AddNewRole {
     this.availabaleRoleList = [...selectedRoleList];
   }
 
- formHandler = async (type: 1 | 2 | null) => {
-  this.isLoading = true;
-  const checkedPermission = this.availabaleRoleList.filter((arl: any) => arl.checked);
+  /** ✅ Create or update */
+  formHandler = async (type: 1 | 2 | null) => {
+    this.isLoading = true;
+    const checkedPermission = this.availabaleRoleList.filter((arl: any) => arl.checked);
 
-  if (checkedPermission.length === 0) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'No Permission is Selected.',
-      life: 2000
-    });
-    this.isLoading = false;
-    return;
-  }
-
-  const payload: any = {
-    ...this.userRoleForm.value,
-    operationEnum: checkedPermission.map((cp: any) => cp.value)
-  };
-
-  let endpoint = 'api/roles/createRole';
-  if (this.userRoleDetails) {
-    endpoint = 'api/roles/updateRole';
-    payload.roleId = this.userRoleDetails.id;
-  }
-
-  try {
-    const res = await this.apiService.POST(endpoint, payload, 'alt');
-    if (res.status === 200) {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: this.userRoleDetails
-          ? 'Role Updated Successfully'
-          : 'Role Added Successfully.',
-        life: 2000
-      });
-
-      if (type === 1) {
-        this.ref.close(true);
-      } else if (type === 2) {
-        this.userRoleForm.reset();
-      }
-      else {
-        this.ref.close(true);
-      }
-    } else {
+    if (checkedPermission.length === 0) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail:'Something went wrong. Please try again.',
+        detail: 'No Permission is Selected.',
         life: 2000
       });
+      this.isLoading = false;
+      return;
     }
-  } catch (err: any) {
-    console.error(err);
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: err?.error?.message || err?.message || 'Request failed'
-    });
-  } finally {
-    this.isLoading = false;
-    this.cdr.detectChanges();
+
+    const payload: any = {
+      ...this.userRoleForm.value,
+      operationEnum: checkedPermission.map((cp: any) => cp.value)
+    };
+
+    let endpoint = 'api/roles/createRole';
+    if (this.userRoleDetails) {
+      endpoint = 'api/roles/updateRole';
+      payload.roleId = this.userRoleDetails.id;
+    }
+
+    try {
+      const res = await this.apiService.POST(endpoint, payload, 'alt');
+      if (res.status === 200) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: this.userRoleDetails ? 'Role Updated Successfully' : 'Role Added Successfully.',
+          life: 2000
+        });
+
+        if (type === 1) this.ref.close(true);
+        else if (type === 2) this.userRoleForm.reset();
+        else this.ref.close(true);
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Something went wrong. Please try again.',
+          life: 2000
+        });
+      }
+    } catch (err: any) {
+      console.error(err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.error?.message || err?.message || 'Request failed'
+      });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
   }
-}
 
   closeDialog(): void {
     this.ref.close();
   }
 
+  /** ✅ Init logic */
   ngOnInit(): void {
-    this.home = { label: 'Dashboard', icon: 'fas fa-home me-2', routerLink: '/admin/dashboard' };
-
+    // populate available permissions
     const rawRoleList = this.lookupService.getUserPermissionEnum();
     rawRoleList.forEach((elm: any) => { elm.checked = false; });
     this.availabaleRoleList = rawRoleList;
 
-    const deviceInfo = this.conf.data;
-    if (deviceInfo) {
-      this.userRoleDetails = deviceInfo;
+    // receive dialog data
+    const roleData = this.conf.data;
+    if (roleData) {
+      this.userRoleDetails = roleData;
       this.renderEditForm(this.userRoleDetails);
     } else {
       this.isLoading = false;
