@@ -287,7 +287,7 @@ export class Register implements OnInit {
         this.msg.add({ severity: 'success', summary: 'Success', detail: apiMessage || 'User saved.' });
 
         if (mode === 1) {
-          setTimeout(() => this.router.navigate(['/users']), 500);
+          setTimeout(() => this.router.navigate(['/user-management/users']), 500);
         } else if (mode === 2) {
           this.resetForm();
         }

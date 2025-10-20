@@ -247,9 +247,7 @@ async loadUsers(): Promise<void> {
       status: '',
       roleId: '',
       emailReceiver: ''
-    };
-    this.currentPage = 0;
-    this.loadUsers();
+    }; 
   }
 
   /** ✅ Navigation methods */

@@ -65,7 +65,6 @@ export class AddNewRole implements OnInit {
     this.cdr.detectChanges();
   };
 
-  /** ✅ Fetch menus dynamically for this role (flat list) */
   async fetchRoleMenus(roleId: number) {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -75,25 +74,19 @@ export class AddNewRole implements OnInit {
       const res = await this.apiService.GET(`api/menus/role/${roleId}`, {}, 'alt');
       const assignedMenus = res?.data?.data || [];
 
-      // 2️⃣ Map backend URLs → IDs for quick lookup
-      const assignedMap = new Map(
-        assignedMenus.map((m: any) => [m.url, m.id])
-      );
+      // 2️⃣ Create quick lookup set for assigned menu IDs
+      const assignedSet = new Set(assignedMenus.map((m: any) => m.id));
 
-      // 3️⃣ Load all menus from lookup
-      const lookupMenus = this.lookupService.getUserPermissionEnum() || [];
+      // 3️⃣ Load all available menus (with real IDs)
+      const lookupMenus = await this.lookupService.getMenuList() || [];
 
-      // 4️⃣ Merge lookup + assigned
-      this.availabaleMenuList = lookupMenus.map((menu: any) => {
-        const backendId = assignedMap.get(menu.value) || null;
-        const isChecked = assignedMap.has(menu.value);
-        return {
-          id: backendId,               // ✅ Real backend menu ID
-          label: menu.label,
-          value: menu.value,           // 'user-management/users', etc.
-          checked: isChecked,
-        };
-      });
+      // 4️⃣ Merge: keep all menu IDs, mark assigned ones checked
+      this.availabaleMenuList = lookupMenus.map((menu: any) => ({
+        id: menu.id,                    // ✅ always keep the real backend menu ID
+        label: menu.label,
+        value: menu.value,
+        checked: assignedSet.has(menu.id), // ✅ checked if role already has access
+      }));
 
     } catch (err) {
       console.error('Failed to fetch role menus:', err);
@@ -108,12 +101,14 @@ export class AddNewRole implements OnInit {
     }
   }
 
+
   /** ✅ Create or update role */
   formHandler = async (type: 1 | 2 | null) => {
     this.isLoading = true;
 
     // 🔹 Collect checked menus
-    const selectedMenus = this.availabaleMenuList.filter((m: any) => m.checked && m.id);
+    const selectedMenus = this.availabaleMenuList.filter((m: any) => m.checked);
+
 
     if (selectedMenus.length === 0) {
       this.messageService.add({
@@ -134,6 +129,7 @@ export class AddNewRole implements OnInit {
       status: true,
       menuIds: selectedMenus.map((m: any) => m.id)
     };
+
 
     // 🔹 Determine endpoint
     const endpoint = this.userRoleDetails
@@ -192,12 +188,14 @@ export class AddNewRole implements OnInit {
     } else {
       // For Add New Role
       this.isLoading = false;
-      this.availabaleMenuList = this.lookupService.getUserPermissionEnum().map((m: any) => ({
-        id: null,
-        label: m.label,
-        value: m.value,
-        checked: false
-      }));
+      this.lookupService.getMenuList().then((menus) => {
+        this.availabaleMenuList = menus.map((m: any) => ({
+          id: null,
+          label: m.label,
+          value: m.value,
+          checked: false
+        }));
+      });
     }
   }
 }
