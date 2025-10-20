@@ -140,29 +140,31 @@ export class LookupService {
 
   UserPermissionEnum = [
     // 👤 User Management
-    { id: 1, value: 'user-management/users', label: 'User List' },
-    { id: 2, value: 'user-management/roles', label: 'Role List' },
-    { id: 3, value: 'user-management/register', label: 'Register User' },
+{ id: 1, value: 'user-management/roles', label: "Role List" },
+{ id: 2, value: 'user-management/role-link', label: "Role Link" },
+{ id: 3, value: 'user-management/add-new-role', label: "Add New Role" },
+{ id: 4, value: 'user-management/users', label: "User List" },
+{ id: 5, value: 'user-management/register', label: "Register User" },
 
     // 📊 Dashboard
-    { id: 4, value: 'dashboard', label: 'Dashboard', icon: 'fas fa-chart-line' },
+    { id: 6, value: 'dashboard', label: 'Dashboard', icon: 'fas fa-chart-line' },
 
     // 🧍 Beneficiary Management
-    { id: 5, value: 'beneficiary', label: 'Beneficiary', icon: 'fas fa-users' },
-    { id: 6, value: 'beneficiary/list', label: 'Beneficiary List', icon: 'fas fa-list' },
+    { id: 7, value: 'beneficiary', label: 'Beneficiary', icon: 'fas fa-users' },
+    { id: 8, value: 'beneficiary/list', label: 'Beneficiary List', icon: 'fas fa-list' },
 
     // ⚖️ Adjudication
-    { id: 7, value: 'adjudication-list', label: 'Adjudication', icon: 'fas fa-balance-scale' },
+    { id: 9, value: 'adjudication-list', label: 'Adjudication', icon: 'fas fa-balance-scale' },
 
     // 📋 Audit & Approval
-    { id: 8, value: 'beneficiary-audit', label: 'Beneficiary Audit', icon: 'fas fa-file-audio' },
-    { id: 9, value: 'beneficiary-audit/audit', label: 'Audit List', icon: 'fas fa-clipboard-list' },
-    { id: 10, value: 'beneficiary-approval', label: 'Approval List', icon: 'fas fa-user-check' },
-    { id: 11, value: 'beneficiary-approval/list', label: 'List', icon: 'fas fa-list-check' },
+    { id: 10, value: 'beneficiary-audit', label: 'Beneficiary Audit', icon: 'fas fa-file-audio' },
+    { id: 11, value: 'beneficiary-audit/audit', label: 'Audit List', icon: 'fas fa-clipboard-list' },
+    { id: 12, value: 'beneficiary-approval', label: 'Approval List', icon: 'fas fa-user-check' },
+    { id: 13, value: 'beneficiary-approval/list', label: 'List', icon: 'fas fa-list-check' },
 
     // 🗂 Archived / Restore
-    { id: 12, value: 'restore', label: 'Archived Beneficiary', icon: 'fas fa-trash-restore' },
-    { id: 13, value: 'restore/list', label: 'Archived List', icon: 'fas fa-archive' },
+    { id: 14, value: 'restore', label: 'Archived Beneficiary', icon: 'fas fa-trash-restore' },
+    { id: 15, value: 'restore/list', label: 'Archived List', icon: 'fas fa-archive' },
   ];
 
   getUserPermissionEnum = () => {
