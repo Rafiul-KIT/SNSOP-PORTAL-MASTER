@@ -43,7 +43,7 @@ export class Register implements OnInit {
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items: MenuItem[] = [
-    { label: 'User List', routerLink: ['/pages/user-management/users'], icon: 'fas fa-users' },
+    { label: 'User List', routerLink: ['/user-management/users'], icon: 'fas fa-users' },
     { label: 'Register New User', icon: 'fas fa-user-plus' },
   ];
 

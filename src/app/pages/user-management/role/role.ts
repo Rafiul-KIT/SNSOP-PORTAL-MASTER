@@ -142,7 +142,7 @@ export class Role implements OnInit, OnDestroy {
     this.ref = this.dialogService.open(AddNewRole, {
       data: roleDetails,
       width: '70%',
-      position: 'bottom',
+      position: 'middle',
       contentStyle: { background: 'transparent', border: 'none', overflow: 'auto' },
       style: { 'background-color': 'transparent', 'box-shadow': 'none' },
       showHeader: false,

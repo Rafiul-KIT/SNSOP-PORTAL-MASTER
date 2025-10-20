@@ -254,7 +254,7 @@ async loadUsers(): Promise<void> {
 
   /** ✅ Navigation methods */
   goToRegister() {
-    this.router.navigate(['/pages/user-management/register']);
+    this.router.navigate(['/user-management/register']);
   }
 
   /** View User in Popup */
@@ -300,7 +300,7 @@ async loadUsers(): Promise<void> {
   }
 
   editUser(user: any) {
-    this.router.navigate(['/pages/user-management/register'], {
+    this.router.navigate(['/user-management/register'], {
       queryParams: { id: user.id },
     });
   }
