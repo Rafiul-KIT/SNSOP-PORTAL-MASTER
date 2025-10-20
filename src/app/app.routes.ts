@@ -6,12 +6,14 @@ import { Profile } from './pages/profile/profile';
 import { Landing } from './pages/landing/landing';
 import { routeGuard } from './route.guard';
 import { authGuard } from './auth.guard';
-import {Users} from './pages/user-management/users/users';
-import {Role} from './pages/user-management/role/role';
-import {Register} from './pages/user-management/register/register';
-import {RoleLink} from './pages/user-management/role-link/role-link';
-import {AddNewRole} from './pages/user-management/add-new-role/add-new-role';
-import { Unauthorized} from './components/unauthorized/unauthorized';
+import { Users } from './pages/user-management/users/users';
+import { Register } from './pages/user-management/register/register';
+import { Role } from './pages/user-management/role/role';
+import { RoleLink } from './pages/user-management/role-link/role-link';
+import { AddNewRole } from './pages/user-management/add-new-role/add-new-role';
+import { Unauthorized } from './components/unauthorized/unauthorized';
+
+
 
 export const routes: Routes = [
   {
@@ -36,7 +38,7 @@ export const routes: Routes = [
   },
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
   {
-    path: 'pages/user-management',
+    path: 'user-management',
     canActivateChild: [routeGuard],
     children: [
       { path: 'users', component: Users },

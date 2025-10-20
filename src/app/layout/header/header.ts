@@ -38,7 +38,7 @@ export class Header {
         this.isPortalsPage = event.urlAfterRedirects !== '/landing';
         this.isLandingPage = event.urlAfterRedirects === '/landing';
         const isUserManagementPage = event.urlAfterRedirects.startsWith(
-          '/pages/user-management/'
+          '/user-management/'
         );
         this.updateMenuList(isUserManagementPage);
       });
@@ -47,7 +47,7 @@ export class Header {
     effect(() => {
       this.userInfo = this.azureService.loginState()?.user;
       const isUserManagementPage = this.router.url.startsWith(
-        '/pages/user-management/'
+        '/user-management/'
       );
       this.updateMenuList(isUserManagementPage);
     });
@@ -74,7 +74,7 @@ export class Header {
         label: 'Settings',
         icon: 'fas fa-cog',
         command: () => {
-          this.router.navigate(['/pages/user-management/users']);
+          this.router.navigate(['/user-management/users']);
           this.showPortalOptions = false;
         },
       },
@@ -92,17 +92,17 @@ getStaticMasterMenus(): MenuItem[] {
         {
           label: 'User List',
           icon: 'fas fa-list',
-          routerLink: ['/pages/user-management/users'],
+          routerLink: ['/user-management/users'],
         },
         {
           label: 'Register User',
           icon: 'fas fa-user-plus',
-          routerLink: ['/pages/user-management/register'],
+          routerLink: ['/user-management/register'],
         },
         {
           label: 'Role List',
           icon: 'fas fa-shield',
-          routerLink: ['/pages/user-management/roles'],
+          routerLink: ['/user-management/roles'],
         },
       ],
     },

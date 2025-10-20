@@ -29,13 +29,13 @@ export class LookupService {
   /** Simple caches to avoid refetching */
   private statesCache: IdName[] | null = null;
   private countiesByState = new Map<string | number, IdName[]>();
-  private payamsByCounty  = new Map<string | number, IdName[]>();
-  private bomasByPayam    = new Map<string | number, IdName[]>();
+  private payamsByCounty = new Map<string | number, IdName[]>();
+  private bomasByPayam = new Map<string | number, IdName[]>();
 
   /** Endpoint path (change if your gateway/path differs) */
   private readonly GEO_SEARCH_URL = '/api/lookup/geo/search';
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
 
   // ---------- PUBLIC API USED BY THE FORM ----------
 
@@ -139,24 +139,30 @@ export class LookupService {
   }
 
   UserPermissionEnum = [
-    { id: 1, value: '/pages/user-management/roles', label: "Role List" },
-    { id: 2, value: '/pages/user-management/role-link', label: "Role Link" },
-    { id: 3, value: '/pages/user-management/add-new-role', label: "Add New Role" },
-    { id: 4, value: '/pages/user-management/users', label: "User List" },
-    { id: 5, value: '/pages/user-management/register', label: "Register User" },
+    // 👤 User Management
+    { id: 1, value: 'user-management/users', label: 'User List' },
+    { id: 2, value: 'user-management/roles', label: 'Role List' },
+    { id: 3, value: 'user-management/register', label: 'Register User' },
 
-    // New Menu Items
-    { id: 6, value: '/dashboard', label: "Dashboard", icon: 'fas fa-dashboard' },
-    { id: 7, value: '/beneficiary/list', label: "Beneficiary List", icon: 'fas fa-list' },
-    { id: 8, value: '/beneficiary-approval-list/edit', label: "Approval List", icon: 'fas fa-user-check' },
-    { id: 9, value: '/adjudication-list', label: "Adjudication", icon: 'fas fa-users-viewfinder' },
-    { id: 10, value: '/id-card', label: "Beneficiary ID Cards", icon: 'fas fa-id-card' },
-    { id: 11, value: '/id-card', label: "Job Card", icon: 'fas fa-id-card' },
-    { id: 12, value: '/id-card', label: "Work Progress", icon: 'fas fa-line-chart' },
-    { id: 13, value: '/id-card', label: "LIPW Export", icon: 'fas fa-file-export' },
-    { id: 14, value: '/report', label: "Report", icon: 'fas fa-file-alt' },
-    { id: 15, value: '/beneficiary/audit', label: "Beneficiary Audit", icon: 'fas fa-history' },
-    { id: 16, value: '/beneficiary/restore', label: "Archived Beneficiary", icon: 'fas fa-trash-restore' }
+    // 📊 Dashboard
+    { id: 4, value: 'dashboard', label: 'Dashboard', icon: 'fas fa-chart-line' },
+
+    // 🧍 Beneficiary Management
+    { id: 5, value: 'beneficiary', label: 'Beneficiary', icon: 'fas fa-users' },
+    { id: 6, value: 'beneficiary/list', label: 'Beneficiary List', icon: 'fas fa-list' },
+
+    // ⚖️ Adjudication
+    { id: 7, value: 'adjudication-list', label: 'Adjudication', icon: 'fas fa-balance-scale' },
+
+    // 📋 Audit & Approval
+    { id: 8, value: 'beneficiary-audit', label: 'Beneficiary Audit', icon: 'fas fa-file-audio' },
+    { id: 9, value: 'beneficiary-audit/audit', label: 'Audit List', icon: 'fas fa-clipboard-list' },
+    { id: 10, value: 'beneficiary-approval', label: 'Approval List', icon: 'fas fa-user-check' },
+    { id: 11, value: 'beneficiary-approval/list', label: 'List', icon: 'fas fa-list-check' },
+
+    // 🗂 Archived / Restore
+    { id: 12, value: 'restore', label: 'Archived Beneficiary', icon: 'fas fa-trash-restore' },
+    { id: 13, value: 'restore/list', label: 'Archived List', icon: 'fas fa-archive' },
   ];
 
   getUserPermissionEnum = () => {

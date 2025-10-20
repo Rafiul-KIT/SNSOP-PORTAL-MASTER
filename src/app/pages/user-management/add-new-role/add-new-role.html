@@ -3,13 +3,14 @@
     <h5 class="mb-0">{{ userRoleDetails ? 'Update Role' : 'Add New Role' }}</h5>
     <button type="button" class="btn-close" (click)="closeDialog()" aria-label="Close"></button>
   </div>
+
   <div class="card-body">
     @if (isLoading) {
       <app-loader></app-loader>
     } @else {
       <div class="container">
         <div class="row justify-content-center">
-          <!-- Left: Basic info -->
+          <!-- Left: Basic Info -->
           <div class="col-12 col-md-5 col-lg-4" [formGroup]="userRoleForm">
             <div class="card mt-2">
               <h5 class="card-header p-3">Basic Information</h5>
@@ -17,16 +18,8 @@
                 <!-- Role Name -->
                 <div class="mb-3">
                   <label for="roleName" class="fw-bold d-block mb-1">Role Name</label>
-
-                  <input
-                    type="text"
-                    id="roleName"
-                    formControlName="roleName"
-                    placeholder="Enter Role Name"
-                    class="form-control"
-                    [ngClass]="{ 'is-invalid': roleNameCtrl?.touched && roleNameCtrl?.invalid }"
-                  />
-
+                  <input type="text" id="roleName" formControlName="roleName" placeholder="Enter Role Name"
+                    class="form-control" [ngClass]="{ 'is-invalid': roleNameCtrl?.touched && roleNameCtrl?.invalid }" />
                   @if (roleNameCtrl?.touched && roleNameCtrl?.invalid) {
                     <div class="invalid-feedback d-block">
                       @if (roleNameErrors['required']) {
@@ -45,68 +38,62 @@
                 <!-- Role Description -->
                 <div class="mb-3">
                   <label for="roleDescription" class="fw-bold d-block mb-1">Role Description</label>
-                  <textarea
-                    id="roleDescription"
-                    formControlName="roleDescription"
-                    class="form-control"
-                    rows="9"
-                    placeholder="Enter Role Description">
-                  </textarea>
+                  <textarea id="roleDescription" formControlName="roleDescription" class="form-control" rows="9"
+                    placeholder="Enter Role Description"></textarea>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right: Permission List -->
+          <!-- Right: Flat Menu Access -->
           <div class="col-12 col-md-7 col-lg-8">
             <div class="card mt-2">
-              <h5 class="card-header p-3">Permission List</h5>
+              <h5 class="card-header p-3">Menu Access</h5>
               <div class="card-body">
-                @for (permission of availabaleRoleList; track permission.value) {
-                  <div class="d-flex align-items-center gap-1 mb-1">
-                    <p-checkbox
-                      [value]="permission.value"
-                      [ngModel]="permission.checked"
-                      [ngModelOptions]="{ standalone: true }"
-                      [binary]="true"
-                      (onChange)="getSelectedPermission($event.checked, permission.value)"
-                      [inputId]="permission.value + '_' + permission.id">
-                    </p-checkbox>
-                    <label [for]="permission.value + '_' + permission.id">{{ permission.label }}</label>
-                  </div>
+                @if (isLoading) {
+                  <app-loader></app-loader>
+                } @else {
+                  @if (availabaleMenuList.length > 0) {
+                    @for (menu of availabaleMenuList; track menu.value) {
+                      <div class="d-flex align-items-center gap-1 mb-1">
+                        <p-checkbox [binary]="true" [(ngModel)]="menu.checked"
+                          [inputId]="'menu_' + menu.value" [ngModelOptions]="{ standalone: true }">
+                        </p-checkbox>
+                        <label [for]="'menu_' + menu.value">{{ menu.label }}</label>
+                      </div>
+                    }
+                  } @else {
+                    <p class="text-muted">No menus found.</p>
+                  }
                 }
               </div>
             </div>
           </div>
 
-          <!-- Footer buttons -->
+          <!-- Footer Buttons -->
           <div class="col-12 col-md-12 col-lg-12">
             <div class="card mt-2">
               @if (userRoleDetails == null) {
                 <div class="card-body text-end">
-                  <button class="btn btn-success btn-sm rounded-0 me-2"
-                          (click)="formHandler(1)"
-                          [disabled]="userRoleForm.invalid">
+                  <button class="btn btn-success btn-sm rounded-0 me-2" (click)="formHandler(1)"
+                    [disabled]="userRoleForm.invalid">
                     <i class="fas fa-save me-2"></i>Save &amp; Close
                   </button>
-                  <button class="btn btn-success btn-sm rounded-0"
-                          (click)="formHandler(2)"
-                          [disabled]="userRoleForm.invalid">
+                  <button class="btn btn-success btn-sm rounded-0" (click)="formHandler(2)"
+                    [disabled]="userRoleForm.invalid">
                     <i class="fas fa-save me-2"></i>Save &amp; Add New
                   </button>
                 </div>
               } @else {
                 <div class="card-body d-flex justify-content-end">
-                  <button class="btn btn-success btn-sm rounded-0"
-                          (click)="formHandler(null)"
-                          [disabled]="userRoleForm.invalid">
+                  <button class="btn btn-success btn-sm rounded-0" (click)="formHandler(null)"
+                    [disabled]="userRoleForm.invalid">
                     <i class="fas fa-save me-2"></i>Update
                   </button>
                 </div>
               }
             </div>
           </div>
-
         </div>
       </div>
     }
