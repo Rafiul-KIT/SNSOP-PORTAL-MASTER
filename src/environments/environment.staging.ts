@@ -2,21 +2,21 @@ export const environment = {
   production: false,
   env: 'dev',
   useHash: true,
-  domain: 'https://devportalmaster.southsudansafetynet.info',
+  domain: 'https://newmis.southsudansafetynet.info',
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
   portals: {
-    master: 'https://devportalmaster.southsudansafetynet.info/master/',
-    beneficiary: 'https://devportalmaster.southsudansafetynet.info/beneficiary',
-    payment: 'https://devportalmaster.southsudansafetynet.info/payment',
-    grm: 'https://devportalmaster.southsudansafetynet.info/grm',
-    report: 'https://devportalmaster.southsudansafetynet.info/report',
+    master: 'https://newmis.southsudansafetynet.info/trial/master/',
+    beneficiary: 'https://newmis.southsudansafetynet.info/trial/beneficiary/',
+    payment: 'https://newmis.southsudansafetynet.info/trial/payment/',
+    grm: 'https://newmis.southsudansafetynet.info/trial/grm/',
+    report: 'https://newmis.southsudansafetynet.info/trial/report/',
   },
   msalConfig: {
     auth: {
       clientId: 'f33243cb-5b62-4850-984b-96f75e9cdce4',
       authority: 'https://login.microsoftonline.com/4a9fe01e-5c9c-4cb8-b299-fb5211533420',
-      redirectUri: 'https://devportalmaster.southsudansafetynet.info/master/',
-      postLogoutRedirectUri: 'https://devportalmaster.southsudansafetynet.info/master/'
+      redirectUri: 'https://newmis.southsudansafetynet.info/trial/master/',
+      postLogoutRedirectUri: ' https://newmis.southsudansafetynet.info/trial/master/'
     },
     cache: {
       cacheLocation: 'localStorage',
