@@ -169,4 +169,24 @@ export class Role implements OnInit, OnDestroy {
     }
   }
 
+  resetForm() {
+  // Step 1: Clear the criteria form
+  this.criteriaForm.reset({
+    name: '',
+    description: ''
+  });
+
+  // Step 2: Reset searchForm (page and criteria should be reset as well)
+  this.searchForm.patchValue({
+    criteria: [],
+    first: 0,
+    page: 0,
+    size: 10
+  });
+
+  // Step 3: Re-fetch the user role list with the reset search form values
+  this.fetchUserRoleList(this.searchForm.value);
+}
+
+
 }
