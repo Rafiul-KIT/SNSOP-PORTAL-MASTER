@@ -248,6 +248,7 @@ async loadUsers(): Promise<void> {
       roleId: '',
       emailReceiver: ''
     }; 
+    this.applyFilters();
   }
 
   /** ✅ Navigation methods */
