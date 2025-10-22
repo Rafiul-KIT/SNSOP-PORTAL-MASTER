@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 import { MenuItem } from 'primeng/api';
 import { filter } from 'rxjs';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-header',
@@ -25,7 +26,8 @@ export class Header {
 
   constructor(
     private router: Router,
-    private azureService: AzureAdAuthService
+    private azureService: AzureAdAuthService,
+    private apiService: ApiService,
   ) {
     // Detect route changes
     this.router.events
@@ -154,7 +156,8 @@ updateMenuList(isUserManagementPage: boolean) {
   goToProfile = () => {
     this.router.navigateByUrl('/home/profile');
   };
-  logout = () => {
-    this.azureService.logout();
-  };
+  logout() {
+    this.apiService.logout();
+    window.location.href = `${environment.portals.master}/#/landing`;
+  }
 }
