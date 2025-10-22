@@ -1,26 +1,17 @@
 <p-toast position="bottom-right" />
 <div class="breadcrumb-wrapper d-flex justify-content-between align-items-center">
-  <!-- Breadcrumb on the left -->
-  <p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
+    <!-- Breadcrumb on the left -->
+    <p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
 
-  <div class="d-flex pt-2">
-    <p-button
-      label="Link Role"
-      icon="fas fa-id-card-clip"
-      severity="warn"
-      size="small"
-      class="me-2"
-      (onClick)="linkRoleModal()">
-    </p-button>
+    <div class="d-flex pt-2">
+        <p-button label="Link Role" icon="fas fa-id-card-clip" severity="warn" size="small" class="me-2"
+            (onClick)="linkRoleModal()">
+        </p-button>
 
-    <p-button
-      label="Add New Role"
-      icon="fas fa-user-check"
-      severity="primary"
-      size="small"
-      (onClick)="manageRoleModal(null)">
-    </p-button>
-  </div>
+        <p-button label="Add New Role" icon="fas fa-user-check" severity="primary" size="small"
+            (onClick)="manageRoleModal(null)">
+        </p-button>
+    </div>
 </div>
 
 
@@ -77,8 +68,8 @@
         <ng-template pTemplate="body" let-role let-rowIndex="rowIndex">
             <tr>
                 <td>{{ (searchForm.value.first || 0) + rowIndex + 1 }}</td> <!-- Adjust the index with page offset -->
-                <td>{{ role.name }}</td>
-                <td>{{ role.description || '—' }}</td>
+                <td>{{ role.roleName }}</td>
+                <td>{{ role.roleDescription || '—' }}</td>
                 <td class="text-center">
                     <i class="fas fa-pencil hand text-primary" (click)="manageRoleModal(role)"></i>
                 </td>
@@ -94,9 +85,11 @@
 
 
 
-    <!-- <p-paginator class="w-100" (onPageChange)="pageChange($event)" [first]="searchForm.value.first"
-        [rows]="searchForm.value.size" [totalRecords]="total" [rowsPerPageOptions]="rowsPerPage">
-    </p-paginator> -->
+    <p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="pageChange($event)" [first]="(currentPage) * pageSize"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    </p-paginator>
+
 
 </div>
 }
