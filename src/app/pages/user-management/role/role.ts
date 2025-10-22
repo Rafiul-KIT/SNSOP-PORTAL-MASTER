@@ -8,10 +8,20 @@ import { Loader } from "../../../components/loader/loader";
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TableModule } from "primeng/table";
 import { PaginatorModule } from "primeng/paginator";
-import {RoleLink} from '../role-link/role-link';
-import {AddNewRole} from '../add-new-role/add-new-role';
+import { RoleLink } from '../role-link/role-link';
+import { AddNewRole } from '../add-new-role/add-new-role';
 import { Button } from "primeng/button";
 import { Toast } from 'primeng/toast';
+import { AxiosResponse } from 'axios';
+
+interface UserRoleResponse {
+  status: boolean;
+  message: string;
+  data: any;
+  httpStatus: string;
+  roles: Array<{ id: number; roleName: string; roleDescription: string; status: boolean }>;
+  total: number;
+}
 
 @Component({
   selector: 'app-role',
@@ -49,6 +59,10 @@ export class Role implements OnInit, OnDestroy {
 
   operators: any = ['EQUAL', 'LIKE', 'LTE', 'GTE'];
 
+  currentPage: number = 0; // current page for pagination
+  pageSize: number = 10; // page size for pagination
+  totalRecords: number = 0; // total records for pagination
+
   constructor(private apiService: ApiService, public lookupService: LookupService, public dialogService: DialogService, private cdr: ChangeDetectorRef) { }
 
   ref: DynamicDialogRef | undefined;
@@ -65,13 +79,12 @@ export class Role implements OnInit, OnDestroy {
     this.isLoading = true;
     // Update the form with correct pagination values
     this.searchForm.patchValue({
-      first: event.first,
-      page: event.page,
-      size: event.rows,
+      first: event.first, // Update first value for the correct set of rows
+      page: event.page,   // Update the page
+      size: event.rows,   // Update page size
     });
     this.fetchUserRoleList(this.searchForm.value); // Re-fetch roles
   }
-
 
   submitSearchForm = () => {
     this.isLoading = true;
@@ -79,26 +92,30 @@ export class Role implements OnInit, OnDestroy {
       page: 0,
       first: 0
     });
+
     const _tempCriteria: any = [];
-    // console.log(this.criteriaForm.value);
+
+    // Dynamically select the correct field name based on form input
     this.availableFieldNames.forEach((field: any) => {
-      if (this.criteriaForm.value[field.fieldName] != '') {
+      // Dynamically pick the fieldName from availableFieldNames, and not hardcoded
+      if (this.criteriaForm.value[field.fieldName] !== '') {
         _tempCriteria.push({
-          "fieldName": field.fieldName,
+          "fieldName": field.fieldName === 'name' ? "ROLE_NAME" : "ROLE_DESCRIPTION", // Set dynamically
           "operator": field.operator,
           "value": this.criteriaForm.value[field.fieldName]
         });
       }
     });
+
     this.criteriaList = _tempCriteria;
     const payload = {
       criteria: this.criteriaList,
       page: this.searchForm.value.page,
       size: this.searchForm.value.size
-    }
+    };
     this.fetchUserRoleList(payload);
-    // console.log(_tempCriteria);
   }
+
   fetchUserRoleList = (payload: any) => {
     const customPayload = {
       criteria: payload.criteria,
@@ -108,15 +125,13 @@ export class Role implements OnInit, OnDestroy {
 
     this.isLoading = true;
 
-    this.apiService.GET('api/users/roles', customPayload, 'alt')
-      .then(res => {
+    this.apiService.POST('api/roles/searchRole', customPayload, 'alt')
+      .then((res: AxiosResponse<UserRoleResponse>) => {
         if (res.status === 200) {
-          // ✅ Directly assign array response
-          this.userRoleList = Array.isArray(res.data) ? res.data : [];
-
-          // ✅ Optional: if total count is not returned, derive from length
-          this.total = this.userRoleList.length;
-
+          this.userRoleList = Array.isArray(res.data.roles) ? res.data.roles : [];
+          this.total = res.data.total || 0;
+          this.totalRecords = this.total; // Ensure total records are set for paginator
+          this.currentPage = payload.page;  // Update current page on successful response
         } else {
           this.userRoleList = [];
         }
@@ -130,7 +145,6 @@ export class Role implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       });
   }
-
 
   ngOnInit(): void {
     this.items = [{ icon: 'fas fa-users-rays me-2', label: 'Role List' }];
@@ -170,23 +184,21 @@ export class Role implements OnInit, OnDestroy {
   }
 
   resetForm() {
-  // Step 1: Clear the criteria form
-  this.criteriaForm.reset({
-    name: '',
-    description: ''
-  });
+    // Step 1: Clear the criteria form
+    this.criteriaForm.reset({
+      name: '',
+      description: ''
+    });
 
-  // Step 2: Reset searchForm (page and criteria should be reset as well)
-  this.searchForm.patchValue({
-    criteria: [],
-    first: 0,
-    page: 0,
-    size: 10
-  });
+    // Step 2: Reset searchForm (page and criteria should be reset as well)
+    this.searchForm.patchValue({
+      criteria: [],
+      first: 0,
+      page: 0,
+      size: 10
+    });
 
-  // Step 3: Re-fetch the user role list with the reset search form values
-  this.fetchUserRoleList(this.searchForm.value);
-}
-
-
+    // Step 3: Re-fetch the user role list with the reset search form values
+    this.fetchUserRoleList(this.searchForm.value);
+  }
 }
