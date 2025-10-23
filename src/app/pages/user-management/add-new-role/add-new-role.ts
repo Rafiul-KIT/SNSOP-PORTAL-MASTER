@@ -42,7 +42,7 @@ export class AddNewRole implements OnInit {
     this.userRoleForm = this.fb.group({
       roleName: ['', [
         Validators.required,
-        Validators.minLength(3),
+        Validators.minLength(2),
         Validators.pattern(/^[A-Za-z][A-Za-z0-9 _-]*$/)
       ]],
       roleDescription: [''],
@@ -187,14 +187,17 @@ export class AddNewRole implements OnInit {
       this.fetchRoleMenus(this.userRoleDetails.id);
     } else {
       // For Add New Role
-      this.isLoading = false;
+      this.isLoading = true;
+      // ✅ Corrected version
       this.lookupService.getMenuList().then((menus) => {
         this.availabaleMenuList = menus.map((m: any) => ({
-          id: null,
+          id: m.id,           // ✅ Keep original ID
           label: m.label,
           value: m.value,
           checked: false
         }));
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
     }
   }
