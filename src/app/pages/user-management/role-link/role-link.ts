@@ -54,7 +54,7 @@ export class RoleLink implements OnInit {
   // ✅ Fetch roles from /api/role/searchRole
   fetchRoleList = async () => {
     try {
-      const res = await this.apiService.POST('api/roles/searchRole', { size: 100 }, 'alt');
+      const res = await this.apiService.POST('api/roles/searchRole', { size: 1000 }, 'alt');
       console.log('Role API Response:', res);
       if (res.status === 200 && res.data) {
         this.roleList = res.data.roles || res.data.roleList || (Array.isArray(res.data) ? res.data : []);
@@ -74,7 +74,7 @@ export class RoleLink implements OnInit {
       const res = await this.apiService.POST(
         'api/users/search',
         {
-          size: 100,
+          size: 1000,
           /*criteria: [{ fieldName: 'STATUS', operator: 'EQUAL', value: '0' }],*/
         },
         'alt'
