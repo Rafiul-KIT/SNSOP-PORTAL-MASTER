@@ -84,57 +84,60 @@ export class Header {
     ];
   }
 
-// ✅ 1. Match backend labels exactly
-getStaticMasterMenus(): MenuItem[] {
-  return [
-    {
-      label: 'User Management', // must match backend name
-      icon: 'fas fa-users',
-      items: [
-        {
-          label: 'User List',
-          icon: 'fas fa-list',
-          routerLink: ['/user-management/users'],
-        },
-        {
-          label: 'Register User',
-          icon: 'fas fa-user-plus',
-          routerLink: ['/user-management/register'],
-        },
-        {
-          label: 'Role List',
-          icon: 'fas fa-shield',
-          routerLink: ['/user-management/roles'],
-        },
-      ],
-    },
-  ];
-}
-
-// ✅ 2. Filter to show only menus that exist in both backend + static
-updateMenuList(isUserManagementPage: boolean) {
-  if (this.isLandingPage) {
-    this.menuList = [];
-    return;
+  // ✅ 1. Match backend labels exactly
+  getStaticMasterMenus(): MenuItem[] {
+    return [
+      {
+        label: 'User Management', // must match backend name
+        icon: 'fas fa-users',
+        items: [
+          {
+            label: 'User List',
+            icon: 'fas fa-list',
+            routerLink: ['/user-management/users'],
+          },
+          {
+            label: 'Register User',
+            icon: 'fas fa-user-plus',
+            routerLink: ['/user-management/register'],
+          },
+          {
+            label: 'Role List',
+            icon: 'fas fa-shield',
+            routerLink: ['/user-management/roles'],
+          },
+        ],
+      },
+    ];
   }
 
-  const state = this.azureService.loginState();
-  const permittedMenus = state?.menus || [];
+  updateMenuList(isUserManagementPage: boolean) {
+    if (this.isLandingPage) {
+      this.menuList = [];
+      return;
+    }
 
-  // Filter backend menus only for master portal ones
-  const masterMenus = permittedMenus.filter(
-    (m: any) =>
-      m.name === 'User Management' ||
-      (m.parentMenu && m.parentMenu.name === 'User Management')
-  );
+    const state = this.azureService.loginState();
+    const permittedMenus = state?.menus || [];
 
-  const allowedNames = masterMenus.map((m: any) => m.name);
-  const staticMenus = this.getStaticMasterMenus();
-  const filteredMenus = this.filterMenusByAccess(staticMenus, allowedNames);
+    // Get the current route path without query parameters
+    const currentPath = this.router.url.split('?')[0];  // Strip out query parameters
 
-  // Only apply menus when in master portal pages
-  this.menuList = isUserManagementPage ? filteredMenus : [];
-}
+    // Filter backend menus only for master portal ones
+    const masterMenus = permittedMenus.filter(
+      (m: any) =>
+        m.name === 'User Management' ||
+        (m.parentMenu && m.parentMenu.name === 'User Management')
+    );
+
+    const allowedNames = masterMenus.map((m: any) => m.name);
+    const staticMenus = this.getStaticMasterMenus();
+    const filteredMenus = this.filterMenusByAccess(staticMenus, allowedNames);
+
+    // Only apply menus when in user-management pages (using currentPath)
+    this.menuList = currentPath.startsWith('/user-management/') ? filteredMenus : [];
+  }
+
 
 
   // ✅ Recursive filter: keep only allowed menus

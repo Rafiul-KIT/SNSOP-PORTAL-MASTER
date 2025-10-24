@@ -301,6 +301,12 @@ export class Register implements OnInit {
       this.msg.add({ severity: 'error', summary: 'Error', detail: `Failed: ${status} - ${message}`, life: 7000 });
     } finally {
       this.isLoading = false;
+      const idParam = this.activatedRoute.snapshot.queryParamMap.get('id');
+      this.routeUserId = idParam !== null ? Number(idParam) : null;
+
+      if (this.routeUserId !== null && !Number.isNaN(this.routeUserId)) {
+        this.loadUserDetails(this.routeUserId);
+      }
       this.cdr.detectChanges();
     }
   }

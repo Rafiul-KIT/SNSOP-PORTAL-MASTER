@@ -1,27 +1,3 @@
-/*
-import { inject } from '@angular/core';
-import { CanActivateChildFn, Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
-import { environment } from '../environments/environment';
-
-export const routeGuard: CanActivateChildFn = (route: any) => {
-  const cookieService = inject(CookieService);
-  const router = inject(Router);
-  let lState: boolean = true;
-  const ACCESS_TOKEN = environment.cookie_name;
-  const isLoggedIn = cookieService.get(ACCESS_TOKEN) ? true : false;
-  console.log('routeGuard', isLoggedIn);
-  // console.log('routeGuard', route.routeConfig.path);
-  if (!isLoggedIn) {
-    lState = false;
-    router.navigateByUrl('/login');
-  }
-  return lState;
-};
-*/
-
-
-// src/app/route.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateChildFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
@@ -80,7 +56,11 @@ export const routeGuard: CanActivateChildFn = async (childRoute: ActivatedRouteS
 
   // Check if the target URL is in the user's permitted menus
   const targetUrl = state.url;
-  const urlToCheck = targetUrl.startsWith('/') ? targetUrl.substring(1) : targetUrl;
+
+  // Strip query parameters from the URL (ignore the query part)
+  const urlToCheck = targetUrl.split('?')[0].startsWith('/') 
+    ? targetUrl.split('?')[0].substring(1) 
+    : targetUrl.split('?')[0]; // Strip query parameters and ensure no leading slashes
 
   const allowed = menus.some((menu: any) => menu.url === urlToCheck);
 
@@ -92,6 +72,3 @@ export const routeGuard: CanActivateChildFn = async (childRoute: ActivatedRouteS
 
   return true;
 };
-
-
-
