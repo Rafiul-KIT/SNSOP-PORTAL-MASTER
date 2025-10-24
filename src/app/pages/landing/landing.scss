@@ -1,7 +1,7 @@
 .home {
   display: flex;
   flex-direction: column;
-  min-height: 93vh; /* Ensure the home container takes up the full height */
+  min-height: 92vh; /* Ensure the home container takes up the full height */
   background-image: url('../../../../public/bg_loginpage.png'); /* Set your background image */
   background-size: cover; /* Make the background cover the entire container */
   background-position: center; /* Center the background image */
@@ -31,12 +31,12 @@
 
 .wrapper {
   position: absolute;
-  top: 60px;
+  top: 0px;
   left: 0;
   right: 0;
   bottom: 0;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   background-color: rgba(241, 241, 241, 0.8);
   padding: 20px;
   box-sizing: border-box;
