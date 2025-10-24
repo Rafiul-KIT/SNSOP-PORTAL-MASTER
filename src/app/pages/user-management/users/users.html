@@ -85,7 +85,7 @@
     dataKey="id" size="small">
     <ng-template pTemplate="header">
       <tr>
-        <th colspan="7" class="text-end">
+        <th colspan="8" class="text-end">
           <p class="fw-bold mb-2">
             Showing <kbd>{{ users.length }}</kbd> of
             <kbd>{{ totalRecords }}</kbd> users
@@ -129,16 +129,16 @@
           <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
             icon="fas fa-pencil" pTooltip="Edit" tooltipPosition="top" appendTo="body" (onClick)="editUser(user)"
             size="small" outlined="true" severity="secondary" class="me-2 action-btn" />
-          <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
+          <!-- <p-button [style]="{ width: '35px', minWidth: '35px', height: '32px', padding: '0' }" type="button"
             icon="fas fa-archive" pTooltip="Archive" tooltipPosition="top" appendTo="body" (onClick)="deleteUser(user)"
-             size="small" outlined="true" severity="danger" class="action-btn"  />
+             size="small" outlined="true" severity="danger" class="action-btn"  /> -->
         </td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center text-danger">
+        <td colspan="8" class="text-center text-danger">
           <b>No users found!</b>
         </td>
       </tr>
