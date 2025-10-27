@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
 
-  background: url("../../../../public/map.jpg") no-repeat center center fixed;
+  background: url("../../../../public/bg_loginpage.png") no-repeat center center fixed;
 
   background-size: cover;
 
@@ -31,13 +31,13 @@
       gap: 10px;
       width: 150px;
       height: 150px;
-      background: #ffffff;
+      background: #070808cc;
       border-radius: 12px;
       transition: 0.25s;
 
       i {
         font-size: 50px;
-        color: #4fcaeb;
+        color: #ffffff;
       }
 
       span {

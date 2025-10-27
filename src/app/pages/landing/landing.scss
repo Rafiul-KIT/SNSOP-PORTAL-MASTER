@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 92vh; /* Ensure the home container takes up the full height */
-  background-image: url('../../../../public/bg_loginpage.png'); /* Set your background image */
+  // background-image: url('../../../../public/bg_loginpage.png'); /* Set your background image */
   background-size: cover; /* Make the background cover the entire container */
   background-position: center; /* Center the background image */
   background-repeat: no-repeat; /* Prevent repeating the image */
@@ -97,3 +97,59 @@ app-loader {
 }
 
 
+:root {
+  --snsop-blue: #007bff;
+  --snsop-green: #28a745;
+  --snsop-orange: #ffc107;
+  --snsop-dark: #343a40;
+  --snsop-light: #f8f9fa;
+  --snsop-bottle-green: #031201;
+}
+
+body {
+  background-color: var(--snsop-light);
+  color: var(--snsop-dark);
+}
+
+.section-title {
+  color: var(--snsop-blue);
+  border-bottom: 3px solid var(--snsop-blue);
+  padding-bottom: 8px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.activity-card {
+  transition: transform 0.2s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+}
+.scroll-banner {
+  background: #CFE2FF;
+  color: black;
+  font-size: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 10px;
+  position: flex;
+}
+
+.scroll-banner p {
+  display: inline-block;
+  margin: 0;
+  position: absolute; /* so it starts outside the view */
+  left: 100%; /* start completely off the right edge */
+  animation: scroll-left 15s linear infinite;
+}
+
+
+@keyframes scroll-left {
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -100%;
+  }
+}

@@ -1,46 +1,273 @@
 <div class="home">
-  <div class="header">
-    <h4 class="brand">
-      <img src="SNSOP_logo.png" height="30px" alt="" />
-    </h4>
-  </div>
 
-  <div class="wrapper">
-    <!-- Loader component shown when loading is true, it will overlay on the card -->
-    @if (isLoading) { <app-loader></app-loader> }
-    @else {
-    <!-- <p-card class="login-card text-center">
-      <ng-template pTemplate="content">
-        <form>
-          <h1 class="m-0">Login</h1>
-          <p class="text-600 mt-2">Sign In with your Microsoft account</p>
-          <div class="grid mt-3">
-            <div class="col-12">
-              <p-button styleClass="w-full" icon="fas fa-sign-in" [loading]="isLoading" (onClick)="loginWithAzureAD()"
-                [label]="isLoading ? 'Logging in...' : 'Login With Microsoft Account'">
-              </p-button>
-            </div>
+  <div class="scroll-banner">
+  <p>
+    Phase II payment is upcoming ...Stay Tuned for Updates! 
+  </p>
+  <br/>
+</div>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0c5358; height:130px;">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="#">
+        <div class="bg-success text-white p-2 rounded me-2 fw-bold">SNSOP</div>
+        Safety Net for Socioeconomic Opportunities Project
+      </a>
+      <div>
+        <button class="btn btn-primary fw-bold" [disabled]="isLoading" (click)="loginWithAzureAD()">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          {{ isLoading ? 'Logging in...' : 'Login with Microsoft Account' }}
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Scrolling Banner -->
+<!-- <div class="scroll-banner">
+  <p>
+    South Sudan National Safety Net Program 🇸🇸 — Stay Tuned for Updates! Phase II payment is upcoming ...
+  </p>
+</div> -->
+
+
+  <!-- Loader -->
+  @if (isLoading) {
+  <app-loader></app-loader>
+  }
+
+  <!-- Main Content -->
+  <div class="container py-4" *ngIf="!isLoading">
+    <!-- Goal -->
+    <h2 class="section-title">Goal and Development Objective</h2>
+    <p>
+      The primary objective of the SNSOP is to
+      <strong>provide cash transfers</strong>,
+      <strong>enhance income-generating opportunities</strong>, and
+      <strong>strengthen the National Safety Net Delivery System</strong> in
+      South Sudan.
+    </p>
+
+    <!-- Activities -->
+    <h2 class="section-title">SNSOP Core Activities</h2>
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="card text-white bg-primary activity-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">Cash Transfers</h5>
+            <p>
+              Providing direct cash assistance to vulnerable households to meet
+              immediate consumption needs.
+            </p>
           </div>
-        </form>
-      </ng-template>
-    </p-card> -->
-    <form class="text-left">
-      <img src="SNSOP_logo.png" alt="SNSOP Logo" style="height: 25%;">
-      <p class="text-600 mt-2 title-large ">
-        Management <br>
-        Information <br>
-        System
-      </p>
-
-      <div class="grid mt-3">
-        <div class="col-12">
-          <p-button styleClass="w-full" icon="fas fa-sign-in" [loading]="isLoading" (onClick)="loginWithAzureAD()"
-            [label]="isLoading ? 'Logging in...' : 'Login With Microsoft Account'">
-          </p-button>
         </div>
       </div>
-    </form>
-    }
-    <p-toast position="bottom-right" />
+      <div class="col-md-3">
+        <div class="card text-dark bg-warning activity-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">Economic Opportunities</h5>
+            <p>
+              Enhancing livelihood options, especially for youth, to promote
+              productivity and self-reliance.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-success activity-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">Institutional Strengthening</h5>
+            <p>
+              Building government capacity for Social Protection and
+              strengthening the MIS system.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-dark activity-card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title">M&E and Knowledge</h5>
+            <p>
+              Managing, monitoring, and generating knowledge for informed
+              policy-making.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements -->
+    <h2 class="section-title">Key Achievement Updates</h2>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <ul>
+          <li>
+            <strong>154,426</strong> out of 157,500 households registered across
+            15 counties.
+          </li>
+          <li>Cash Transfers launched for registered households.</li>
+          <li>LIPW activities created community assets and jobs.</li>
+          <li>Government-led MIS under rollout.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <h2 class="section-title">Beneficiary Breakdown (Estimated)</h2>
+    <div class="row text-center">
+      <div class="col-md-2 col-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h4 class="text-primary">672,000</h4>
+          <p>Total Beneficiaries</p>
+        </div>
+      </div>
+      <div class="col-md-2 col-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h4 class="text-primary">157,500</h4>
+          <p>Households</p>
+        </div>
+      </div>
+      <div class="col-md-2 col-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h4 class="text-primary">~50%</h4>
+          <p>Female</p>
+        </div>
+      </div>
+      <div class="col-md-2 col-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h4 class="text-primary">TBD</h4>
+          <p>Payment Status</p>
+        </div>
+      </div>
+      <div class="col-md-2 col-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h4 class="text-primary">7,000+</h4>
+          <p>Refugee/Host HHs</p>
+        </div>
+      </div>
+      <div class="col-md-2 col-6 mb-3">
+        <div class="card p-3 shadow-sm">
+          <h4 class="text-primary">Incl.</h4>
+          <p>PWD Targeted</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Components -->
+    <h2 class="section-title">Project Components</h2>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card border-success shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="text-success">
+              Component 1: Cash Transfers & Social Measures ($98M)
+            </h5>
+            <p>
+              Supports LIPW & DIS with human capital growth programs.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-success shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="text-success">
+              Component 2: Economic Opportunities ($15M)
+            </h5>
+            <p>
+              Livelihood support and training for poor and vulnerable youth.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-success shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="text-success">
+              Component 3: Institutional Capacity ($6M)
+            </h5>
+            <p>
+              Strengthens MGCSW & builds the national safety net delivery
+              system.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-success shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="text-success">
+              Component 4: M&E and Knowledge ($10M)
+            </h5>
+            <p>
+              Supports PCU for management, monitoring, and coordination.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Context -->
+    <h2 class="section-title">South Sudan Context</h2>
+    <div class="card bg-light border-0 shadow-sm p-3">
+      <p>
+        <strong>Independence:</strong> July 9, 2011. The world’s youngest
+        nation, facing conflict and humanitarian challenges.
+      </p>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card p-3 border-warning">
+            <strong class="text-warning">Population:</strong> ~15.8M
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 border-warning">
+            <strong class="text-warning">Poverty:</strong> 76% below poverty line
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 border-warning">
+            <strong class="text-warning">Economy:</strong> Oil-dependent, high
+            inflation
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 border-warning">
+            <strong class="text-warning">Social Security:</strong> Low coverage;
+            SNSOP foundational
+          </div>
+        </div>
+      </div>
+    </div>
+    <h2 class="section-title">Stakeholders & Partners</h2>
+    <div class="card bg-light border-0 shadow-sm p-3">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card p-3 border-info">
+            <strong class="text-info">Implementing Ministries:</strong> MGCSW & MAFS
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 border-info">
+            <strong class="text-info">Financing Partner:</strong> The World Bank (IDA)
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 border-info">
+            <strong class="text-info">Support:</strong> UNOPS and third-party agencies
+            inflation
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3 border-info">
+            <strong class="text-info">Coordination:</strong> National Social Protection Working Group
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Toast -->
+  <p-toast position="bottom-right"></p-toast>
+
 </div>
