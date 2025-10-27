@@ -202,6 +202,17 @@ export class AzureAdAuthService {
     return this.loginState().menus || [];
   }
 
+  public setExchangeTokenCookie(token: string): void {
+    const host = (() => {
+      try {
+        return new URL(environment.domain).hostname;
+      } catch {
+        return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+      }
+    })();
+    this.cookieService.set(this.ACCESS_TOKEN, token, undefined, '/', host, true, 'Lax');
+  }
+
   public getToken(): string | null {
     return this.loginState().token;
   }

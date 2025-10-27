@@ -45,6 +45,7 @@ import { filter } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { MessageService } from 'primeng/api';
 import { AzureAdAuthService } from '../services/azure-ad-auth.service';
+import axios from 'axios';
 
 
 // ---------- MSAL factories (use environment.msalConfig) ----------
@@ -98,118 +99,79 @@ function initMsal(
   console.log('initMsal', authService);
   return async () => {
     try {
-      // Step 1: Wait for MSAL initialization to complete and handle the redirect
+      // Handle MSAL redirect only once
       const redirectResponse = await authService
         .handleRedirectObservable()
-        .toPromise();
+        .toPromise(); // Use toPromise() for APP_INITIALIZER to wait
+
       if (redirectResponse) {
-        // If redirect response is available, set the active account
         authService.instance.setActiveAccount(redirectResponse.account);
-      }
 
-      // Step 2: Check if an active account exists and set it
-      const checkAccount = () => {
-        const _loggedIn = !!authService.instance.getActiveAccount();
-      };
+        // Perform token exchange with backend
+        try {
+          const headers = new HttpHeaders({
+            Authorization: `Bearer ${redirectResponse.idToken}`, // Use idToken from the redirect response
+            'X-ENV': environment.env
+          });
 
-      const checkAndSetActiveAccount = () => {
-        let active = authService.instance.getActiveAccount();
-        if (!active) {
-          const accounts = authService.instance.getAllAccounts();
-          if (accounts.length > 0) {
-            authService.instance.setActiveAccount(accounts[0]);
-            active = authService.instance.getActiveAccount();
+          const exchangeResponse: any = await http
+            .get(`${environment.authBackend}/auth/exchange`, { headers })
+            .toPromise(); // Convert to Promise for await
+
+          console.log('/auth/exchange', exchangeResponse);
+          if (exchangeResponse?.status === 'OK' && exchangeResponse?.data?.access_token) {
+            const host = (() => {
+              try { return new URL(environment.domain).hostname; }
+              catch { return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, ''); }
+            })();
+            cookieService.set(
+              environment.cookie_name,
+              exchangeResponse.data.access_token,
+              undefined,
+              '/',
+              host,
+              true,
+              'Lax'
+            );
+
+            azureAdAuthService.updateLoginState(exchangeResponse.data.access_token);
+            // Navigation will be handled by landing.ts effect or guard
+            // router.navigate(['home']); // Removed direct navigation from here
+          } else {
+            messageService.add({
+              severity: 'error',
+              summary: 'Login Failed',
+              detail: 'User not found'
+            });
+            router.navigate(['/landing']);
           }
+        } catch (exchangeError) {
+          console.error('Error exchanging token with backend:', exchangeError);
+          messageService.add({
+            severity: 'error',
+            summary: 'Login Failed',
+            detail: 'User not found'
+          });
+          router.navigate(['/landing']);
         }
-        checkAccount();
-      };
-
-      // Step 3: Subscribe to MSAL broadcast service once initialization is done
-      msalBroadcastService.inProgress$
-        .pipe(filter((s: InteractionStatus) => s === InteractionStatus.None))
-        .subscribe(() => {
-          checkAccount();
-          checkAndSetActiveAccount();
-        });
-
-      msalBroadcastService.msalSubject$
-        .pipe(
-          filter(
-            (msg: EventMessage) =>
-              msg.eventType === EventType.LOGIN_SUCCESS ||
-              msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
-          )
-        )
-        .subscribe((msg: EventMessage) => {
-          const payload = msg.payload as AuthenticationResult;
-          authService.instance.setActiveAccount(payload.account);
-          // Optionally stash the payload.idToken for later
-        });
-
-      // Step 4: Handle redirect and exchange ID token with backend
-      const response = await authService.handleRedirectObservable().toPromise();
-      console.log('authService.handleRedirectObservable() response', response);
-      if (response) {
-        authService.instance.setActiveAccount(response.account);
-        checkAccount();
-
-        const headers = new HttpHeaders({
-          Authorization: `Bearer ${response.idToken}`,
-          'X-ENV': environment.env
-
-        });
-
-        http
-          .get(`${environment.authBackend}/auth/exchange`, { headers })
-          .subscribe({
-            next: (r: any) => {
-              console.log('/auth/exchange', r);
-              if (r?.status === 'OK' && r?.data?.access_token) {
-                // derive bare hostname from environment.domain
-                const host = (() => {
-                  try { return new URL(environment.domain).hostname; }
-                  catch { return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, ''); }
-                })();
-
-                // If you want a session cookie (clears on browser close):
-                cookieService.set(
-                  environment.cookie_name,          // 'mis_ta'
-                  r.data.access_token,              // token from backend
-                  undefined,                        // no expires => session cookie
-                  '/',                              // path
-                  host,                             // domain WITHOUT protocol
-                  true,                             // secure (required on HTTPS)
-                  'Lax'                             // sameSite ('None' if used inside iframes/cross-site)
-                );
-
-                // If you *do* want a fixed lifetime instead (e.g., 1 day):
-                // cookieService.set(environment.cookie_name, r.data.access_token, 1, '/', host, true, 'Lax');
-
-                azureAdAuthService.updateLoginState(r.data.access_token);
-                router.navigate(['home']);
-              } else {
-        messageService.add({
-          severity: 'error',
-          summary: 'Login Failed',
-          detail: 'User not found'
-        });
-        router.navigate(['landing']);
-      }
-    },
-    error: () => {
-      messageService.add({
-        severity: 'error',
-        summary: 'Login Failed',
-        detail: 'User not found'
-      });
-      router.navigate(['landing']);
-    },
-  });
+      } else {
+        // If no redirect response, check if already authenticated (e.g., page refresh)
+        const activeAccount = authService.instance.getActiveAccount();
+        if (activeAccount) {
+          // If an active account exists, try to get the exchange token from cookie
+          // This is handled by AzureAdAuthService.initializeFromCookie()
+          // If initializeFromCookie() fails, it will clear the state.
+          // No explicit action needed here, as initializeFromCookie() runs in AzureAdAuthService constructor.
+        }
       }
 
-      checkAndSetActiveAccount();
+      // Removed redundant MSAL broadcast service subscriptions and account checks here
+      // These are already handled in AzureAdAuthService constructor.
+
     } catch (err) {
       console.error('MSAL initialization failed:', err);
+      // If MSAL initialization fails, ensure user is on landing page
+      router.navigate(['/landing']);
     }
   };
 }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -33,7 +33,7 @@ import { Toast } from 'primeng/toast';
   styleUrl: './landing.scss',
   providers: [DialogService],
 })
-export class Landing implements OnDestroy {
+export class Landing implements OnDestroy, OnInit {
   private authService = inject(AzureAdAuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -44,10 +44,41 @@ export class Landing implements OnDestroy {
   private readonly _destroying$ = new Subject<void>();
 
   constructor(public dialogService: DialogService) {
-    // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    // if (this.authService.isAuthenticated()) {
-    //   this.router.navigate([this.returnUrl]);
-    // }
+    // Synchronously check for an authentication redirect hash in the URL.
+    // This prevents the landing page from flashing content when a login redirect is being processed.
+    if (window.location.hash.includes('code=') || window.location.hash.includes('id_token=')) {
+      this.isLoading = true;
+    }
+
+    // Use an effect to react to changes in the loginState signal
+    // This will trigger navigation once the exchange token is available
+    effect(() => {
+      if (this.authService.loginState().token && this.router.url === '/landing') {
+        this.router.navigate(['/home/portals']);
+      }
+    });
+  }
+
+  ngOnInit() {
+    this.msalBroadcastService.inProgress$
+      .pipe(
+        filter(
+          (status: InteractionStatus) => status === InteractionStatus.None
+        ),
+        takeUntil(this._destroying$)
+      )
+      .subscribe(() => {
+        // If the exchange token is not yet available, and no redirect is processing, hide the loader
+        if (!this.authService.loginState().token) {
+          const isRedirectProcessing = window.location.hash.includes('code=') || window.location.hash.includes('id_token=');
+          if (!isRedirectProcessing) {
+            this.isLoading = false;
+          }
+        }
+        // If the token is available, the effect will handle navigation.
+        // If the token is not available, and it's a redirect, isLoading remains true.
+        // If the token is not available, and it's not a redirect, isLoading becomes false.
+      });
   }
 
   showLogin() {
@@ -69,8 +100,6 @@ export class Landing implements OnDestroy {
   loginWithAzureAD(): void {
     this.isLoading = true; // Show the loading spinner when login starts
     this.authService.login(); // Just call login if it doesn't return a Promise
-    // Optionally, you can check authentication status here or call a success/failure handler
-    // this.isLoading = true; // Hide the loading spinner when login finishes
   }
 
   ngOnDestroy() {
