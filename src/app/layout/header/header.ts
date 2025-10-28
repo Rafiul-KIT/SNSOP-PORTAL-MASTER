@@ -1,4 +1,4 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
@@ -23,6 +23,8 @@ export class Header {
   userInfo: any = null;
   isPortalsPage = false;
   isLandingPage = false;
+  isLoading = false;
+  private authService = inject(AzureAdAuthService);
 
   constructor(
     private router: Router,
@@ -82,6 +84,11 @@ export class Header {
       },
       { label: 'Survey CTO', icon: 'fas fa-poll' },
     ];
+  }
+
+  loginWithAzureAD(): void {
+    this.isLoading = true; // Show the loading spinner when login starts
+    this.authService.login(); // Just call login if it doesn't return a Promise
   }
 
   // ✅ 1. Match backend labels exactly

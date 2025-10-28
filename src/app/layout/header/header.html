@@ -1,6 +1,30 @@
 
-<div class="header">
 
+<div class="header">
+  @if(isLandingPage){
+      <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0c5358; width: 100%; height:130px;">
+   
+      <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="#">
+        <div class="d-flex align-items-center mt-4">
+
+          <img src="SNSOP_logo.png" alt="SNSOP Logo" class="me-2" style="height: 30px; width: auto;" />
+
+          <span class="fw-bold">Safety Net for Socioeconomic Opportunities Project</span>
+        </div>
+      </a>
+      <div>
+        <button class="btn mt-4 btn-primary fw-bold" [disabled]="isLoading" (click)="loginWithAzureAD()">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          {{ isLoading ? 'Logging in...' : 'MIS Login' }}
+        </button>
+      </div>
+  
+    </div>
+
+  </nav>
+
+  } @else {
   @if (isPortalsPage) {
     <div class="portals" (click)="showPortalOptions = !showPortalOptions">
       <i class="fas fa-braille hand"></i>
@@ -65,5 +89,6 @@
     </div>
   </div>
   }
-
+}
 </div>
+ 
