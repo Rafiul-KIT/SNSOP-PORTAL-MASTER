@@ -26,7 +26,7 @@ export class AddNewRole implements OnInit {
   isLoading = true;
   userRoleDetails: any = null;
   availabaleRoleList: any[] = [];
-  availabaleMenuList: any[] = [];
+  menuTree: any[] = [];
   userRoleForm!: FormGroup;
 
   constructor(
@@ -65,6 +65,41 @@ export class AddNewRole implements OnInit {
     this.cdr.detectChanges();
   };
 
+  processMenus(menus: any[], assignedMenuIds: Set<number> = new Set()) {
+    const menuMap = new Map<number, any>();
+    const roots: any[] = [];
+
+    menus.forEach(menu => {
+      menuMap.set(menu.id, {
+        ...menu,
+        checked: assignedMenuIds.has(menu.id),
+        children: []
+      });
+    });
+
+    menuMap.forEach(menu => {
+      if (menu.parentMenu && menuMap.has(menu.parentMenu.id)) {
+        const parent = menuMap.get(menu.parentMenu.id);
+        if (parent) {
+          parent.children.push(menu);
+        }
+      } else {
+        roots.push(menu);
+      }
+    });
+
+    // Ensure parents are checked if any of their children are checked
+    roots.forEach(parent => {
+      if (parent.children?.length > 0) {
+        if (parent.children.some((child: any) => child.checked)) {
+          parent.checked = true;
+        }
+      }
+    });
+
+    this.menuTree = roots;
+  }
+
   async fetchRoleMenus(roleId: number) {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -75,18 +110,13 @@ export class AddNewRole implements OnInit {
       const assignedMenus = res?.data?.data || [];
 
       // 2️⃣ Create quick lookup set for assigned menu IDs
-      const assignedSet = new Set(assignedMenus.map((m: any) => m.id));
+      const assignedSet = new Set<number>(assignedMenus.map((m: any) => m.id));
 
       // 3️⃣ Load all available menus (with real IDs)
       const lookupMenus = await this.lookupService.getMenuList() || [];
 
-      // 4️⃣ Merge: keep all menu IDs, mark assigned ones checked
-      this.availabaleMenuList = lookupMenus.map((menu: any) => ({
-        id: menu.id,                    // ✅ always keep the real backend menu ID
-        label: menu.label,
-        value: menu.value,
-        checked: assignedSet.has(menu.id), // ✅ checked if role already has access
-      }));
+      // 4️⃣ Process menus into a tree structure
+      this.processMenus(lookupMenus, assignedSet);
 
     } catch (err) {
       console.error('Failed to fetch role menus:', err);
@@ -101,13 +131,35 @@ export class AddNewRole implements OnInit {
     }
   }
 
+  onParentChange(parentMenu: any) {
+    parentMenu.children.forEach((c: any) => c.checked = parentMenu.checked);
+    this.cdr.detectChanges();
+  }
+
+  onChildChange(parentMenu: any) {
+    if (parentMenu.children.some((c: any) => c.checked)) {
+      parentMenu.checked = true;
+    }
+    this.cdr.detectChanges();
+  }
 
   /** ✅ Create or update role */
   formHandler = async (type: 1 | 2 | null) => {
     this.isLoading = true;
 
     // 🔹 Collect checked menus
-    const selectedMenus = this.availabaleMenuList.filter((m: any) => m.checked);
+    const selectedMenus: any[] = [];
+    const collectChecked = (nodes: any[]) => {
+      nodes.forEach(node => {
+        if (node.checked) {
+          selectedMenus.push(node);
+        }
+        if (node.children && node.children.length > 0) {
+          collectChecked(node.children);
+        }
+      });
+    };
+    collectChecked(this.menuTree);
 
 
     if (selectedMenus.length === 0) {
@@ -188,14 +240,8 @@ export class AddNewRole implements OnInit {
     } else {
       // For Add New Role
       this.isLoading = true;
-      // ✅ Corrected version
       this.lookupService.getMenuList().then((menus) => {
-        this.availabaleMenuList = menus.map((m: any) => ({
-          id: m.id,           // ✅ Keep original ID
-          label: m.label,
-          value: m.value,
-          checked: false
-        }));
+        this.processMenus(menus || []);
         this.isLoading = false;
         this.cdr.detectChanges();
       });

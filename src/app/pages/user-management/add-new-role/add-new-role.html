@@ -45,7 +45,7 @@
             </div>
           </div>
 
-          <!-- Right: Flat Menu Access -->
+          <!-- Right: Hierarchical Menu Access -->
           <div class="col-12 col-md-7 col-lg-8">
             <div class="card mt-2">
               <h5 class="card-header p-3">Menu Access</h5>
@@ -53,13 +53,30 @@
                 @if (isLoading) {
                   <app-loader></app-loader>
                 } @else {
-                  @if (availabaleMenuList.length > 0) {
-                    @for (menu of availabaleMenuList; track menu.value) {
-                      <div class="d-flex align-items-center gap-1 mb-1">
-                        <p-checkbox [binary]="true" [(ngModel)]="menu.checked"
-                          [inputId]="'menu_' + menu.value" [ngModelOptions]="{ standalone: true }">
-                        </p-checkbox>
-                        <label [for]="'menu_' + menu.value">{{ menu.label }}</label>
+                  @if (menuTree.length > 0) {
+                    @for (parentMenu of menuTree; track parentMenu.id) {
+                      <div class="parent-menu mb-2">
+                        <div class="d-flex align-items-center gap-1 mb-1">
+                          <p-checkbox [binary]="true" [(ngModel)]="parentMenu.checked"
+                            [inputId]="'menu_' + parentMenu.id" [ngModelOptions]="{ standalone: true }"
+                            (onChange)="onParentChange(parentMenu)">
+                          </p-checkbox>
+                          <label [for]="'menu_' + parentMenu.id" class="fw-bold">{{ parentMenu.label }}</label>
+                        </div>
+
+                        @if (parentMenu.children && parentMenu.children.length > 0) {
+                          <div class="child-menus ps-3">
+                            @for (childMenu of parentMenu.children; track childMenu.id) {
+                              <div class="d-flex align-items-center gap-1 mb-1">
+                                <p-checkbox [binary]="true" [(ngModel)]="childMenu.checked"
+                                  [inputId]="'menu_' + childMenu.id" [ngModelOptions]="{ standalone: true }"
+                                  (onChange)="onChildChange(parentMenu)">
+                                </p-checkbox>
+                                <label [for]="'menu_' + childMenu.id">{{ childMenu.label }}</label>
+                              </div>
+                            }
+                          </div>
+                        }
                       </div>
                     }
                   } @else {
