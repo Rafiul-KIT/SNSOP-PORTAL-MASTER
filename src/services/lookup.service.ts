@@ -31,6 +31,7 @@ interface MenuItem {
   id: number;
   value: string;
   label: string;
+  parentMenu?: any;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -160,6 +161,7 @@ async getMenuList(): Promise<MenuItem[]> {
     id: menu.id,
     value: menu.url ?? `parent-${menu.id}`, // fallback value for null URLs
     label: menu.name,
+    parentMenu: menu.parentMenu
   }));
 
   console.log('✅ Menu list loaded:', this.menuListCache.length, 'items');
