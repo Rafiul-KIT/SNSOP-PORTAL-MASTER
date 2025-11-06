@@ -40,6 +40,8 @@ interface RoleInfo {
 export class Register implements OnInit {
   isLoading = false;
   private routeUserId: number | null = null;
+  private initialFormValue: any = {};
+  isFormUnchanged = true;
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items: MenuItem[] = [
@@ -73,6 +75,11 @@ export class Register implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
+    this.initialFormValue = this.userRegistrationForm.value;
+    this.userRegistrationForm.valueChanges.subscribe(value => {
+      this.isFormUnchanged = this.areObjectsEqual(this.initialFormValue, value);
+    });
+
     this.loadRoles();
 
     const idParam = this.activatedRoute.snapshot.queryParamMap.get('id');
@@ -168,8 +175,7 @@ export class Register implements OnInit {
           mappedRoleId = byName ? byName.id : null;
         }
 
-        // form patch
-        this.userRegistrationForm.patchValue({
+        const formValue = {
           username: user.username ?? (user.email ? user.email.split('@')[0] : ''),
           fullName: user.fullName ?? '',
           email: user.email ?? '',
@@ -177,8 +183,11 @@ export class Register implements OnInit {
           status: this.statusToNumber(user.status),
           isMobile: !!user.isMobile,
           emailReceiver: !!user.emailReceiver,
-          // password stays blank; validators are handled by isMobile
-        });
+          password: '',
+        };
+        this.initialFormValue = formValue;
+        this.userRegistrationForm.reset(formValue, { emitEvent: false });
+        this.isFormUnchanged = true;
 
         // set footer status info
         this.userDetails = {
@@ -314,7 +323,7 @@ export class Register implements OnInit {
 
 
   private resetForm(): void {
-    this.userRegistrationForm.reset({
+    const emptyFormValue = {
       username: '',
       fullName: '',
       email: '',
@@ -323,7 +332,10 @@ export class Register implements OnInit {
       emailReceiver: false,
       status: 1,
       roleId: null,
-    });
+    };
+    this.initialFormValue = emptyFormValue;
+    this.userRegistrationForm.reset(emptyFormValue, { emitEvent: false });
+    this.isFormUnchanged = true;
   }
 
   private buildPayload() {
@@ -338,5 +350,25 @@ export class Register implements OnInit {
       password: v.password || null,
       isMobile: !!v.isMobile,
     };
+  }
+
+  private areObjectsEqual(obj1: any, obj2: any): boolean {
+    if (obj1 === null || obj2 === null || obj1 === undefined || obj2 === undefined) {
+      return obj1 === obj2;
+    }
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+
+    for (const key of keys1) {
+      if (obj1[key] !== obj2[key]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
