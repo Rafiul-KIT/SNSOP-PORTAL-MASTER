@@ -236,7 +236,7 @@
                   <button
                     class="btn btn-success btn-sm rounded-0"
                     (click)="formHandler(null)"
-                    [disabled]="userRegistrationForm.invalid || isLoading">
+                    [disabled]="userRegistrationForm.invalid || isLoading || isFormUnchanged">
                     <i class="fas fa-save me-2"></i>Update
                   </button>
                 </div>
