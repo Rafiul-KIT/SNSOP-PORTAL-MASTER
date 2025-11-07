@@ -1,29 +1,17 @@
 <div class="home">
 
-  <div class="scroll-banner">
-  <p>
-    Phase II payment is upcoming ...Stay Tuned for Updates! 
-  </p>
-  <br/>
-</div>
+
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0c5358; height:130px;">
-    <div class="container d-flex justify-content-between align-items-center">
-      <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="#">
-        <div class="bg-success text-white p-2 rounded me-2 fw-bold">SNSOP</div>
-        Safety Net for Socioeconomic Opportunities Project
-      </a>
-      <div>
-        <button class="btn btn-primary fw-bold" [disabled]="isLoading" (click)="loginWithAzureAD()">
-          <i class="fas fa-sign-in-alt me-2"></i>
-          {{ isLoading ? 'Logging in...' : 'Login with Microsoft Account' }}
-        </button>
-      </div>
-    </div>
-  </nav>
+ 
+  <div class="scroll-banner">
+    <p>
+      Phase II payment is upcoming ...Stay Tuned for Updates!
+    </p>
+    <br />
+  </div>
 
   <!-- Scrolling Banner -->
-<!-- <div class="scroll-banner">
+  <!-- <div class="scroll-banner">
   <p>
     South Sudan National Safety Net Program 🇸🇸 — Stay Tuned for Updates! Phase II payment is upcoming ...
   </p>
@@ -38,7 +26,7 @@
   <!-- Main Content -->
   <div class="container py-4" *ngIf="!isLoading">
     <!-- Goal -->
-    <h2 class="section-title">Goal and Development Objective</h2>
+    <h5 class="section-title">Goal and Development Objective</h5>
     <p>
       The primary objective of the SNSOP is to
       <strong>provide cash transfers</strong>,
@@ -48,7 +36,7 @@
     </p>
 
     <!-- Activities -->
-    <h2 class="section-title">SNSOP Core Activities</h2>
+    <h5 class="section-title">SNSOP Core Activities</h5>
     <div class="row g-4">
       <div class="col-md-3">
         <div class="card text-white bg-primary activity-card h-100">
@@ -97,7 +85,7 @@
     </div>
 
     <!-- Achievements -->
-    <h2 class="section-title">Key Achievement Updates</h2>
+    <h5 class="section-title">Key Achievement Updates</h5>
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <ul>
@@ -113,7 +101,7 @@
     </div>
 
     <!-- Stats -->
-    <h2 class="section-title">Beneficiary Breakdown (Estimated)</h2>
+    <h5 class="section-title">Beneficiary Breakdown (Estimated)</h5>
     <div class="row text-center">
       <div class="col-md-2 col-6 mb-3">
         <div class="card p-3 shadow-sm">
@@ -154,7 +142,7 @@
     </div>
 
     <!-- Components -->
-    <h2 class="section-title">Project Components</h2>
+    <h5 class="section-title">Project Components</h5>
     <div class="row g-3">
       <div class="col-md-6">
         <div class="card border-success shadow-sm h-100">
@@ -208,7 +196,7 @@
     </div>
 
     <!-- Country Context -->
-    <h2 class="section-title">South Sudan Context</h2>
+    <h5 class="section-title">South Sudan Context</h5>
     <div class="card bg-light border-0 shadow-sm p-3">
       <p>
         <strong>Independence:</strong> July 9, 2011. The world’s youngest
@@ -239,7 +227,7 @@
         </div>
       </div>
     </div>
-    <h2 class="section-title">Stakeholders & Partners</h2>
+    <h5 class="section-title">Stakeholders & Partners</h5>
     <div class="card bg-light border-0 shadow-sm p-3">
       <div class="row g-3">
         <div class="col-md-3">
@@ -266,7 +254,13 @@
       </div>
     </div>
   </div>
+  <footer class="footer text-white  mt-5">
+  
+    <div class="stakeholders">
 
+      <p>&copy; 2025 SNSOP - South Sudan National Social Protection Project</p>
+    </div>
+  </footer>
   <!-- Toast -->
   <p-toast position="bottom-right"></p-toast>
 
