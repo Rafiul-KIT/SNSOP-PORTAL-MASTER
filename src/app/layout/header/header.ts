@@ -65,13 +65,26 @@ export class Header {
       },
       {
         label: 'Payment',
-        link: environment.portals.payment,
+        command: () => {
+          this.router.navigate(['/under-construction']);
+          this.showPortalOptions = false;
+        },
         icon: 'fas fa-credit-card',
       },
-      { label: 'GRM', link: environment.portals.grm, icon: 'fas fa-sitemap' },
+      {
+        label: 'GRM',
+        command: () => {
+          this.router.navigate(['/under-construction']);
+          this.showPortalOptions = false;
+        },
+        icon: 'fas fa-sitemap'
+      },
       {
         label: 'Report',
-        link: environment.portals.report,
+        command: () => {
+          this.router.navigate(['/under-construction']);
+          this.showPortalOptions = false;
+        },
         icon: 'fas fa-chart-line',
       },
       {
@@ -82,7 +95,14 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
-      { label: 'Survey CTO', icon: 'fas fa-poll' },
+      {
+        label: 'Survey CTO',
+        icon: 'fas fa-poll',
+        command: () => {
+          this.router.navigate(['/under-construction']);
+          this.showPortalOptions = false;
+        },
+      },
     ];
   }
 
