@@ -12,6 +12,7 @@ import { Role } from './pages/user-management/role/role';
 import { RoleLink } from './pages/user-management/role-link/role-link';
 import { AddNewRole } from './pages/user-management/add-new-role/add-new-role';
 import { Unauthorized } from './components/unauthorized/unauthorized';
+import { UnderConstruction } from './pages/under-construction/under-construction';
 
 
 
@@ -50,6 +51,7 @@ export const routes: Routes = [
     ],
   },
   { path: 'unauthorized', component: Unauthorized },
+  { path: 'under-construction', component: UnderConstruction },
   {
     path: '**',
     component: NotFound,

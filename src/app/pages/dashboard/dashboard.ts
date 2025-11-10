@@ -13,7 +13,7 @@ export class Dashboard {
   portalList: any = [];
 
   constructor(private router: Router) {
-        this.portalList = [
+    this.portalList = [
       // {
       //   label: 'Dashboard',
       //   link: environment.portals.master,
@@ -26,13 +26,17 @@ export class Dashboard {
       },
       {
         label: 'Payment',
-        link: environment.portals.payment,
+        routerLink: '/under-construction',
         icon: 'fas fa-credit-card',
       },
-      { label: 'GRM', link: environment.portals.grm, icon: 'fas fa-sitemap' },
+      {
+        label: 'GRM',
+        routerLink: '/under-construction',
+        icon: 'fas fa-sitemap'
+      },
       {
         label: 'Report',
-        link: environment.portals.report,
+        routerLink: '/under-construction',
         icon: 'fas fa-chart-line',
       },
       {
@@ -44,6 +48,7 @@ export class Dashboard {
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
+        routerLink: '/under-construction',
       },
     ];
   }
