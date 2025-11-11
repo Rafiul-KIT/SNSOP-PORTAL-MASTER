@@ -77,3 +77,16 @@
 .portal:hover span {
   color: #0ea5e9;
 }
+/* Version Styling */
+.version {
+  position: absolute;
+  bottom: 30px;  /* Adjust distance from the bottom */
+  right: 20px;   /* Adjust distance from the right */
+  background-color: #089000; /* Matching background color */
+  color: white;
+  padding: 1px 10px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  font-size: 0.9rem;
+}
