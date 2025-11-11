@@ -1,11 +1,15 @@
 .home {
   display: flex;
   flex-direction: column;
-  min-height: 92vh; /* Ensure the home container takes up the full height */
+  min-height: 92vh;
+  /* Ensure the home container takes up the full height */
   // background-image: url('../../../../public/bg_loginpage.png'); /* Set your background image */
-  background-size: cover; /* Make the background cover the entire container */
-  background-position: center; /* Center the background image */
-  background-repeat: no-repeat; /* Prevent repeating the image */
+  background-size: cover;
+  /* Make the background cover the entire container */
+  background-position: center;
+  /* Center the background image */
+  background-repeat: no-repeat;
+  /* Prevent repeating the image */
 }
 
 
@@ -43,8 +47,10 @@
   box-sizing: border-box;
   z-index: 1;
   display: flex;
-  justify-content: center; /* 👈 push items to the left */
-  align-items: flex-start;    /* 👈 push items to the top */
+  justify-content: center;
+  /* 👈 push items to the left */
+  align-items: flex-start;
+  /* 👈 push items to the top */
   flex-direction: column;
   padding-left: 100px;
 }
@@ -52,16 +58,19 @@
 
 /* Styling for the loader */
 app-loader {
-  position: fixed;  /* Make it overlay on top of everything */
+  position: fixed;
+  /* Make it overlay on top of everything */
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.3); /* Slightly darkened overlay */
+  background: rgba(0, 0, 0, 0.3);
+  /* Slightly darkened overlay */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Ensure loader appears on top */
+  z-index: 9999;
+  /* Ensure loader appears on top */
 }
 
 /* Optional: Styling for the button grid */
@@ -76,25 +85,36 @@ app-loader {
 
 
 .login-card {
-  width: 400px;        /* fixed width */
-  max-width: 50%;      /* responsive on small screens */
-  height: 200px;       /* fixed height */
-  min-height: 300px;   /* optional: ensures it never gets too small */
-  padding: 20px;       /* inner spacing */
+  width: 400px;
+  /* fixed width */
+  max-width: 50%;
+  /* responsive on small screens */
+  height: 200px;
+  /* fixed height */
+  min-height: 300px;
+  /* optional: ensures it never gets too small */
+  padding: 20px;
+  /* inner spacing */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  display: flex;       /* optional: to control inner layout */
+  display: flex;
+  /* optional: to control inner layout */
   flex-direction: column;
-  justify-content: center; /* center form vertically inside */
+  justify-content: center;
+  /* center form vertically inside */
 }
 
 .title-large {
-  font-size: 3rem;    /* controls size (3rem ≈ 48px) */
-  font-weight: 600;   /* keeps it bold */
-  line-height: 1.2;   /* tighter spacing between lines */
-  margin: 1rem 0;  
+  font-size: 3rem;
+  /* controls size (3rem ≈ 48px) */
+  font-weight: 600;
+  /* keeps it bold */
+  line-height: 1.2;
+  /* tighter spacing between lines */
+  margin: 1rem 0;
   text-align: left;
-  color: #555555;   /* some spacing above/below */
+  color: #555555;
+  /* some spacing above/below */
 }
 
 
@@ -127,6 +147,7 @@ body {
 .activity-card:hover {
   transform: translateY(-5px);
 }
+
 .scroll-banner {
   background: #CFE2FF;
   color: black;
@@ -141,25 +162,52 @@ body {
 .scroll-banner p {
   display: inline-block;
   margin: 0;
-  position: absolute; /* so it starts outside the view */
-  left: 100%; /* start completely off the right edge */
+  position: absolute;
+  /* so it starts outside the view */
+  left: 100%;
+  /* start completely off the right edge */
   animation: scroll-left 25s linear infinite;
 }
-  .footer {
-      background-color: #0D6EFD;
-      color: var(--snsop-white);
-      padding: 40px 0;
-      text-align: center;
-    }
 
-    .footer p {
-      margin: 5px 0;
-    }
+.footer {
+  background-color: #0C5358;
+  color: var(--snsop-white);
+  padding: 40px 0;
+  text-align: center;
+  /* Default to center everything */
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  /* Center the content */
+  align-items: center;
+  /* Vertically center */
+  width: 100%;
+  position: relative;
+}
+
+.footer p {
+  margin: 5px 0;
+}
+
+.version {
+  position: absolute;
+  right: 20px; /* Adjust this for more padding on the right */
+  background-color: #089000; /* Light background color */
+  padding: 1px 10px; /* Add some padding around the text */
+  border-radius: 5px; /* Optional: rounded corners */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* Add shadow */
+  font-weight: bold; /* Optional: makes the text bold */
+}
+
+
 
 @keyframes scroll-left {
   0% {
     left: 100%;
   }
+
   100% {
     left: -100%;
   }
