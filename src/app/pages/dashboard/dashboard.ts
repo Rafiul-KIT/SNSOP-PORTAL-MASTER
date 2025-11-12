@@ -26,7 +26,7 @@ export class Dashboard {
       },
       {
         label: 'Payment',
-        routerLink: environment.portals.payment,
+        link: environment.portals.payment,
         icon: 'fas fa-credit-card',
       },
       {
