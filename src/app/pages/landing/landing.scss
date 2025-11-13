@@ -156,17 +156,13 @@ body {
   white-space: nowrap;
   padding: 10px;
   margin-top: 25px;
-  position: flex;
+  position: relative;     /* FIXED */
 }
 
 .scroll-banner p {
-  display: inline-block;
-  margin: 0;
   position: absolute;
-  /* so it starts outside the view */
-  left: 100%;
-  /* start completely off the right edge */
-  animation: scroll-left 25s linear infinite;
+  margin: 0;
+  animation: pingpong 15s linear infinite;
 }
 
 .footer {
@@ -202,13 +198,9 @@ body {
 }
 
 
-
-@keyframes scroll-left {
-  0% {
-    left: 100%;
-  }
-
-  100% {
-    left: -100%;
-  }
+/* Ping-pong animation */
+@keyframes pingpong {
+  0%   { left: 0; }
+  50%  { left: calc(100% - 400px); }   /* 300px = text width */
+  100% { left: 0; }
 }
