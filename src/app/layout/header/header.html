@@ -26,18 +26,15 @@
 
   } @else {
   @if (isPortalsPage) {
-    <div class="portals" (click)="showPortalOptions = !showPortalOptions">
-      <i class="fas fa-braille hand"></i>
-      <div>
-  <strong>
-    <h3 class="name">SNSOP</h3>
-    <span>Admin</span> <br>
-  </strong>
-</div>
-
-     <i class="fas fa-angle-{{ showPortalOptions ? 'down' : 'right' }} hand"></i>
-      <span class="vertical-line"></span>
+  <div class="portals" (click)="showPortalOptions = !showPortalOptions">
+    &nbsp;<i class="fas fa-braille hand"></i>
+    <div>
+     <strong><h3 class="name">SNSOP</h3>
+     <span>Admin</span></strong>
     </div>
+    <i class="fas fa-angle-{{ showPortalOptions ? 'down' : 'right' }} hand"></i>
+    <span class="vertical-line"></span>
+  </div>
   }
   <div class="portals-option-wrapper {{ showPortalOptions ? 'show' : '' }}" (mouseleave)="showPortalOptions = false">
     <div class="portal-items">
@@ -84,10 +81,10 @@
   ></p-button>
 
   <div
-    class="user-menu {{ showUsermenu ? 'show' : '' }}">
+    class="user-menu {{ showUsermenu ? 'show' : '' }}" (mouseleave)="showUsermenu = false">
     <div class="item" (click)="goToProfile()">
       <i class="fas fa-user me-2"></i>
-      Profile ({{userInfo.sub}})
+      Profile
     </div>
     <div class="item" (click)="logout()">
       <i class="fas fa-sign-out-alt me-2"></i>
