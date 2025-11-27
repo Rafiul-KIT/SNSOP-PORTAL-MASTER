@@ -53,8 +53,9 @@
                 @if (isLoading) {
                   <app-loader></app-loader>
                 } @else {
-                  @if (menuTree.length > 0) {
-                    @for (parentMenu of menuTree; track parentMenu.id) {
+                  <div class="menu-access-scroll-area">
+                    @if (menuTree.length > 0) {
+                      @for (parentMenu of menuTree; track parentMenu.id) {
                       <div class="parent-menu mb-2">
                         <div class="d-flex align-items-center gap-1 mb-1">
                           <p-checkbox [binary]="true" [(ngModel)]="parentMenu.checked"
@@ -82,6 +83,7 @@
                   } @else {
                     <p class="text-muted">No menus found.</p>
                   }
+                  </div>
                 }
               </div>
             </div>
