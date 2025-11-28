@@ -14,7 +14,7 @@ import {
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MenuItem } from 'primeng/api';
 import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
+
 import { jwtDecode } from 'jwt-decode';
 import { ApiService } from '../../../services/api.service';
 import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
@@ -34,7 +34,7 @@ interface RoleInfo {
 @Component({
   selector: 'app-profile',
     standalone: true,
-  imports: [Loader, ButtonModule, CardModule, RouterModule, ReactiveFormsModule, BreadcrumbModule, Loader, Toast],
+  imports: [Loader, ButtonModule, CardModule, RouterModule, ReactiveFormsModule, BreadcrumbModule, Loader],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   providers: [MessageService]
