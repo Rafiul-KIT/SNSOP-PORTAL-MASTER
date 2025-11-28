@@ -40,11 +40,11 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'landing' },
   {
     path: 'user-management',
-    canActivateChild: [routeGuard],
+    canActivate: [routeGuard],
     children: [
-      { path: 'users', component: Users },
-      { path: 'register', component: Register },
-      { path: 'roles', component: Role },
+      { path: 'users', component: Users, canActivate: [routeGuard], },
+      { path: 'register', component: Register, canActivate: [routeGuard], },
+      { path: 'roles', component: Role, canActivate: [routeGuard], },
       { path: 'role-link', component: RoleLink },
       { path: 'add-new-role', component: AddNewRole },
       { path: '', redirectTo: 'users', pathMatch: 'full' }
