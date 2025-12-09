@@ -48,7 +48,7 @@ export class Dashboard {
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
-        routerLink: '/under-construction',
+        routerLink: '/survey-cto',
       },
     ];
   }

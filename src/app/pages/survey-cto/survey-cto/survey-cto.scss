@@ -1,0 +1,26 @@
+.light-blue-row {
+    background-color: #e3f2fd;
+}
+
+.bordered-row {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.bordered-cell {
+    border-right: 1px solid #dee2e6;
+}
+
+.bordered-cell:last-child {
+    border-right: none;
+}
+
+.paginator-sticky {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    z-index: 1;
+}
+
+.breadcrumb-wrapper {
+    margin-bottom: 1rem;
+}
