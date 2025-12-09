@@ -24,3 +24,7 @@
 .breadcrumb-wrapper {
     margin-bottom: 1rem;
 }
+
+.no-wrap-label .p-splitbutton-text {
+  white-space: nowrap !important;
+}
