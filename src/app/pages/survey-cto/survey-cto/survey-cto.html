@@ -1,0 +1,165 @@
+@if (isLoading) {
+<app-loader></app-loader>
+} @else {
+<div class="breadcrumb-wrapper">
+    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
+</div>
+
+<div class="card p-3 mb-2">
+    <form [formGroup]="searchForm" class="row g-3">
+        <!-- State -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <p-select [options]="states" optionLabel="name" formControlName="state"
+                    (onChange)="onStateChange($event.value)" />
+                <label>State Name</label>
+            </p-floatlabel>
+        </div>
+
+        <!-- County -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <p-select [options]="counties" optionLabel="name" formControlName="county"
+                    (onChange)="onCountyChange($event.value)" />
+                <label>County Name</label>
+            </p-floatlabel>
+        </div>
+        <!-- Payam -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <p-select [options]="payams" optionLabel="name" formControlName="payam"
+                    (onChange)="onPayamChange($event.value)" />
+                <label>Payam Name</label>
+            </p-floatlabel>
+        </div>
+        <!-- Boma -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <p-select [options]="bomas" optionLabel="name" formControlName="boma" />
+                <label>Boma Name</label>
+            </p-floatlabel>
+        </div>
+
+        <!-- Advanced Search Fields -->
+        @if (showAdvancedSearch) {
+        <!-- Household Number -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <input pInputText formControlName="householdNumber" class="w-100" />
+                <label>Household Number</label>
+            </p-floatlabel>
+        </div>
+
+        <!-- Name -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <input pInputText formControlName="name" class="w-100" />
+                <label>Name</label>
+            </p-floatlabel>
+        </div>
+
+        <!-- Mobile Number -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <input pInputText formControlName="mobileNumber" class="w-100" />
+                <label>Mobile Number</label>
+            </p-floatlabel>
+        </div>
+
+        <!-- Wallet Number -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <input pInputText formControlName="walletNumber" class="w-100" />
+                <label>Wallet Number</label>
+            </p-floatlabel>
+        </div>
+        }
+
+        <div class="col-12">
+            <!-- Mobile: stacked full width; ≥sm: right-aligned row -->
+            <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
+                <p-button 
+    [label]="showAdvancedSearch ? 'Hide Advanced Search' : 'Show Advanced Search'" 
+    (onClick)="toggleAdvancedSearch()" 
+    [outlined]="true" 
+    size="small">
+</p-button>
+                <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" [outlined]="true"
+                    (onClick)="resetForm()">
+                </p-button>
+
+                <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
+                    (onClick)="searchPayroll()" [disabled]="searchForm.invalid">
+                </p-button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<p-table [value]="payrollData" [scrollable]="true" [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px'  }" size="small">
+
+    <ng-template pTemplate="header">
+         <tr>
+            <th colspan="9">
+                <!-- Flexbox container to manage button and text placement -->
+                <div class="d-flex justify-content-between">
+                    <!-- Left-aligned Buttons -->
+                    <div class="d-flex align-items-center gap-2">
+                        <p-button label="Load Data" icon="pi pi-refresh" (onClick)="searchPayroll()" size="small"></p-button>
+                        <p-button label="Import" icon="pi pi-upload" (onClick)="importData()" size="small" severity="secondary"></p-button>
+                        <p-splitButton [label]="exportLabel" icon="pi pi-download" (onClick)="exportAs(exportFormat)" [model]="exportItems" size="small" severity="secondary"></p-splitButton>
+                    </div>
+
+                    <!-- Right-aligned Text (Showing record count) -->
+                    <p class="fw-bold mb-2 text-end">
+                        Showing <kbd>{{ payrollData.length }}</kbd> of
+                        <kbd>{{ totalRecords }}</kbd> Beneficiaries
+                    </p>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th class="light-blue-row">SL#</th>
+            <th class="light-blue-row">HH ID</th>
+            <th class="light-blue-row">Beneficiary Name</th>
+            <th class="light-blue-row">Age/Gender/Marital Status</th>
+            <th class="light-blue-row">Education</th>
+            <th class="light-blue-row">No. of Family member</th>
+            <th class="light-blue-row">Support Type</th>
+            <th class="light-blue-row">Alternate</th>
+            <th class="light-blue-row">Nominee</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <tr class="bordered-row">
+            <td class="bordered-cell">{{ item.sl }}</td>
+            <td class="bordered-cell">{{ item.hhId }}</td>
+            <td class="bordered-cell">{{ item.beneficiaryName }}</td>
+            <td class="bordered-cell">{{ item.age }} / {{ item.gender }} / {{ item.maritalStatus }}</td>
+            <td class="bordered-cell">{{ item.education }}</td>
+            <td class="bordered-cell">{{ item.numFamilyMembers }}</td>
+            <td class="bordered-cell">{{ item.supportType }}</td>
+            <td class="bordered-cell">{{ item.alternate }}</td>
+            <td class="bordered-cell">{{ item.nominee }}</td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="9" class="text-center text-danger">
+                <b>No payroll data found!</b>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
+    [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="(currentPage) * pageSize"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+</p-paginator>
+
+}
+
+<p-toast position="bottom-right"></p-toast>

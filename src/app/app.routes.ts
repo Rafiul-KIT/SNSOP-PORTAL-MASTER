@@ -13,6 +13,7 @@ import { RoleLink } from './pages/user-management/role-link/role-link';
 import { AddNewRole } from './pages/user-management/add-new-role/add-new-role';
 import { Unauthorized } from './components/unauthorized/unauthorized';
 import { UnderConstruction } from './pages/under-construction/under-construction';
+import { SurveyCto } from './pages/survey-cto/survey-cto/survey-cto';
 
 
 
@@ -49,6 +50,9 @@ export const routes: Routes = [
       { path: 'add-new-role', component: AddNewRole },
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
+  },
+  { path: 'survey-cto', 
+    component: SurveyCto 
   },
   { path: 'unauthorized', component: Unauthorized },
   { path: 'under-construction', component: UnderConstruction },

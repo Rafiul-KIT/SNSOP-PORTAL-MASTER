@@ -100,7 +100,7 @@ export class Header {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
         command: () => {
-          this.router.navigate(['/under-construction']);
+          this.router.navigate(['/survey-cto']);
           this.showPortalOptions = false;
         },
       },
