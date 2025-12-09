@@ -11,7 +11,7 @@
         <div class="col-md-3">
             <p-floatlabel variant="on" class="w-100">
                 <p-select [options]="states" optionLabel="name" formControlName="state"
-                    (onChange)="onStateChange($event.value)" />
+                    (onChange)="onStateChange($event)" />
                 <label>State Name</label>
             </p-floatlabel>
         </div>
@@ -20,7 +20,7 @@
         <div class="col-md-3">
             <p-floatlabel variant="on" class="w-100">
                 <p-select [options]="counties" optionLabel="name" formControlName="county"
-                    (onChange)="onCountyChange($event.value)" />
+                    (onChange)="onCountyChange($event)" />
                 <label>County Name</label>
             </p-floatlabel>
         </div>
@@ -28,7 +28,7 @@
         <div class="col-md-3">
             <p-floatlabel variant="on" class="w-100">
                 <p-select [options]="payams" optionLabel="name" formControlName="payam"
-                    (onChange)="onPayamChange($event.value)" />
+                    (onChange)="onPayamChange($event)" />
                 <label>Payam Name</label>
             </p-floatlabel>
         </div>
@@ -73,6 +73,22 @@
                 <label>Wallet Number</label>
             </p-floatlabel>
         </div>
+
+        <!-- Support Type -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <p-select [options]="supportTypes" optionLabel="name" formControlName="supportType" />
+                <label>Support Type</label>
+            </p-floatlabel>
+        </div>
+
+        <!-- Registration Phase -->
+        <div class="col-md-3">
+            <p-floatlabel variant="on" class="w-100">
+                <p-select [options]="registrationPhases" optionLabel="name" formControlName="registrationPhase" />
+                <label>Registration Phase</label>
+            </p-floatlabel>
+        </div>
         }
 
         <div class="col-12">
@@ -89,7 +105,7 @@
                 </p-button>
 
                 <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
-                    (onClick)="searchPayroll()" [disabled]="searchForm.invalid">
+                    (onClick)="searchSurveyData()" [disabled]="searchForm.invalid">
                 </p-button>
             </div>
         </div>
@@ -97,23 +113,24 @@
     </form>
 </div>
 
-<p-table [value]="payrollData" [scrollable]="true" [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px'  }" size="small">
+<p-table [value]="surveyData" [scrollable]="true" [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px'  }" size="small">
 
     <ng-template pTemplate="header">
          <tr>
-            <th colspan="9">
+            <th colspan="11">
                 <!-- Flexbox container to manage button and text placement -->
                 <div class="d-flex justify-content-between">
                     <!-- Left-aligned Buttons -->
                     <div class="d-flex align-items-center gap-2">
-                        <p-button label="Load Data" icon="pi pi-refresh" (onClick)="searchPayroll()" size="small"></p-button>
-                        <p-button label="Import" icon="pi pi-upload" (onClick)="importData()" size="small" severity="secondary"></p-button>
-                        <p-splitButton [label]="exportLabel" icon="pi pi-download" (onClick)="exportAs(exportFormat)" [model]="exportItems" size="small" severity="secondary"></p-splitButton>
+                        <input type="file" #csvUploader class="form-control" (change)="onFileSelect($event)" accept=".csv" />
+                        <p-button icon="fas fa-times" (onClick)="clearSelectedFile()" [disabled]="!selectedFile" size="small" severity="secondary"></p-button>
+                        <p-button label="Import" icon="fas fa-upload" (onClick)="importData()" size="small" severity="primary" [disabled]="!selectedFile"></p-button>
+                        <p-splitButton [label]="exportLabel" icon="fas fa-download" (onClick)="exportAs(exportFormat)" [model]="exportItems" size="small" severity="secondary" class="no-wrap-label"></p-splitButton>
                     </div>
 
                     <!-- Right-aligned Text (Showing record count) -->
                     <p class="fw-bold mb-2 text-end">
-                        Showing <kbd>{{ payrollData.length }}</kbd> of
+                        Showing <kbd>{{ surveyData.length }}</kbd> of
                         <kbd>{{ totalRecords }}</kbd> Beneficiaries
                     </p>
                 </div>
@@ -123,7 +140,9 @@
             <th class="light-blue-row">SL#</th>
             <th class="light-blue-row">HH ID</th>
             <th class="light-blue-row">Beneficiary Name</th>
-            <th class="light-blue-row">Age/Gender/Marital Status</th>
+            <th class="light-blue-row">Age</th>
+            <th class="light-blue-row">Gender</th>
+            <th class="light-blue-row">Marital Status</th>
             <th class="light-blue-row">Education</th>
             <th class="light-blue-row">No. of Family member</th>
             <th class="light-blue-row">Support Type</th>
@@ -137,7 +156,9 @@
             <td class="bordered-cell">{{ item.sl }}</td>
             <td class="bordered-cell">{{ item.hhId }}</td>
             <td class="bordered-cell">{{ item.beneficiaryName }}</td>
-            <td class="bordered-cell">{{ item.age }} / {{ item.gender }} / {{ item.maritalStatus }}</td>
+            <td class="bordered-cell">{{ item.age }}</td>
+            <td class="bordered-cell">{{ item.gender }}</td>
+            <td class="bordered-cell">{{ item.maritalStatus }}</td>
             <td class="bordered-cell">{{ item.education }}</td>
             <td class="bordered-cell">{{ item.numFamilyMembers }}</td>
             <td class="bordered-cell">{{ item.supportType }}</td>
@@ -148,8 +169,8 @@
 
     <ng-template pTemplate="emptymessage">
         <tr>
-            <td colspan="9" class="text-center text-danger">
-                <b>No payroll data found!</b>
+            <td colspan="11" class="text-center text-danger">
+                <b>No Survey CTO data found!</b>
             </td>
         </tr>
     </ng-template>
@@ -162,4 +183,5 @@
 
 }
 
+<input type="file" #csvUploader style="display: none" (change)="onFileSelect($event)" accept=".csv" />
 <p-toast position="bottom-right"></p-toast>

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MenuItem, MessageService } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SelectModule } from 'primeng/select';
@@ -12,7 +13,14 @@ import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { InputGroupModule } from 'primeng/inputgroup';
 import { Loader } from '../../../components/loader/loader';
+import { LookupService } from '../../../../services/lookup.service';
+
+
+
+
+
 
 @Component({
   selector: 'app-survey-cto',
@@ -30,12 +38,14 @@ import { Loader } from '../../../components/loader/loader';
     Loader,
     InputTextModule,
     SplitButtonModule,
+    HttpClientModule,
   ],
   templateUrl: './survey-cto.html',
   styleUrl: './survey-cto.scss',
   providers: [MessageService]
 })
 export class SurveyCto implements OnInit {
+  @ViewChild('csvUploader') csvUploader!: ElementRef<HTMLInputElement>;
   isLoading = false;
   showAdvancedSearch = false;
   breadcrumbItems: MenuItem[] = [];
@@ -45,15 +55,18 @@ export class SurveyCto implements OnInit {
   counties: any[] = [];
   payams: any[] = [];
   bomas: any[] = [];
-  payrollData: any[] = [];
+  supportTypes: any[] = [];
+  registrationPhases: any[] = [];
+  surveyData: any[] = [];
   totalRecords = 0;
   pageSize = 10;
   currentPage = 0;
   exportItems: MenuItem[] = [];
-  exportLabel = 'Export as PDF';
-  exportFormat = 'pdf';
+  exportLabel = 'Export as CSV';
+  exportFormat = 'csv';
+  selectedFile: File | null = null;
 
-  constructor(private fb: FormBuilder, private messageService: MessageService) {
+  constructor(private fb: FormBuilder, private messageService: MessageService, private http: HttpClient, private cdr: ChangeDetectorRef, private lookupService: LookupService) {
     this.searchForm = this.fb.group({
       state: [null],
       county: [null],
@@ -63,6 +76,8 @@ export class SurveyCto implements OnInit {
       name: [null],
       mobileNumber: [null],
       walletNumber: [null],
+      supportType: [null],
+      registrationPhase: [null],
     });
   }
 
@@ -101,49 +116,222 @@ export class SurveyCto implements OnInit {
         }
       }
     ];
+
+    this.supportTypes = [
+      { name: 'ALL' },
+      { name: 'LIPW' },
+      { name: 'DIS' },
+    ];
+
+    this.registrationPhases = [
+      { name: 'ALL' },
+      { name: 'AF(Additional Financing)' },
+      { name: 'PP(Parent Project)' },
+    ];
+
+    this.searchForm.get('county')?.disable();
+    this.searchForm.get('payam')?.disable();
+    this.searchForm.get('boma')?.disable();
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    this.lookupService.getStateList().then(states => {
+      this.states = states;
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }).catch(error => {
+      console.error('Error fetching states:', error);
+      this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load states.'});
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    });
   }
 
   toggleAdvancedSearch(): void {
     this.showAdvancedSearch = !this.showAdvancedSearch;
   }
 
-  onStateChange(state: any): void {
-    console.log('State changed:', state);
+  async onStateChange(event: { value: { id: number, name: string } }): Promise<void> {
+    this.searchForm.get('county')?.reset();
+    this.searchForm.get('payam')?.reset();
+    this.searchForm.get('boma')?.reset();
+  
+    if (event.value) {
+      this.searchForm.get('county')?.enable();
+      this.cdr.detectChanges();
+      try {
+        const counties = await this.lookupService.getCountyListByStateId(event.value.id);
+        this.counties = counties;
+      } catch (error) {
+        console.error('Error fetching counties:', error);
+        this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load counties.'});
+      } finally {
+        this.cdr.detectChanges();
+      }
+    } else {
+      this.searchForm.get('county')?.disable();
+      this.searchForm.get('payam')?.disable();
+      this.searchForm.get('boma')?.disable();
+      this.counties = [];
+      this.payams = [];
+      this.bomas = [];
+      this.cdr.detectChanges();
+    }
   }
 
-  onCountyChange(county: any): void {
-    console.log('County changed:', county);
+  async onCountyChange(event: { value: { id: number, name: string } }): Promise<void> {
+    this.searchForm.get('payam')?.reset();
+    this.searchForm.get('boma')?.reset();
+  
+    if (event.value) {
+      this.searchForm.get('payam')?.enable();
+      this.cdr.detectChanges();
+      try {
+        const payams = await this.lookupService.getPayamListByCountyId(event.value.id);
+        this.payams = payams;
+      } catch (error) {
+        console.error('Error fetching payams:', error);
+        this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load payams.'});
+      } finally {
+        this.cdr.detectChanges();
+      }
+    } else {
+      this.searchForm.get('payam')?.disable();
+      this.searchForm.get('boma')?.disable();
+      this.payams = [];
+      this.bomas = [];
+      this.cdr.detectChanges();
+    }
   }
 
-  onPayamChange(payam: any): void {
-    console.log('Payam changed:', payam);
+  async onPayamChange(event: { value: { id: number, name: string } }): Promise<void> {
+    this.searchForm.get('boma')?.reset();
+  
+    if (event.value) {
+      this.searchForm.get('boma')?.enable();
+      this.cdr.detectChanges();
+      try {
+        const bomas = await this.lookupService.getBomaListByPayamId(event.value.id);
+        this.bomas = bomas;
+      } catch (error) {
+        console.error('Error fetching bomas:', error);
+        this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load bomas.'});
+      } finally {
+        this.cdr.detectChanges();
+      }
+    } else {
+      this.searchForm.get('boma')?.disable();
+      this.bomas = [];
+      this.cdr.detectChanges();
+    }
   }
 
   resetForm(): void {
     this.searchForm.reset();
+    this.counties = [];
+    this.payams = [];
+    this.bomas = [];
+    this.searchForm.get('county')?.disable();
+    this.searchForm.get('payam')?.disable();
+    this.searchForm.get('boma')?.disable();
+    this.cdr.detectChanges();
     this.messageService.add({severity:'success', summary:'Success', detail:'Form has been reset'});
   }
 
-  searchPayroll(): void {
-    console.log('Searching payroll with form data:', this.searchForm.value);
-    this.messageService.add({severity:'info', summary:'Info', detail:'Searching for payroll data'});
+  searchSurveyData(): void {
+    console.log('Searching Survey CTO data with form data:', this.searchForm.value);
+    this.messageService.add({severity:'info', summary:'Info', detail:'Searching for Survey CTO data'});
   }
 
   importData(): void {
-    console.log('Importing data...');
-    this.messageService.add({severity:'info', summary:'Info', detail:'Import functionality is not yet implemented.'});
+    if (!this.selectedFile) {
+      this.messageService.add({severity:'warn', summary:'Warning', detail:'Please select a file to import.'});
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile, this.selectedFile.name);
+
+    this.messageService.add({severity:'info', summary:'Importing', detail:`${this.selectedFile.name} is being uploaded.`});
+    this.http.post('/api/dummy-import-csv', formData).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Upload Started',
+          detail: `${this.selectedFile?.name} has been imported successfully.`,
+        });
+        this.selectedFile = null;
+        this.csvUploader.nativeElement.value = ''; // Clear the input field
+        this.cdr.detectChanges(); // Update button disabled state and UI
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Upload Failed',
+          detail: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
+        });
+        this.selectedFile = null;
+        this.csvUploader.nativeElement.value = ''; // Clear the input field
+        this.cdr.detectChanges(); // Update button disabled state and UI
+      },
+    });
+  }
+
+  clearSelectedFile(): void {
+    this.selectedFile = null;
+    this.csvUploader.nativeElement.value = ''; // Clear the native file input
+    this.cdr.detectChanges(); // Update button states and UI
+    this.messageService.add({severity:'info', summary:'File Cleared', detail:'Selected file has been removed.'});
+  }
+
+  onFileSelect(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    if (element.files && element.files.length > 0) {
+      this.selectedFile = element.files[0];
+      console.log('Selected file:', this.selectedFile.name);
+    } else {
+      this.selectedFile = null;
+    }
+    this.cdr.detectChanges(); // Update button disabled state
   }
 
   exportAs(format: string): void {
     this.exportLabel = `Export as ${format.toUpperCase()}`;
     this.exportFormat = format;
-    console.log(`Exporting as ${format}...`);
-    this.messageService.add({severity:'info', summary:'Info', detail:`Exporting as ${format} is not yet implemented.`});
+
+    if (format === 'csv') {
+      console.log('Exporting as CSV...');
+      this.http.get('/api/dummy-export-csv').subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'CSV export started.',
+          });
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: `CSV export failed. Error: ${err.message}`,
+          });
+        },
+      });
+    } else {
+      const msg = `Exporting as ${format.toUpperCase()} is not available for now.`;
+      console.log(msg);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Not Available',
+        detail: msg,
+      });
+    }
   }
 
   onPageChange(event: PaginatorState): void {
     this.currentPage = event.page ?? 0;
     this.pageSize = event.rows ?? 10;
-    this.searchPayroll();
+    this.searchSurveyData();
   }
 }
