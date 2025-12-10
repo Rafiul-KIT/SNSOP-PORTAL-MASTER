@@ -85,15 +85,7 @@ export class SurveyCto implements OnInit {
     ];
 
     this.exportItems = [
-      {
-        label: 'Export as PDF',
-        icon: 'pi pi-file-pdf',
-        command: () => {
-          this.exportLabel = 'Export as PDF';
-          this.exportFormat = 'pdf';
-          this.exportAs(this.exportFormat);
-        }
-      },
+
       {
         label: 'Export as CSV',
         icon: 'pi pi-file',
@@ -305,7 +297,7 @@ export class SurveyCto implements OnInit {
       const file = element.files[0];
       if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
         this.selectedFile = file;
-        console.log('Selected file:', this.selectedFile.name);
+      
       } else {
         Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
         this.selectedFile = null;
@@ -329,7 +321,7 @@ export class SurveyCto implements OnInit {
         });
         return;
       }
-      console.log('Exporting as CSV...');
+    
       const formValues = this.searchForm.value;
       const params = {
         stateId: formValues.state?.id,
