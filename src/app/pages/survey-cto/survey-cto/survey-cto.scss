@@ -28,3 +28,8 @@
 .no-wrap-label .p-splitbutton-text {
   white-space: nowrap !important;
 }
+:host ::ng-deep .p-splitbutton.no-wrap-label {
+    .p-button, .p-button-label {
+        white-space: nowrap;
+    }
+}

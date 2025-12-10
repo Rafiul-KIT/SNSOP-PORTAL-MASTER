@@ -1,26 +1,22 @@
+
+
 import { Component, ChangeDetectorRef, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SelectModule } from 'primeng/select';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
-import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
-import { InputGroupModule } from 'primeng/inputgroup';
 import { Loader } from '../../../components/loader/loader';
 import { LookupService } from '../../../../services/lookup.service';
-
-
-
-
-
+import { ApiService } from '../../../../services/api.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-survey-cto',
@@ -33,16 +29,13 @@ import { LookupService } from '../../../../services/lookup.service';
     FloatLabelModule,
     TableModule,
     PaginatorModule,
-    ToastModule,
     ButtonModule,
     Loader,
     InputTextModule,
     SplitButtonModule,
-    HttpClientModule,
   ],
   templateUrl: './survey-cto.html',
   styleUrl: './survey-cto.scss',
-  providers: [MessageService]
 })
 export class SurveyCto implements OnInit {
   @ViewChild('csvUploader') csvUploader!: ElementRef<HTMLInputElement>;
@@ -66,7 +59,12 @@ export class SurveyCto implements OnInit {
   exportFormat = 'csv';
   selectedFile: File | null = null;
 
-  constructor(private fb: FormBuilder, private messageService: MessageService, private http: HttpClient, private cdr: ChangeDetectorRef, private lookupService: LookupService) {
+  constructor(
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private lookupService: LookupService,
+    private apiService: ApiService
+  ) {
     this.searchForm = this.fb.group({
       state: [null],
       county: [null],
@@ -141,7 +139,7 @@ export class SurveyCto implements OnInit {
       this.cdr.detectChanges();
     }).catch(error => {
       console.error('Error fetching states:', error);
-      this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load states.'});
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load states.' });
       this.isLoading = false;
       this.cdr.detectChanges();
     });
@@ -164,7 +162,7 @@ export class SurveyCto implements OnInit {
         this.counties = counties;
       } catch (error) {
         console.error('Error fetching counties:', error);
-        this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load counties.'});
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load counties.' });
       } finally {
         this.cdr.detectChanges();
       }
@@ -191,7 +189,7 @@ export class SurveyCto implements OnInit {
         this.payams = payams;
       } catch (error) {
         console.error('Error fetching payams:', error);
-        this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load payams.'});
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load payams.' });
       } finally {
         this.cdr.detectChanges();
       }
@@ -215,7 +213,7 @@ export class SurveyCto implements OnInit {
         this.bomas = bomas;
       } catch (error) {
         console.error('Error fetching bomas:', error);
-        this.messageService.add({severity:'error', summary:'Error', detail:'Failed to load bomas.'});
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load bomas.' });
       } finally {
         this.cdr.detectChanges();
       }
@@ -235,53 +233,56 @@ export class SurveyCto implements OnInit {
     this.searchForm.get('payam')?.disable();
     this.searchForm.get('boma')?.disable();
     this.cdr.detectChanges();
-    this.messageService.add({severity:'success', summary:'Success', detail:'Form has been reset'});
+    Swal.fire({ icon: 'success', title: 'Success', text: 'Form has been reset' });
   }
 
   searchSurveyData(): void {
     console.log('Searching Survey CTO data with form data:', this.searchForm.value);
-    this.messageService.add({severity:'info', summary:'Info', detail:'Searching for Survey CTO data'});
+    Swal.fire({ icon: 'info', title: 'Info', text: 'Searching for Survey CTO data' });
   }
 
   importData(): void {
     if (!this.selectedFile) {
-      this.messageService.add({severity:'warn', summary:'Warning', detail:'Please select a file to import.'});
+      Swal.fire({ icon: 'warning', title: 'Warning', text: 'Please select a file to import.' });
       return;
     }
 
     const formData = new FormData();
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
-    this.messageService.add({severity:'info', summary:'Importing', detail:`${this.selectedFile.name} is being uploaded.`});
-    this.http.post('/api/dummy-import-csv', formData).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Upload Started',
-          detail: `${this.selectedFile?.name} has been imported successfully.`,
+    Swal.fire({ icon: 'info', title: 'Importing', text: `${this.selectedFile.name} is being uploaded.` });
+    this.apiService.POST('surveycto/revisiting/upload', formData, 'global', { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Upload Started',
+          text: `${this.selectedFile?.name} has been imported successfully.`,
         });
         this.selectedFile = null;
-        this.csvUploader.nativeElement.value = ''; // Clear the input field
+        if (this.csvUploader) {
+          this.csvUploader.nativeElement.value = ''; // Clear the input field
+        }
         this.cdr.detectChanges(); // Update button disabled state and UI
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Upload Failed',
-          detail: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
         });
         this.selectedFile = null;
-        this.csvUploader.nativeElement.value = ''; // Clear the input field
+        if (this.csvUploader) {
+          this.csvUploader.nativeElement.value = ''; // Clear the input field
+        }
         this.cdr.detectChanges(); // Update button disabled state and UI
-      },
-    });
+      });
   }
 
   clearSelectedFile(): void {
     this.selectedFile = null;
     this.csvUploader.nativeElement.value = ''; // Clear the native file input
     this.cdr.detectChanges(); // Update button states and UI
-    this.messageService.add({severity:'info', summary:'File Cleared', detail:'Selected file has been removed.'});
+    Swal.fire({ icon: 'info', title: 'File Cleared', text: 'Selected file has been removed.' });
   }
 
   onFileSelect(event: Event): void {
@@ -296,34 +297,49 @@ export class SurveyCto implements OnInit {
   }
 
   exportAs(format: string): void {
-    this.exportLabel = `Export as ${format.toUpperCase()}`;
-    this.exportFormat = format;
-
     if (format === 'csv') {
       console.log('Exporting as CSV...');
-      this.http.get('/api/dummy-export-csv').subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'CSV export started.',
+      const formValues = this.searchForm.value;
+      const params = {
+        stateId: formValues.state?.id,
+        countyId: formValues.county?.id,
+        payamId: formValues.payam?.id,
+        bomaId: formValues.boma?.id,
+        page: this.currentPage,
+        size: this.pageSize
+      };
+
+      this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', { responseType: 'blob' })
+        .then((response: any) => {
+          const blob = new Blob([response.data], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'survey-cto-template.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'CSV export started.',
           });
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: `CSV export failed. Error: ${err.message}`,
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `CSV export failed. Error: ${err.message}`,
           });
-        },
-      });
+        });
     } else {
       const msg = `Exporting as ${format.toUpperCase()} is not available for now.`;
       console.log(msg);
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Not Available',
-        detail: msg,
+      Swal.fire({
+        icon: 'warning',
+        title: 'Not Available',
+        text: msg,
       });
     }
   }
