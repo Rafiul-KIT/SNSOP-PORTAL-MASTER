@@ -58,6 +58,7 @@ export class SurveyCto implements OnInit {
   exportLabel = 'Export as CSV';
   exportFormat = 'csv';
   selectedFile: File | null = null;
+  isFilteredSearch = false;
 
   constructor(
     private fb: FormBuilder,
@@ -135,6 +136,7 @@ export class SurveyCto implements OnInit {
       this.isLoading = false;
       this.cdr.detectChanges();
     });
+    this.performSearch();
   }
 
   toggleAdvancedSearch(): void {
@@ -224,12 +226,23 @@ export class SurveyCto implements OnInit {
     this.searchForm.get('county')?.disable();
     this.searchForm.get('payam')?.disable();
     this.searchForm.get('boma')?.disable();
+    this.isFilteredSearch = false;
+    this.searchForm.patchValue({
+      supportType: this.supportTypes[0],
+      registrationPhase: this.registrationPhases[0].value
+    });
     this.cdr.detectChanges();
     Swal.fire({ icon: 'success', title: 'Success', text: 'Form has been reset' });
   }
 
   searchSurveyData(): void {
-    if (this.searchForm.invalid) {
+    this.isFilteredSearch = true;
+    this.currentPage = 0;
+    this.performSearch();
+  }
+
+  private performSearch(): void {
+    if (this.isFilteredSearch && this.searchForm.invalid) {
       Swal.fire({
         icon: 'error',
         title: 'Validation Error',
@@ -243,13 +256,16 @@ export class SurveyCto implements OnInit {
 
     const formValues = this.searchForm.value;
     const requestBody: { [key: string]: any } = {
-      stateId: formValues.state?.id,
-      countyId: formValues.county?.id,
-      payamId: formValues.payam?.id,
-      bomaId: formValues.boma?.id,
       page: this.currentPage,
       size: this.pageSize,
     };
+
+    if (this.isFilteredSearch) {
+      requestBody['stateId'] = formValues.state?.id;
+      requestBody['countyId'] = formValues.county?.id;
+      requestBody['payamId'] = formValues.payam?.id;
+      requestBody['bomaId'] = formValues.boma?.id;
+    }
 
     if (formValues.householdNumber) {
       requestBody['applicationId'] = formValues.householdNumber;
@@ -263,10 +279,10 @@ export class SurveyCto implements OnInit {
     if (formValues.walletNumber) {
       requestBody['walletNumber'] = formValues.walletNumber;
     }
-    if (formValues.supportType?.name && formValues.supportType.name !== 'ALL') {
+    if (formValues.supportType?.name) {
       requestBody['selectionCriteria'] = formValues.supportType.name;
     }
-    if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
+    if (formValues.registrationPhase) {
       requestBody['registrationPhase'] = formValues.registrationPhase;
     }
 
@@ -443,6 +459,6 @@ export class SurveyCto implements OnInit {
   onPageChange(event: PaginatorState): void {
     this.currentPage = event.page ?? 0;
     this.pageSize = event.rows ?? 10;
-    this.searchSurveyData();
+    this.performSearch();
   }
 }
