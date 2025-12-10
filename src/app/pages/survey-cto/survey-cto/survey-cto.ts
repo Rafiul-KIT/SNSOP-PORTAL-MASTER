@@ -49,7 +49,7 @@ export class SurveyCto implements OnInit {
   isLoading = false;
   showAdvancedSearch = false;
   breadcrumbItems: MenuItem[] = [];
-  breadcrumbHome: MenuItem = { icon: 'pi pi-home', routerLink: '/' };
+  breadcrumbHome: MenuItem = { icon: 'fas fa-home', routerLink: '/' };
   searchForm: FormGroup;
   states: any[] = [];
   counties: any[] = [];
@@ -83,7 +83,6 @@ export class SurveyCto implements OnInit {
 
   ngOnInit(): void {
     this.breadcrumbItems = [
-      { label: 'Report' },
       { label: 'Survey CTO' }
     ];
 
