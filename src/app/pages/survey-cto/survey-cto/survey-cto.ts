@@ -1,7 +1,7 @@
 
 
 import { Component, ChangeDetectorRef, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
@@ -66,10 +66,10 @@ export class SurveyCto implements OnInit {
     private apiService: ApiService
   ) {
     this.searchForm = this.fb.group({
-      state: [null],
-      county: [null],
-      payam: [null],
-      boma: [null],
+      state: [null, Validators.required],
+      county: [null, Validators.required],
+      payam: [null, Validators.required],
+      boma: [null, Validators.required],
       householdNumber: [null],
       name: [null],
       mobileNumber: [null],
@@ -237,6 +237,14 @@ export class SurveyCto implements OnInit {
   }
 
   searchSurveyData(): void {
+    if (this.searchForm.invalid) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Please select State, County, Payam, and Boma.',
+      });
+      return;
+    }
     console.log('Searching Survey CTO data with form data:', this.searchForm.value);
     Swal.fire({ icon: 'info', title: 'Info', text: 'Searching for Survey CTO data' });
   }
@@ -247,11 +255,17 @@ export class SurveyCto implements OnInit {
       return;
     }
 
+    if (this.selectedFile.type !== 'text/csv' && !this.selectedFile.name.endsWith('.csv')) {
+      Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
+      this.clearSelectedFile();
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
     Swal.fire({ icon: 'info', title: 'Importing', text: `${this.selectedFile.name} is being uploaded.` });
-    this.apiService.POST('surveycto/revisiting/upload', formData, 'global', { headers: { 'Content-Type': 'multipart/form-data' } })
+    this.apiService.POST('api/surveycto/revisiting/upload', formData, 'global', { headers: { 'Content-Type': 'multipart/form-data' } })
       .then(() => {
         Swal.fire({
           icon: 'success',
@@ -288,8 +302,17 @@ export class SurveyCto implements OnInit {
   onFileSelect(event: Event): void {
     const element = event.target as HTMLInputElement;
     if (element.files && element.files.length > 0) {
-      this.selectedFile = element.files[0];
-      console.log('Selected file:', this.selectedFile.name);
+      const file = element.files[0];
+      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        this.selectedFile = file;
+        console.log('Selected file:', this.selectedFile.name);
+      } else {
+        Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
+        this.selectedFile = null;
+        if (this.csvUploader) {
+          this.csvUploader.nativeElement.value = '';
+        }
+      }
     } else {
       this.selectedFile = null;
     }
@@ -298,6 +321,14 @@ export class SurveyCto implements OnInit {
 
   exportAs(format: string): void {
     if (format === 'csv') {
+      if (this.searchForm.invalid) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Please select State, County, Payam, and Boma for export.',
+        });
+        return;
+      }
       console.log('Exporting as CSV...');
       const formValues = this.searchForm.value;
       const params = {
