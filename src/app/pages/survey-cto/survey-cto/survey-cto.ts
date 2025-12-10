@@ -113,9 +113,9 @@ export class SurveyCto implements OnInit {
     ];
 
     this.registrationPhases = [
-      { name: 'ALL' },
-      { name: 'AF(Additional Financing)' },
-      { name: 'PP(Parent Project)' },
+      { name: 'ALL', value: 'ALL' },
+      { name: 'AF(Additional Financing)', value: 'AF' },
+      { name: 'PP(Parent Project)', value: 'PARENT' },
     ];
 
     this.searchForm.get('county')?.disable();
@@ -237,8 +237,71 @@ export class SurveyCto implements OnInit {
       });
       return;
     }
-    console.log('Searching Survey CTO data with form data:', this.searchForm.value);
-    Swal.fire({ icon: 'info', title: 'Info', text: 'Searching for Survey CTO data' });
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    const formValues = this.searchForm.value;
+    const requestBody: { [key: string]: any } = {
+      stateId: formValues.state?.id,
+      countyId: formValues.county?.id,
+      payamId: formValues.payam?.id,
+      bomaId: formValues.boma?.id,
+      page: this.currentPage,
+      size: this.pageSize,
+    };
+
+    if (formValues.householdNumber) {
+      requestBody['applicationId'] = formValues.householdNumber;
+    }
+    if (formValues.name) {
+      requestBody['respondentName'] = formValues.name;
+    }
+    if (formValues.mobileNumber) {
+      requestBody['mobileNumber'] = formValues.mobileNumber;
+    }
+    if (formValues.walletNumber) {
+      requestBody['walletNumber'] = formValues.walletNumber;
+    }
+    if (formValues.supportType?.name && formValues.supportType.name !== 'ALL') {
+      requestBody['selectionCriteria'] = formValues.supportType.name;
+    }
+    if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
+      requestBody['registrationPhase'] = formValues.registrationPhase;
+    }
+
+    this.apiService.POST('/api/surveycto/search', requestBody)
+      .then(response => {
+        if (response.data.operationResult) {
+          this.totalRecords = response.data.total || 0;
+          this.surveyData = (response.data.beneficiaries || []).map((beneficiary: any, index: number) => ({
+            sl: this.currentPage * this.pageSize + index + 1,
+            hhId: beneficiary.applicationId,
+            beneficiaryName: [beneficiary.respondentFirstName, beneficiary.respondentMiddleName, beneficiary.respondentLastName].filter(Boolean).join(' '),
+            age: beneficiary.respondentAge,
+            gender: beneficiary.respondentGender,
+            maritalStatus: beneficiary.maritalStatus,
+            education: beneficiary.isReadWrite ? 'Literate' : 'Illiterate',
+            numFamilyMembers: beneficiary.numberOfHouseholds,
+            supportType: beneficiary.selectionCriteria,
+            alternate: beneficiary.alternate ? [beneficiary.alternate.payeeFirstName, beneficiary.alternate.payeeMiddleName, beneficiary.alternate.payeeLastName].filter(Boolean).join(' ') : 'No',
+            nominee: beneficiary.nominee ? [beneficiary.nominee.nomineeFirstName, beneficiary.nominee.nomineeMiddleName, beneficiary.nominee.nomineeLastName].filter(Boolean).join(' ') : 'No'
+          }));
+        } else {
+          Swal.fire({ icon: 'error', title: 'Search Failed', text: response.data.errorMsg || 'An unknown error occurred.' });
+          this.surveyData = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(err => {
+        Swal.fire({ icon: 'error', title: 'API Error', text: err.message || 'Failed to fetch survey data.' });
+        this.surveyData = [];
+        this.totalRecords = 0;
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
   }
 
   importData(): void {
@@ -323,14 +386,24 @@ export class SurveyCto implements OnInit {
       }
     
       const formValues = this.searchForm.value;
-      const params = {
+      const params: { [key: string]: any } = {
         stateId: formValues.state?.id,
         countyId: formValues.county?.id,
         payamId: formValues.payam?.id,
         bomaId: formValues.boma?.id,
         page: this.currentPage,
-        size: this.pageSize
+        size: -1,
       };
+
+      // Add criteria if not 'ALL'
+      if (formValues.supportType?.name !== 'ALL') {
+        params['criteria'] = formValues.supportType?.name;
+      }
+
+      // Add registrationPhase if not 'ALL'
+      if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
+        params['registrationPhase'] = formValues.registrationPhase;
+      }
 
       this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', { responseType: 'blob' })
         .then((response: any) => {
