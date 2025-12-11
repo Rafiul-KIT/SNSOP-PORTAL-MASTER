@@ -123,7 +123,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <input type="file" #csvUploader class="form-control" (change)="onFileSelect($event)"
                             accept=".csv" />
-                        <p-button icon="fas fa-times" (onClick)="clearSelectedFile()" [disabled]="!selectedFile"
+                        <p-button icon="fas fa-times" (onClick)="clearSelectedFile(true)" [disabled]="!selectedFile"
                             size="small" severity="secondary"></p-button>
                         <p-button label="Import" icon="fas fa-upload" (onClick)="importData()" size="small"
                             severity="primary" [disabled]="!selectedFile"></p-button>
@@ -186,5 +186,3 @@
 </p-paginator>
 
 }
-
-<input type="file" #csvUploader style="display: none" (change)="onFileSelect($event)" accept=".csv" />

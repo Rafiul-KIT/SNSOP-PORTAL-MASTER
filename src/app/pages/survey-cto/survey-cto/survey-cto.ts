@@ -13,6 +13,8 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { ProgressBarModule } from 'primeng/progressbar';
+import axios, { CancelTokenSource } from 'axios';
 import { Loader } from '../../../components/loader/loader';
 import { LookupService } from '../../../../services/lookup.service';
 import { ApiService } from '../../../../services/api.service';
@@ -33,6 +35,7 @@ import Swal from 'sweetalert2';
     Loader,
     InputTextModule,
     SplitButtonModule,
+    ProgressBarModule,
   ],
   templateUrl: './survey-cto.html',
   styleUrl: './survey-cto.scss',
@@ -332,42 +335,62 @@ export class SurveyCto implements OnInit {
       return;
     }
 
+    Swal.fire({
+      title: 'Importing in progress',
+      html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+    });
+
     const formData = new FormData();
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
-    Swal.fire({ icon: 'info', title: 'Importing', text: `${this.selectedFile.name} is being uploaded.` });
-    this.apiService.POST('api/surveycto/revisiting/upload', formData, 'global', { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(() => {
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    };
+
+    this.apiService.POST('api/surveycto/revisiting/upload', formData, 'global', config)
+      .then((response) => {
+        Swal.close();
+        const result = response.data;
+        const successMessage = `
+          <div style="text-align: left; padding: 0 1rem;">
+            <p class="mb-1"><b>File:</b> ${result.fileName}</p>
+            <p class="mb-1"><b>Total Rows:</b> ${result.totalRows}</p>
+            <p class="mb-1"><b>Saved:</b> ${result.savedRows}</p>
+            <p class="mb-1"><b>Skipped:</b> ${result.skippedRows}</p>
+            ${result.errors && result.errors.length > 0 ? `<p class="text-danger mb-1"><b>Errors:</b> ${result.errors.length}</p>` : ''}
+          </div>
+        `;
         Swal.fire({
           icon: 'success',
-          title: 'Upload Started',
-          text: `${this.selectedFile?.name} has been imported successfully.`,
+          title: 'Import Successful',
+          html: successMessage,
         });
-        this.selectedFile = null;
-        if (this.csvUploader) {
-          this.csvUploader.nativeElement.value = ''; // Clear the input field
-        }
-        this.cdr.detectChanges(); // Update button disabled state and UI
+        this.clearSelectedFile(false);
       })
       .catch((err) => {
+        Swal.close();
         Swal.fire({
           icon: 'error',
           title: 'Upload Failed',
           text: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
         });
-        this.selectedFile = null;
-        if (this.csvUploader) {
-          this.csvUploader.nativeElement.value = ''; // Clear the input field
-        }
-        this.cdr.detectChanges(); // Update button disabled state and UI
+        this.clearSelectedFile(false);
       });
   }
 
-  clearSelectedFile(): void {
+  clearSelectedFile(showNotification: boolean = false): void {
     this.selectedFile = null;
-    this.csvUploader.nativeElement.value = ''; // Clear the native file input
+    if (this.csvUploader?.nativeElement) {
+      this.csvUploader.nativeElement.value = ''; // Clear the native file input
+    }
     this.cdr.detectChanges(); // Update button states and UI
-    Swal.fire({ icon: 'info', title: 'File Cleared', text: 'Selected file has been removed.' });
+    if (showNotification) {
+      Swal.fire({ icon: 'info', title: 'File Cleared', text: 'Selected file has been removed.' });
+    }
   }
 
   onFileSelect(event: Event): void {
@@ -400,29 +423,38 @@ export class SurveyCto implements OnInit {
         });
         return;
       }
-    
+
+      Swal.fire({
+        title: 'Exporting in progress',
+        html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+      });
+
       const formValues = this.searchForm.value;
       const params: { [key: string]: any } = {
-        stateId: formValues.state?.id,
-        countyId: formValues.county?.id,
-        payamId: formValues.payam?.id,
-        bomaId: formValues.boma?.id,
-        page: this.currentPage,
+        page: 0,
         size: -1,
       };
 
-      // Add criteria if not 'ALL'
-      if (formValues.supportType?.name !== 'ALL') {
-        params['criteria'] = formValues.supportType?.name;
+      if (formValues.state?.id) params['stateId'] = formValues.state.id;
+      if (formValues.county?.id) params['countyId'] = formValues.county.id;
+      if (formValues.payam?.id) params['payamId'] = formValues.payam.id;
+      if (formValues.boma?.id) params['bomaId'] = formValues.boma.id;
+      if (formValues.supportType?.name && formValues.supportType.name !== 'ALL') {
+        params['criteria'] = formValues.supportType.name;
       }
-
-      // Add registrationPhase if not 'ALL'
       if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
         params['registrationPhase'] = formValues.registrationPhase;
       }
 
-      this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', { responseType: 'blob' })
+      const config = {
+        responseType: 'blob' as 'blob',
+      };
+
+      this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', config)
         .then((response: any) => {
+          Swal.close();
           const blob = new Blob([response.data], { type: 'text/csv' });
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -435,10 +467,11 @@ export class SurveyCto implements OnInit {
           Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: 'CSV export started.',
+            text: 'CSV export complete.',
           });
         })
         .catch((err) => {
+          Swal.close();
           Swal.fire({
             icon: 'error',
             title: 'Error',
