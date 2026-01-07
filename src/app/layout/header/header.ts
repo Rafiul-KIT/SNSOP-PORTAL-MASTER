@@ -121,7 +121,7 @@ export class Header {
         items: [
           {
             label: 'User List',
-            icon: 'fas fa-list',
+            icon: 'fas fa-users',
             routerLink: ['/user-management/users'],
           },
           {
@@ -131,7 +131,7 @@ export class Header {
           },
           {
             label: 'Role List',
-            icon: 'fas fa-shield',
+            icon: 'fas fa-users-rays',
             routerLink: ['/user-management/roles'],
           },
         ],

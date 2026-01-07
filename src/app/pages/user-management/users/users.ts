@@ -73,7 +73,7 @@ export class Users implements OnInit {
     { label: 'Inactive', value: 0 }
   ];
 
-  home = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
+  home = { icon: 'fas fa-home', routerLink: ['/user-management/users'] };
   items = [{ label: 'User List', icon: 'fas fa-users' }];
 
 
@@ -247,7 +247,7 @@ async loadUsers(): Promise<void> {
       status: '',
       roleId: '',
       emailReceiver: ''
-    }; 
+    };
     this.applyFilters();
   }
 
