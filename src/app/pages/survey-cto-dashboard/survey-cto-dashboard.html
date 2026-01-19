@@ -55,6 +55,44 @@
       </div>
     </div>
   </div>
+  <div class="summary-cards">
+    <div class="card card-1">
+      <div class="card-icon">
+        <i class="fas fa-map-marked-alt"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">Number of Revisit Boma</div>
+        <div class="card-value">{{ totalBeneficiaries | number }}</div>
+      </div>
+    </div>
+    <div class="card card-2">
+      <div class="card-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">Number of Revisit Beneficiary</div>
+        <div class="card-value">{{ totalHouseholds | number }}</div>
+      </div>
+    </div>
+    <div class="card card-3">
+      <div class="card-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">Alternate/Nominee changes</div>
+        <div class="card-value">{{ statesCovered | number }}</div>
+      </div>
+    </div>
+    <div class="card card-4">
+      <div class="card-icon">
+        <i class="fas fa-dollar"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">Number of Missing Payment</div>
+        <div class="card-value">{{ countiesCovered | number }}</div>
+      </div>
+    </div>
+  </div>
 
   <div class="charts-grid">
     <div class="chart-container large">
