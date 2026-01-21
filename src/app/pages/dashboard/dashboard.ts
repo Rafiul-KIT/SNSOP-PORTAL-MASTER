@@ -31,7 +31,7 @@ export class Dashboard {
       },
       {
         label: 'GRM',
-        routerLink: '/under-construction',
+        link: environment.portals.grm,
         icon: 'fas fa-sitemap'
       },
       {

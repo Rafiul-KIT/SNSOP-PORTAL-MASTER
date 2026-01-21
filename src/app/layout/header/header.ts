@@ -68,19 +68,12 @@ export class Header {
       },
       {
         label: 'Payment',
-        // command: () => {
-        //   this.router.navigate(['/under-construction']);
-        //   this.showPortalOptions = false;
-        // },
          link: environment.portals.payment,
         icon: 'fas fa-credit-card',
       },
       {
         label: 'GRM',
-        command: () => {
-          this.router.navigate(['/under-construction']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.grm,
         icon: 'fas fa-sitemap'
       },
       {
