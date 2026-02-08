@@ -67,7 +67,7 @@
                 }
               ]
             },
-            "dev": {
+            "qa": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -90,8 +90,8 @@
             "staging": {
               "buildTarget": "snsop-mf-portal-master:build:staging"
             },
-            "dev": {
-              "buildTarget": "snsop-mf-portal-master:build:dev"
+            "qa": {
+              "buildTarget": "snsop-mf-portal-master:build:qa"
             }
           },
           "defaultConfiguration": "development"
