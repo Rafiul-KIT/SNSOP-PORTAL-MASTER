@@ -31,7 +31,7 @@ export class Dashboard {
       },
       {
         label: 'GRM',
-        routerLink: '/under-construction',
+        link: environment.portals.grm,
         icon: 'fas fa-sitemap'
       },
       {
@@ -48,7 +48,7 @@ export class Dashboard {
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
-        routerLink: '/survey-cto',
+        routerLink: '/cto-dashboard'
       },
     ];
   }

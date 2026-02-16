@@ -13,6 +13,8 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { ProgressBarModule } from 'primeng/progressbar';
+import axios, { CancelTokenSource } from 'axios';
 import { Loader } from '../../../components/loader/loader';
 import { LookupService } from '../../../../services/lookup.service';
 import { ApiService } from '../../../../services/api.service';
@@ -33,6 +35,7 @@ import Swal from 'sweetalert2';
     Loader,
     InputTextModule,
     SplitButtonModule,
+    ProgressBarModule,
   ],
   templateUrl: './survey-cto.html',
   styleUrl: './survey-cto.scss',
@@ -58,6 +61,7 @@ export class SurveyCto implements OnInit {
   exportLabel = 'Export as CSV';
   exportFormat = 'csv';
   selectedFile: File | null = null;
+  isFilteredSearch = false;
 
   constructor(
     private fb: FormBuilder,
@@ -85,15 +89,7 @@ export class SurveyCto implements OnInit {
     ];
 
     this.exportItems = [
-      {
-        label: 'Export as PDF',
-        icon: 'pi pi-file-pdf',
-        command: () => {
-          this.exportLabel = 'Export as PDF';
-          this.exportFormat = 'pdf';
-          this.exportAs(this.exportFormat);
-        }
-      },
+
       {
         label: 'Export as CSV',
         icon: 'pi pi-file',
@@ -121,9 +117,9 @@ export class SurveyCto implements OnInit {
     ];
 
     this.registrationPhases = [
-      { name: 'ALL' },
-      { name: 'AF(Additional Financing)' },
-      { name: 'PP(Parent Project)' },
+      { name: 'ALL', value: 'ALL' },
+      { name: 'AF(Additional Financing)', value: 'AF' },
+      { name: 'PP(Parent Project)', value: 'PARENT' },
     ];
 
     this.searchForm.get('county')?.disable();
@@ -143,6 +139,7 @@ export class SurveyCto implements OnInit {
       this.isLoading = false;
       this.cdr.detectChanges();
     });
+    this.performSearch();
   }
 
   toggleAdvancedSearch(): void {
@@ -153,7 +150,7 @@ export class SurveyCto implements OnInit {
     this.searchForm.get('county')?.reset();
     this.searchForm.get('payam')?.reset();
     this.searchForm.get('boma')?.reset();
-  
+
     if (event.value) {
       this.searchForm.get('county')?.enable();
       this.cdr.detectChanges();
@@ -180,7 +177,7 @@ export class SurveyCto implements OnInit {
   async onCountyChange(event: { value: { id: number, name: string } }): Promise<void> {
     this.searchForm.get('payam')?.reset();
     this.searchForm.get('boma')?.reset();
-  
+
     if (event.value) {
       this.searchForm.get('payam')?.enable();
       this.cdr.detectChanges();
@@ -204,7 +201,7 @@ export class SurveyCto implements OnInit {
 
   async onPayamChange(event: { value: { id: number, name: string } }): Promise<void> {
     this.searchForm.get('boma')?.reset();
-  
+
     if (event.value) {
       this.searchForm.get('boma')?.enable();
       this.cdr.detectChanges();
@@ -232,12 +229,23 @@ export class SurveyCto implements OnInit {
     this.searchForm.get('county')?.disable();
     this.searchForm.get('payam')?.disable();
     this.searchForm.get('boma')?.disable();
+    this.isFilteredSearch = false;
+    this.searchForm.patchValue({
+      supportType: this.supportTypes[0],
+      registrationPhase: this.registrationPhases[0].value
+    });
     this.cdr.detectChanges();
     Swal.fire({ icon: 'success', title: 'Success', text: 'Form has been reset' });
   }
 
   searchSurveyData(): void {
-    if (this.searchForm.invalid) {
+    this.isFilteredSearch = true;
+    this.currentPage = 0;
+    this.performSearch();
+  }
+
+  private performSearch(): void {
+    if (this.isFilteredSearch && this.searchForm.invalid) {
       Swal.fire({
         icon: 'error',
         title: 'Validation Error',
@@ -245,8 +253,74 @@ export class SurveyCto implements OnInit {
       });
       return;
     }
-    console.log('Searching Survey CTO data with form data:', this.searchForm.value);
-    Swal.fire({ icon: 'info', title: 'Info', text: 'Searching for Survey CTO data' });
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
+
+    const formValues = this.searchForm.value;
+    const requestBody: { [key: string]: any } = {
+      page: this.currentPage,
+      size: this.pageSize,
+    };
+
+    if (this.isFilteredSearch) {
+      requestBody['stateId'] = formValues.state?.id;
+      requestBody['countyId'] = formValues.county?.id;
+      requestBody['payamId'] = formValues.payam?.id;
+      requestBody['bomaId'] = formValues.boma?.id;
+    }
+
+    if (formValues.householdNumber) {
+      requestBody['applicationId'] = formValues.householdNumber;
+    }
+    if (formValues.name) {
+      requestBody['respondentName'] = formValues.name;
+    }
+    if (formValues.mobileNumber) {
+      requestBody['mobileNumber'] = formValues.mobileNumber;
+    }
+    if (formValues.walletNumber) {
+      requestBody['walletNumber'] = formValues.walletNumber;
+    }
+    if (formValues.supportType?.name) {
+      requestBody['selectionCriteria'] = formValues.supportType.name;
+    }
+    if (formValues.registrationPhase) {
+      requestBody['registrationPhase'] = formValues.registrationPhase;
+    }
+
+    this.apiService.POST('/api/surveycto/search', requestBody)
+      .then(response => {
+        if (response.data.operationResult) {
+          this.totalRecords = response.data.total || 0;
+          this.surveyData = (response.data.beneficiaries || []).map((beneficiary: any, index: number) => ({
+            sl: this.currentPage * this.pageSize + index + 1,
+            hhId: beneficiary.applicationId,
+            beneficiaryName: [beneficiary.respondentFirstName, beneficiary.respondentMiddleName, beneficiary.respondentLastName].filter(Boolean).join(' '),
+            age: beneficiary.respondentAge,
+            gender: beneficiary.respondentGender,
+            maritalStatus: beneficiary.maritalStatus,
+            education: beneficiary.isReadWrite ? 'Literate' : 'Illiterate',
+            numFamilyMembers: beneficiary.numberOfHouseholds,
+            supportType: beneficiary.selectionCriteria,
+            alternate: beneficiary.alternate ? [beneficiary.alternate.payeeFirstName, beneficiary.alternate.payeeMiddleName, beneficiary.alternate.payeeLastName].filter(Boolean).join(' ') : 'No',
+            nominee: beneficiary.nominee ? [beneficiary.nominee.nomineeFirstName, beneficiary.nominee.nomineeMiddleName, beneficiary.nominee.nomineeLastName].filter(Boolean).join(' ') : 'No'
+          }));
+        } else {
+          Swal.fire({ icon: 'error', title: 'Search Failed', text: response.data.errorMsg || 'An unknown error occurred.' });
+          this.surveyData = [];
+          this.totalRecords = 0;
+        }
+      })
+      .catch(err => {
+        Swal.fire({ icon: 'error', title: 'API Error', text: err.message || 'Failed to fetch survey data.' });
+        this.surveyData = [];
+        this.totalRecords = 0;
+      })
+      .finally(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
   }
 
   importData(): void {
@@ -261,42 +335,62 @@ export class SurveyCto implements OnInit {
       return;
     }
 
+    Swal.fire({
+      title: 'Importing in progress',
+      html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+    });
+
     const formData = new FormData();
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
-    Swal.fire({ icon: 'info', title: 'Importing', text: `${this.selectedFile.name} is being uploaded.` });
-    this.apiService.POST('api/surveycto/revisiting/upload', formData, 'global', { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(() => {
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    };
+
+    this.apiService.POST('api/surveycto/revisiting/upload', formData, 'global', config)
+      .then((response) => {
+        Swal.close();
+        const result = response.data;
+        const successMessage = `
+          <div style="text-align: left; padding: 0 1rem;">
+            <p class="mb-1"><b>File:</b> ${result.fileName}</p>
+            <p class="mb-1"><b>Total Rows:</b> ${result.totalRows}</p>
+            <p class="mb-1"><b>Saved:</b> ${result.savedRows}</p>
+            <p class="mb-1"><b>Skipped:</b> ${result.skippedRows}</p>
+            ${result.errors && result.errors.length > 0 ? `<p class="text-danger mb-1"><b>Errors:</b> ${result.errors.length}</p>` : ''}
+          </div>
+        `;
         Swal.fire({
           icon: 'success',
-          title: 'Upload Started',
-          text: `${this.selectedFile?.name} has been imported successfully.`,
+          title: 'Import Successful',
+          html: successMessage,
         });
-        this.selectedFile = null;
-        if (this.csvUploader) {
-          this.csvUploader.nativeElement.value = ''; // Clear the input field
-        }
-        this.cdr.detectChanges(); // Update button disabled state and UI
+        this.clearSelectedFile(false);
       })
       .catch((err) => {
+        Swal.close();
         Swal.fire({
           icon: 'error',
           title: 'Upload Failed',
           text: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
         });
-        this.selectedFile = null;
-        if (this.csvUploader) {
-          this.csvUploader.nativeElement.value = ''; // Clear the input field
-        }
-        this.cdr.detectChanges(); // Update button disabled state and UI
+        this.clearSelectedFile(false);
       });
   }
 
-  clearSelectedFile(): void {
+  clearSelectedFile(showNotification: boolean = false): void {
     this.selectedFile = null;
-    this.csvUploader.nativeElement.value = ''; // Clear the native file input
+    if (this.csvUploader?.nativeElement) {
+      this.csvUploader.nativeElement.value = ''; // Clear the native file input
+    }
     this.cdr.detectChanges(); // Update button states and UI
-    Swal.fire({ icon: 'info', title: 'File Cleared', text: 'Selected file has been removed.' });
+    if (showNotification) {
+      Swal.fire({ icon: 'info', title: 'File Cleared', text: 'Selected file has been removed.' });
+    }
   }
 
   onFileSelect(event: Event): void {
@@ -305,7 +399,7 @@ export class SurveyCto implements OnInit {
       const file = element.files[0];
       if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
         this.selectedFile = file;
-        console.log('Selected file:', this.selectedFile.name);
+
       } else {
         Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
         this.selectedFile = null;
@@ -329,24 +423,45 @@ export class SurveyCto implements OnInit {
         });
         return;
       }
-      console.log('Exporting as CSV...');
+
+      Swal.fire({
+        title: 'Exporting in progress',
+        html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+      });
+
       const formValues = this.searchForm.value;
-      const params = {
-        stateId: formValues.state?.id,
-        countyId: formValues.county?.id,
-        payamId: formValues.payam?.id,
-        bomaId: formValues.boma?.id,
-        page: this.currentPage,
-        size: this.pageSize
+      const params: { [key: string]: any } = {
+        page: 0,
+        size: -1,
       };
 
-      this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', { responseType: 'blob' })
+      if (formValues.state?.id) params['stateId'] = formValues.state.id;
+      if (formValues.county?.id) params['countyId'] = formValues.county.id;
+      if (formValues.payam?.id) params['payamId'] = formValues.payam.id;
+      if (formValues.boma?.id) params['bomaId'] = formValues.boma.id;
+      if (formValues.supportType?.name && formValues.supportType.name !== 'ALL') {
+        params['criteria'] = formValues.supportType.name;
+      }
+      if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
+        params['registrationPhase'] = formValues.registrationPhase;
+      }
+
+      const config = {
+        responseType: 'blob' as 'blob',
+      };
+
+      this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', config)
         .then((response: any) => {
+          Swal.close();
           const blob = new Blob([response.data], { type: 'text/csv' });
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
           a.download = 'survey-cto-template.csv';
+
+          
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -354,10 +469,11 @@ export class SurveyCto implements OnInit {
           Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: 'CSV export started.',
+            text: 'CSV export complete.',
           });
         })
         .catch((err) => {
+          Swal.close();
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -378,6 +494,6 @@ export class SurveyCto implements OnInit {
   onPageChange(event: PaginatorState): void {
     this.currentPage = event.page ?? 0;
     this.pageSize = event.rows ?? 10;
-    this.searchSurveyData();
+    this.performSearch();
   }
 }

@@ -73,7 +73,7 @@ export class Users implements OnInit {
     { label: 'Inactive', value: 0 }
   ];
 
-  home = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
+  home = { icon: 'fas fa-home', routerLink: ['/user-management/users'] };
   items = [{ label: 'User List', icon: 'fas fa-users' }];
 
 
@@ -153,13 +153,13 @@ private buildCriteriaFromFilters(): any[] {
   });
 
   // ROLE_ID (EQUAL)
-  if (this.filters.roleId !== '' && this.filters.roleId !== null && this.filters.roleId !== undefined) {
-    criteria.push({
-      fieldName: 'ROLE_ID',
-      operator: 'EQUAL',
-      value: String(this.filters.roleId),
-    });
-  }
+  // if (this.filters.roleId !== '' && this.filters.roleId !== null && this.filters.roleId !== undefined) {
+  //   criteria.push({
+  //     fieldName: 'ROLE_ID',
+  //     operator: 'EQUAL',
+  //     value: String(this.filters.roleId),
+  //   });
+  // }
 
   // EMAIL_RECEIVER (EQUAL)
   const er = this.filters.emailReceiver;
@@ -187,14 +187,17 @@ async loadUsers(): Promise<void> {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    const payload = {
+    const payload: any = {
       criteria: this.buildCriteriaFromFilters(), // <-- required criteria array
       sortColumn: 'ID',                          // or make this dynamic if you add UI controls
       sortOrder: 'DESC',                         // 'ASC' | 'DESC'
       page: this.currentPage,                    // zero-based
       size: this.pageSize,                       // rows per page
-
     };
+
+    if (this.filters.roleId !== '' && this.filters.roleId !== null && this.filters.roleId !== undefined) {
+      payload.roleId = this.filters.roleId;
+    }
 
     const res = await this.api.POST('/api/users/search', payload, 'alt');
     const data = res?.data ?? res ?? {};
@@ -247,7 +250,7 @@ async loadUsers(): Promise<void> {
       status: '',
       roleId: '',
       emailReceiver: ''
-    }; 
+    };
     this.applyFilters();
   }
 

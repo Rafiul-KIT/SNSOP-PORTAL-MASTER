@@ -23,6 +23,7 @@ export class Header {
   userInfo: any = null;
   isPortalsPage = false;
   isLandingPage = false;
+  isSurveyCtoPage = false;
   isLoading = false;
   private authService = inject(AzureAdAuthService);
 
@@ -44,7 +45,8 @@ export class Header {
         const isUserManagementPage = event.urlAfterRedirects.startsWith(
           '/user-management/'
         );
-        this.updateMenuList(isUserManagementPage);
+        this.isSurveyCtoPage = event.urlAfterRedirects.startsWith('/survey-cto') || event.urlAfterRedirects.startsWith('/cto-dashboard');
+        this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage);
       });
 
     // Watch login state
@@ -53,7 +55,8 @@ export class Header {
       const isUserManagementPage = this.router.url.startsWith(
         '/user-management/'
       );
-      this.updateMenuList(isUserManagementPage);
+      this.isSurveyCtoPage = this.router.url.startsWith('/survey-cto') || this.router.url.startsWith('/cto-dashboard');
+      this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage);
     });
 
     // Static portal links (unchanged)
@@ -65,19 +68,12 @@ export class Header {
       },
       {
         label: 'Payment',
-        // command: () => {
-        //   this.router.navigate(['/under-construction']);
-        //   this.showPortalOptions = false;
-        // },
          link: environment.portals.payment,
         icon: 'fas fa-credit-card',
       },
       {
         label: 'GRM',
-        command: () => {
-          this.router.navigate(['/under-construction']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.grm,
         icon: 'fas fa-sitemap'
       },
       {
@@ -100,7 +96,7 @@ export class Header {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
         command: () => {
-          this.router.navigate(['/survey-cto']);
+          this.router.navigate(['/cto-dashboard']);
           this.showPortalOptions = false;
         },
       },
@@ -121,7 +117,7 @@ export class Header {
         items: [
           {
             label: 'User List',
-            icon: 'fas fa-list',
+            icon: 'fas fa-users',
             routerLink: ['/user-management/users'],
           },
           {
@@ -131,7 +127,7 @@ export class Header {
           },
           {
             label: 'Role List',
-            icon: 'fas fa-shield',
+            icon: 'fas fa-users-rays',
             routerLink: ['/user-management/roles'],
           },
         ],
@@ -139,9 +135,29 @@ export class Header {
     ];
   }
 
-  updateMenuList(isUserManagementPage: boolean) {
+  getSurveyCtoMenus(): MenuItem[] {
+    return [
+      {
+        label: 'CTO Dashboard',
+        icon: 'fas fa-chart-line',
+        routerLink: ['/cto-dashboard'],
+      },
+      {
+        label: 'Survey CTO',
+        icon: 'fas fa-poll',
+        routerLink: ['/survey-cto'],
+      }
+    ];
+  }
+
+  updateMenuList(isUserManagementPage: boolean, isSurveyCtoPage: boolean) {
     if (this.isLandingPage) {
       this.menuList = [];
+      return;
+    }
+
+    if (isSurveyCtoPage) {
+      this.menuList = this.getSurveyCtoMenus();
       return;
     }
 

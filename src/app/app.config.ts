@@ -96,7 +96,7 @@ function initMsal(
   messageService: MessageService,
   azureAdAuthService: AzureAdAuthService,
 ) {
-  console.log('initMsal', authService);
+
   return async () => {
     try {
       // Handle MSAL redirect only once
@@ -186,9 +186,15 @@ export const appConfig: ApplicationConfig = {
     // Enable DI-based interceptors (MsalInterceptor)
     provideHttpClient(withInterceptorsFromDi()),
     providePrimeNG({
-      theme: { preset: Aura },
-      zIndex: { modal: 1100, overlay: 1000, menu: 1000, tooltip: 1100 },
+      theme: {
+        preset: Aura,
+        options: {
+          darkModeSelector: 'none'
+        }
+      },
+ zIndex: { modal: 1100, overlay: 1000, menu: 1000, tooltip: 1100 },
     }),
+
     { provide: MSAL_INSTANCE, useFactory: msalInstanceFactory },
     { provide: MSAL_GUARD_CONFIG, useFactory: msalGuardConfigFactory },
     {

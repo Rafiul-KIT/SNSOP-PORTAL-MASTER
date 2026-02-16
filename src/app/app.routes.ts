@@ -14,6 +14,7 @@ import { AddNewRole } from './pages/user-management/add-new-role/add-new-role';
 import { Unauthorized } from './components/unauthorized/unauthorized';
 import { UnderConstruction } from './pages/under-construction/under-construction';
 import { SurveyCto } from './pages/survey-cto/survey-cto/survey-cto';
+import { SurveyCtoDashboard } from './pages/survey-cto-dashboard/survey-cto-dashboard';
 
 
 
@@ -51,8 +52,13 @@ export const routes: Routes = [
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
   },
-  { path: 'survey-cto', 
-    component: SurveyCto 
+  { path: 'survey-cto',
+    canActivate: [routeGuard],
+    component: SurveyCto
+  },
+  { path: 'cto-dashboard',
+    canActivate: [routeGuard],
+    component: SurveyCtoDashboard
   },
   { path: 'unauthorized', component: Unauthorized },
   { path: 'under-construction', component: UnderConstruction },
