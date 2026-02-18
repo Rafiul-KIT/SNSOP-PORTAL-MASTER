@@ -150,7 +150,6 @@ export class SurveyCto implements OnInit {
     this.searchForm.get('county')?.reset();
     this.searchForm.get('payam')?.reset();
     this.searchForm.get('boma')?.reset();
-  
     if (event.value) {
       this.searchForm.get('county')?.enable();
       this.cdr.detectChanges();
@@ -177,7 +176,6 @@ export class SurveyCto implements OnInit {
   async onCountyChange(event: { value: { id: number, name: string } }): Promise<void> {
     this.searchForm.get('payam')?.reset();
     this.searchForm.get('boma')?.reset();
-  
     if (event.value) {
       this.searchForm.get('payam')?.enable();
       this.cdr.detectChanges();
@@ -201,7 +199,6 @@ export class SurveyCto implements OnInit {
 
   async onPayamChange(event: { value: { id: number, name: string } }): Promise<void> {
     this.searchForm.get('boma')?.reset();
-  
     if (event.value) {
       this.searchForm.get('boma')?.enable();
       this.cdr.detectChanges();
@@ -399,7 +396,6 @@ export class SurveyCto implements OnInit {
       const file = element.files[0];
       if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
         this.selectedFile = file;
-      
       } else {
         Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
         this.selectedFile = null;
@@ -460,6 +456,8 @@ export class SurveyCto implements OnInit {
           const a = document.createElement('a');
           a.href = url;
           a.download = 'survey-cto-template.csv';
+
+          
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);

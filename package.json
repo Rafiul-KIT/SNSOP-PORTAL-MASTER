@@ -8,6 +8,7 @@
     "build-staging": "ng build --configuration staging",
     "build-dev": "ng build --configuration development",
     "build-prod": "ng build --configuration production",
+    "build-qa": "ng build --configuration qa",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -25,6 +26,7 @@
     "@primeuix/themes": "^1.2.3",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.1",
     "jwt-decode": "^4.0.0",
     "ngx-cookie-service": "^20.1.0",
     "primeng": "^20.0.1",

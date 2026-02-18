@@ -43,10 +43,10 @@ export class Register implements OnInit {
   private initialFormValue: any = {};
   isFormUnchanged = true;
 
-  home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
+  home: MenuItem = { icon: 'fas fa-home', routerLink: ['/user-management/users'] };
   items: MenuItem[] = [
     { label: 'User List', routerLink: ['/user-management/users'], icon: 'fas fa-users' },
-    { label: 'Register New User', icon: 'fas fa-user-plus' },
+    { label: 'Register User', icon: 'fas fa-user-plus' },
   ];
 
   userRegistrationForm!: FormGroup;
