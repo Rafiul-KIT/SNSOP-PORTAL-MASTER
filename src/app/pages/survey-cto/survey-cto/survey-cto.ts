@@ -111,9 +111,9 @@ export class SurveyCto implements OnInit {
     ];
 
     this.supportTypes = [
-      { name: 'ALL' },
-      { name: 'LIPW' },
-      { name: 'DIS' },
+      { name: 'ALL', value: 'ALL' },
+      { name: 'LIPW', value: 'LIPW' },
+      { name: 'DIS', value: 'DIS' },
     ];
 
     this.registrationPhases = [
@@ -228,7 +228,7 @@ export class SurveyCto implements OnInit {
     this.searchForm.get('boma')?.disable();
     this.isFilteredSearch = false;
     this.searchForm.patchValue({
-      supportType: this.supportTypes[0],
+      supportType: this.supportTypes[0].value,
       registrationPhase: this.registrationPhases[0].value
     });
     this.cdr.detectChanges();
@@ -279,10 +279,10 @@ export class SurveyCto implements OnInit {
     if (formValues.walletNumber) {
       requestBody['walletNumber'] = formValues.walletNumber;
     }
-    if (formValues.supportType?.name) {
-      requestBody['selectionCriteria'] = formValues.supportType.name;
+    if (formValues.supportType && formValues.supportType !== 'ALL') {
+      requestBody['selectionCriteria'] = formValues.supportType;
     }
-    if (formValues.registrationPhase) {
+    if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
       requestBody['registrationPhase'] = formValues.registrationPhase;
     }
 
@@ -437,8 +437,8 @@ export class SurveyCto implements OnInit {
       if (formValues.county?.id) params['countyId'] = formValues.county.id;
       if (formValues.payam?.id) params['payamId'] = formValues.payam.id;
       if (formValues.boma?.id) params['bomaId'] = formValues.boma.id;
-      if (formValues.supportType?.name && formValues.supportType.name !== 'ALL') {
-        params['criteria'] = formValues.supportType.name;
+      if (formValues.supportType && formValues.supportType !== 'ALL') {
+        params['criteria'] = formValues.supportType;
       }
       if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
         params['registrationPhase'] = formValues.registrationPhase;
@@ -485,6 +485,64 @@ export class SurveyCto implements OnInit {
         text: msg,
       });
     }
+  }
+
+  downloadLatestSaved(): void {
+    const formValues = this.searchForm.value;
+    const requestBody: { [key: string]: any } = {};
+
+    if (formValues.state?.id) requestBody['stateId'] = formValues.state.id;
+    if (formValues.county?.id) requestBody['countyId'] = formValues.county.id;
+    if (formValues.payam?.id) requestBody['payamId'] = formValues.payam.id;
+    if (formValues.boma?.id) requestBody['bomaId'] = formValues.boma.id;
+    if (formValues.householdNumber) requestBody['applicationId'] = formValues.householdNumber;
+    if (formValues.name) requestBody['respondentName'] = formValues.name;
+    if (formValues.mobileNumber) requestBody['mobileNumber'] = formValues.mobileNumber;
+    if (formValues.walletNumber) requestBody['walletNumber'] = formValues.walletNumber;
+    if (formValues.supportType && formValues.supportType !== 'ALL') {
+      requestBody['selectionCriteria'] = formValues.supportType;
+    }
+    if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
+      requestBody['registrationPhase'] = formValues.registrationPhase;
+    }
+
+    Swal.fire({
+      title: 'Downloading in progress',
+      html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+    });
+
+    const config = {
+      responseType: 'blob' as 'blob',
+    };
+
+    this.apiService.POST('api/surveycto/revisiting/download-latest-saved', requestBody, 'global', config)
+      .then((response: any) => {
+        Swal.close();
+        const blob = new Blob([response.data], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'latest-saved-data.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Download complete.',
+        });
+      })
+      .catch((err) => {
+        Swal.close();
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Download failed. Error: ${err.message}`,
+        });
+      });
   }
 
   onPageChange(event: PaginatorState): void {

@@ -77,7 +77,7 @@
         <!-- Support Type -->
         <div class="col-md-3">
             <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="supportTypes" optionLabel="name" formControlName="supportType" />
+                <p-select [options]="supportTypes" optionLabel="name" optionValue="value" formControlName="supportType" />
                 <label>Support Type</label>
             </p-floatlabel>
         </div>
@@ -122,11 +122,13 @@
                     <!-- Left-aligned Buttons -->
                     <div class="d-flex align-items-center gap-2">
                         <input type="file" #csvUploader class="form-control" (change)="onFileSelect($event)"
-                            accept=".csv" />
+                            accept=".csv" style="max-width: 250px;" />
                         <p-button icon="fas fa-times" (onClick)="clearSelectedFile(true)" [disabled]="!selectedFile"
                             size="small" severity="secondary"></p-button>
                         <p-button label="Import" icon="fas fa-upload" (onClick)="importData()" size="small"
                             severity="primary" [disabled]="!selectedFile"></p-button>
+                        <p-button label="Download Latest" icon="fas fa-file-download" (onClick)="downloadLatestSaved()"
+                            size="small" severity="info" class="no-wrap-label" [disabled]="searchForm.invalid"></p-button>
                         <p-splitButton [label]="exportLabel" icon="fas fa-download" (onClick)="exportAs(exportFormat)"
                             [model]="exportItems" size="small" severity="secondary"
                             class="no-wrap-label"></p-splitButton>
