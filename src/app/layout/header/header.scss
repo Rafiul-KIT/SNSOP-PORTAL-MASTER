@@ -133,14 +133,18 @@
           color: #999999;
         }
 
-        span {
-          font-style: normal;
-          font-weight: 700;
-          font-size: 14px;
-          line-height: 19px;
-          text-align: center;
-          color: #666666;
-        }
+      span {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: center;
+  color: #666666;
+
+  white-space: normal;      /* allow wrapping */
+  word-break: break-word;   /* prevent overflow */
+  display: inline-block;
+}
 
         &:hover {
           border-color: #0ea5e9;
@@ -165,4 +169,10 @@
     justify-content: flex-start;
     width: 100%;
   }
+  @media (max-width: 768px) {
+  .navbar-brand span {
+    font-size: 15px;
+    line-height: 12px;
+  }
+}
 }
