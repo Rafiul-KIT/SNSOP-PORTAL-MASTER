@@ -1,6 +1,6 @@
 
 
-import { Component, ChangeDetectorRef, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -41,7 +41,6 @@ import Swal from 'sweetalert2';
   styleUrl: './survey-cto.scss',
 })
 export class SurveyCto implements OnInit {
-  @ViewChild('csvUploader') csvUploader!: ElementRef<HTMLInputElement>;
   isLoading = false;
   showAdvancedSearch = false;
   breadcrumbItems: MenuItem[] = [];
@@ -60,7 +59,6 @@ export class SurveyCto implements OnInit {
   exportItems: MenuItem[] = [];
   exportLabel = 'Export as CSV';
   exportFormat = 'csv';
-  selectedFile: File | null = null;
   isFilteredSearch = false;
 
   constructor(
@@ -89,7 +87,6 @@ export class SurveyCto implements OnInit {
     ];
 
     this.exportItems = [
-
       {
         label: 'Export as CSV',
         icon: 'pi pi-file',
@@ -320,95 +317,6 @@ export class SurveyCto implements OnInit {
       });
   }
 
-  importData(): void {
-    if (!this.selectedFile) {
-      Swal.fire({ icon: 'warning', title: 'Warning', text: 'Please select a file to import.' });
-      return;
-    }
-
-    if (this.selectedFile.type !== 'text/csv' && !this.selectedFile.name.endsWith('.csv')) {
-      Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
-      this.clearSelectedFile();
-      return;
-    }
-
-    Swal.fire({
-      title: 'Importing in progress',
-      html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
-      allowOutsideClick: false,
-      showConfirmButton: false,
-    });
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile, this.selectedFile.name);
-
-    const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    };
-
-    this.apiService.POST('api/surveycto/revisiting/upload', formData, 'global', config)
-      .then((response) => {
-        Swal.close();
-        const result = response.data;
-        const successMessage = `
-          <div style="text-align: left; padding: 0 1rem;">
-            <p class="mb-1"><b>File:</b> ${result.fileName}</p>
-            <p class="mb-1"><b>Total Rows:</b> ${result.totalRows}</p>
-            <p class="mb-1"><b>Saved:</b> ${result.savedRows}</p>
-            <p class="mb-1"><b>Skipped:</b> ${result.skippedRows}</p>
-            ${result.errors && result.errors.length > 0 ? `<p class="text-danger mb-1"><b>Errors:</b> ${result.errors.length}</p>` : ''}
-          </div>
-        `;
-        Swal.fire({
-          icon: 'success',
-          title: 'Import Successful',
-          html: successMessage,
-        });
-        this.clearSelectedFile(false);
-      })
-      .catch((err) => {
-        Swal.close();
-        Swal.fire({
-          icon: 'error',
-          title: 'Upload Failed',
-          text: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
-        });
-        this.clearSelectedFile(false);
-      });
-  }
-
-  clearSelectedFile(showNotification: boolean = false): void {
-    this.selectedFile = null;
-    if (this.csvUploader?.nativeElement) {
-      this.csvUploader.nativeElement.value = ''; // Clear the native file input
-    }
-    this.cdr.detectChanges(); // Update button states and UI
-    if (showNotification) {
-      Swal.fire({ icon: 'info', title: 'File Cleared', text: 'Selected file has been removed.' });
-    }
-  }
-
-  onFileSelect(event: Event): void {
-    const element = event.target as HTMLInputElement;
-    if (element.files && element.files.length > 0) {
-      const file = element.files[0];
-      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
-        this.selectedFile = file;
-      } else {
-        Swal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only CSV files are allowed for import.' });
-        this.selectedFile = null;
-        if (this.csvUploader) {
-          this.csvUploader.nativeElement.value = '';
-        }
-      }
-    } else {
-      this.selectedFile = null;
-    }
-    this.cdr.detectChanges(); // Update button disabled state
-  }
-
   exportAs(format: string): void {
     if (format === 'csv') {
       if (this.searchForm.invalid) {
@@ -457,7 +365,6 @@ export class SurveyCto implements OnInit {
           a.href = url;
           a.download = 'survey-cto-template.csv';
 
-          
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -485,64 +392,6 @@ export class SurveyCto implements OnInit {
         text: msg,
       });
     }
-  }
-
-  downloadLatestSaved(): void {
-    const formValues = this.searchForm.value;
-    const requestBody: { [key: string]: any } = {};
-
-    if (formValues.state?.id) requestBody['stateId'] = formValues.state.id;
-    if (formValues.county?.id) requestBody['countyId'] = formValues.county.id;
-    if (formValues.payam?.id) requestBody['payamId'] = formValues.payam.id;
-    if (formValues.boma?.id) requestBody['bomaId'] = formValues.boma.id;
-    if (formValues.householdNumber) requestBody['applicationId'] = formValues.householdNumber;
-    if (formValues.name) requestBody['respondentName'] = formValues.name;
-    if (formValues.mobileNumber) requestBody['mobileNumber'] = formValues.mobileNumber;
-    if (formValues.walletNumber) requestBody['walletNumber'] = formValues.walletNumber;
-    if (formValues.supportType && formValues.supportType !== 'ALL') {
-      requestBody['selectionCriteria'] = formValues.supportType;
-    }
-    if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
-      requestBody['registrationPhase'] = formValues.registrationPhase;
-    }
-
-    Swal.fire({
-      title: 'Downloading in progress',
-      html: '<div class="progress" style="margin-top: 20px;"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>',
-      allowOutsideClick: false,
-      showConfirmButton: false,
-    });
-
-    const config = {
-      responseType: 'blob' as 'blob',
-    };
-
-    this.apiService.POST('api/surveycto/revisiting/download-latest-saved', requestBody, 'global', config)
-      .then((response: any) => {
-        Swal.close();
-        const blob = new Blob([response.data], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'latest-saved-data.csv';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'Download complete.',
-        });
-      })
-      .catch((err) => {
-        Swal.close();
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: `Download failed. Error: ${err.message}`,
-        });
-      });
   }
 
   onPageChange(event: PaginatorState): void {

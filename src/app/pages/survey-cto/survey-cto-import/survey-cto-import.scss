@@ -1,0 +1,22 @@
+.breadcrumb-wrapper {
+  margin-bottom: 1rem;
+}
+
+.no-wrap-label .p-splitbutton-text {
+  white-space: nowrap !important;
+}
+
+:host ::ng-deep {
+  .no-wrap-label,
+  .no-wrap-label .p-button,
+  .no-wrap-label .p-button-label,
+  .no-wrap-label .p-splitbutton-defaultbutton .p-button-label {
+      white-space: nowrap !important;
+      display: inline-block !important;
+  }
+}
+
+.card {
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+  border-radius: 4px;
+}

@@ -117,23 +117,12 @@
     <ng-template pTemplate="header">
         <tr>
             <th colspan="11">
-                <!-- Flexbox container to manage button and text placement -->
                 <div class="d-flex justify-content-between">
-                    <!-- Left-aligned Buttons -->
                     <div class="d-flex align-items-center gap-2">
-                        <input type="file" #csvUploader class="form-control" (change)="onFileSelect($event)"
-                            accept=".csv" style="max-width: 250px;" />
-                        <p-button icon="fas fa-times" (onClick)="clearSelectedFile(true)" [disabled]="!selectedFile"
-                            size="small" severity="secondary"></p-button>
-                        <p-button label="Import" icon="fas fa-upload" (onClick)="importData()" size="small"
-                            severity="primary" [disabled]="!selectedFile"></p-button>
-                        <p-button label="Download Latest" icon="fas fa-file-download" (onClick)="downloadLatestSaved()"
-                            size="small" severity="info" class="no-wrap-label" [disabled]="searchForm.invalid"></p-button>
                         <p-splitButton [label]="exportLabel" icon="fas fa-download" (onClick)="exportAs(exportFormat)"
                             [model]="exportItems" size="small" severity="secondary"
                             class="no-wrap-label"></p-splitButton>
                     </div>
-
                     <!-- Right-aligned Text (Showing record count) -->
                     <p class="fw-bold mb-2 text-end">
                         Showing <kbd>{{ surveyData.length }}</kbd> of
