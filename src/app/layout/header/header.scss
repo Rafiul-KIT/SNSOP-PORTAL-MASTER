@@ -169,7 +169,7 @@
     justify-content: flex-start;
     width: 100%;
   }
-  @media (max-width: 768px) {
+  @media (max-width: 960px) {
   .navbar-brand span {
     font-size: 15px;
     line-height: 12px;
@@ -177,7 +177,7 @@
 }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .header {
     // flex-wrap: wrap;
     padding: 0 8px;
