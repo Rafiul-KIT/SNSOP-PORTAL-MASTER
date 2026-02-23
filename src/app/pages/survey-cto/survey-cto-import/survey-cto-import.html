@@ -8,7 +8,7 @@
 <div class="card p-3 mb-2">
   <form [formGroup]="searchForm" class="row g-3">
     <!-- State -->
-    <div class="col-md-3">
+    <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="states" optionLabel="name" formControlName="state" (onChange)="onStateChange($event)" />
         <label>State Name</label>
@@ -16,63 +16,29 @@
     </div>
 
     <!-- County -->
-    <div class="col-md-3">
+    <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="counties" optionLabel="name" formControlName="county" (onChange)="onCountyChange($event)" />
         <label>County Name</label>
       </p-floatlabel>
     </div>
     <!-- Payam -->
-    <div class="col-md-3">
+    <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="payams" optionLabel="name" formControlName="payam" (onChange)="onPayamChange($event)" />
         <label>Payam Name</label>
       </p-floatlabel>
     </div>
     <!-- Boma -->
-    <div class="col-md-3">
+    <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="bomas" optionLabel="name" formControlName="boma" />
         <label>Boma Name</label>
       </p-floatlabel>
     </div>
 
-    <!-- Advanced Search Fields -->
-    @if (showAdvancedSearch) {
-    <!-- Household Number -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <input pInputText formControlName="householdNumber" class="w-100" />
-        <label>Household Number</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Name -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <input pInputText formControlName="name" class="w-100" />
-        <label>Name</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Mobile Number -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <input pInputText formControlName="mobileNumber" class="w-100" />
-        <label>Mobile Number</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Wallet Number -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <input pInputText formControlName="walletNumber" class="w-100" />
-        <label>Wallet Number</label>
-      </p-floatlabel>
-    </div>
-
     <!-- Support Type -->
-    <div class="col-md-3">
+    <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="supportTypes" optionLabel="name" optionValue="value" formControlName="supportType" />
         <label>Support Type</label>
@@ -80,23 +46,22 @@
     </div>
 
     <!-- Registration Phase -->
-    <div class="col-md-3">
+    <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="registrationPhases" optionLabel="name" optionValue="value"
           formControlName="registrationPhase" />
         <label>Registration Phase</label>
       </p-floatlabel>
     </div>
-    }
 
     <div class="col-12">
       <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
-        <p-button [label]="showAdvancedSearch ? 'Close' : 'Advance Search'" icon="fas fa-filter"
-          (onClick)="toggleAdvancedSearch()" severity="warn" size="small" [outlined]="true" size="small">
-        </p-button>
-
         <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" [outlined]="true"
           (onClick)="resetForm()">
+        </p-button>
+
+        <p-button label="Search" icon="fas fa-search" severity="success" size="small"
+          (onClick)="fetchSavedData()">
         </p-button>
       </div>
     </div>
@@ -122,4 +87,44 @@
     </div>
   </div>
 </div>
+
+@if (surveyData.length > 0 || isTableLoading) {
+<div class="card p-3 mb-2">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="m-0 fw-bold text-primary">Survey CTO Saved Data</h5>
+    <span class="badge bg-info text-dark">Total Records: {{surveyData.length}}</span>
+  </div>
+  <div class="table-responsive">
+    <p-table [value]="surveyData" [columns]="cols" [scrollable]="true" scrollHeight="500px" [loading]="isTableLoading"
+      styleClass="p-datatable-sm p-datatable-gridlines" [tableStyle]="{'min-width': '600rem'}"
+      [paginator]="true" [rows]="rowsPerPage" [totalRecords]="totalRecords" [lazy]="true" (onPage)="onPageChange($event)"
+      [first]="first" [rowsPerPageOptions]="[10, 25, 50, 100]">
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          @for (col of columns; track col.field) {
+          <th style="white-space: nowrap;">
+            {{col.header}}
+          </th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+        <tr>
+          @for (col of columns; track col.field) {
+          <td>
+            @if (col.field === 'slNo') {
+            {{rowIndex + 1}}
+            } @else {
+            {{rowData[col.field]}}
+            }
+          </td>
+          }
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+}
+
+
 }

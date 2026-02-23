@@ -14,6 +14,7 @@ import { AddNewRole } from './pages/user-management/add-new-role/add-new-role';
 import { Unauthorized } from './components/unauthorized/unauthorized';
 import { UnderConstruction } from './pages/under-construction/under-construction';
 import { SurveyCto } from './pages/survey-cto/survey-cto/survey-cto';
+import { SurveyCtoImport } from './pages/survey-cto/survey-cto-import/survey-cto-import';
 import { SurveyCtoDashboard } from './pages/survey-cto-dashboard/survey-cto-dashboard';
 
 
@@ -55,6 +56,10 @@ export const routes: Routes = [
   { path: 'survey-cto',
     canActivate: [routeGuard],
     component: SurveyCto
+  },
+  { path: 'survey-cto-import',
+    canActivate: [routeGuard],
+    component: SurveyCtoImport
   },
   { path: 'cto-dashboard',
     canActivate: [routeGuard],
