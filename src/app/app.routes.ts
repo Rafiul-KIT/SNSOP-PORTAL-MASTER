@@ -55,12 +55,17 @@ export const routes: Routes = [
   },
   { path: 'survey-cto',
     canActivate: [routeGuard],
+    children: [
+  { path: 'survey-cto-export',
+    canActivate: [routeGuard],
     component: SurveyCto
   },
   { path: 'survey-cto-import',
     canActivate: [routeGuard],
     component: SurveyCtoImport
-  },
+  }
+    ],
+  }, 
   { path: 'cto-dashboard',
     canActivate: [routeGuard],
     component: SurveyCtoDashboard

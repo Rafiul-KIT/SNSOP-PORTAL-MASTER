@@ -136,7 +136,6 @@ export class SurveyCto implements OnInit {
       this.isLoading = false;
       this.cdr.detectChanges();
     });
-    this.performSearch();
   }
 
   toggleAdvancedSearch(): void {

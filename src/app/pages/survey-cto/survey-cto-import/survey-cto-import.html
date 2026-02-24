@@ -8,7 +8,7 @@
 <div class="card p-3 mb-2">
   <form [formGroup]="searchForm" class="row g-3">
     <!-- State -->
-    <div class="col-md-2">
+    <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="states" optionLabel="name" formControlName="state" (onChange)="onStateChange($event)" />
         <label>State Name</label>
@@ -16,21 +16,21 @@
     </div>
 
     <!-- County -->
-    <div class="col-md-2">
+    <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="counties" optionLabel="name" formControlName="county" (onChange)="onCountyChange($event)" />
         <label>County Name</label>
       </p-floatlabel>
     </div>
     <!-- Payam -->
-    <div class="col-md-2">
+    <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="payams" optionLabel="name" formControlName="payam" (onChange)="onPayamChange($event)" />
         <label>Payam Name</label>
       </p-floatlabel>
     </div>
     <!-- Boma -->
-    <div class="col-md-2">
+    <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="bomas" optionLabel="name" formControlName="boma" />
         <label>Boma Name</label>
@@ -38,7 +38,7 @@
     </div>
 
     <!-- Support Type -->
-    <div class="col-md-2">
+    <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="supportTypes" optionLabel="name" optionValue="value" formControlName="supportType" />
         <label>Support Type</label>
@@ -46,7 +46,7 @@
     </div>
 
     <!-- Registration Phase -->
-    <div class="col-md-2">
+    <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="registrationPhases" optionLabel="name" optionValue="value"
           formControlName="registrationPhase" />
@@ -91,8 +91,11 @@
 @if (surveyData.length > 0 || isTableLoading) {
 <div class="card p-3 mb-2">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="m-0 fw-bold text-primary">Survey CTO Saved Data</h5>
-    <span class="badge bg-info text-dark">Total Records: {{surveyData.length}}</span>
+    <div style="flex: 1;"></div>
+    <h5 class="m-0 fw-bold text-primary text-center" style="flex: 2;">Survey CTO Saved Data</h5>
+    <div class="text-end" style="flex: 1;">
+      <span class="badge bg-info text-dark">Total Records: {{surveyData.length}}</span>
+    </div>
   </div>
   <div class="table-responsive">
     <p-table [value]="surveyData" [columns]="cols" [scrollable]="true" scrollHeight="500px" [loading]="isTableLoading"

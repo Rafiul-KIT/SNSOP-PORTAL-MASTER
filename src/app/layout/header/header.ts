@@ -145,13 +145,19 @@ export class Header {
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
-        routerLink: ['/survey-cto'],
+        items: [
+      {
+        label: 'Survey CTO Export',
+        icon: 'fas fa-poll',
+        routerLink: ['/survey-cto/survey-cto-export'],
       },
       {
         label: 'Survey CTO Import',
         icon: 'fas fa-poll',
-        routerLink: ['/survey-cto-import'],
+        routerLink: ['/survey-cto/survey-cto-import'],
       }
+        ],
+      },
     ];
   }
 
