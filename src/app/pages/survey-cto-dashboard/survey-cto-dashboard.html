@@ -1,4 +1,8 @@
+@if (isLoading) {
+<app-loader></app-loader>
+} @else {
 <div class="dashboard-container">
+  <!-- Primary Summary row -->
   <div class="summary-cards">
     <div class="card card-1">
       <div class="card-icon">
@@ -51,10 +55,12 @@
       </div>
       <div class="card-info">
         <div class="card-title">Literacy Rate</div>
-        <div class="card-value">{{ literacyRate }}%</div>
+        <div class="card-value">{{ literacyRate | number:'1.2-2' }}%</div>
       </div>
     </div>
   </div>
+
+  <!-- Revisit Statistics row -->
   <div class="summary-cards">
     <div class="card card-1">
       <div class="card-icon">
@@ -62,7 +68,7 @@
       </div>
       <div class="card-info">
         <div class="card-title">Number of Revisit Boma</div>
-        <div class="card-value">{{ totalBeneficiaries | number }}</div>
+        <div class="card-value">{{ numRevisitBoma | number }}</div>
       </div>
     </div>
     <div class="card card-2">
@@ -71,25 +77,25 @@
       </div>
       <div class="card-info">
         <div class="card-title">Number of Revisit Beneficiary</div>
-        <div class="card-value">{{ totalHouseholds | number }}</div>
+        <div class="card-value">{{ numRevisitBeneficiary | number }}</div>
       </div>
     </div>
     <div class="card card-3">
       <div class="card-icon">
-        <i class="fas fa-users"></i>
+        <i class="fas fa-user-edit"></i>
       </div>
       <div class="card-info">
         <div class="card-title">Alternate/Nominee changes</div>
-        <div class="card-value">{{ statesCovered | number }}</div>
+        <div class="card-value">{{ alternateNomineeChanges | number }}</div>
       </div>
     </div>
     <div class="card card-4">
       <div class="card-icon">
-        <i class="fas fa-dollar"></i>
+        <i class="fas fa-money-bill-wave"></i>
       </div>
       <div class="card-info">
         <div class="card-title">Number of Missing Payment</div>
-        <div class="card-value">{{ countiesCovered | number }}</div>
+        <div class="card-value">{{ missingPaymentCount | number }}</div>
       </div>
     </div>
   </div>
@@ -97,25 +103,36 @@
   <div class="charts-grid">
     <div class="chart-container large">
       <h5 class="chart-title">Beneficiaries by County</h5>
-      <p-chart type="bar" [data]="beneficiariesByCountyData" [options]="beneficiariesByCountyOptions"></p-chart>
+      @if (beneficiariesByCountyData) {
+        <p-chart type="bar" [data]="beneficiariesByCountyData" [options]="beneficiariesByCountyOptions"></p-chart>
+      }
     </div>
     <div class="chart-container">
       <h5 class="chart-title">Support Type Distribution</h5>
-      <p-chart type="pie" [data]="supportTypeData" [options]="supportTypeOptions"></p-chart>
+      @if (supportTypeData) {
+        <p-chart type="pie" [data]="supportTypeData" [options]="supportTypeOptions"></p-chart>
+      }
     </div>
     <div class="chart-container">
       <h5 class="chart-title">Beneficiaries by Registration Phase</h5>
-      <p-chart type="pie" [data]="registrationPhaseData" [options]="registrationPhaseOptions"></p-chart>
+      @if (registrationPhaseData) {
+        <p-chart type="pie" [data]="registrationPhaseData" [options]="registrationPhaseOptions"></p-chart>
+      }
     </div>
     <div class="chart-container">
       <h5 class="chart-title">Gender Distribution</h5>
-      <p-chart type="doughnut" [data]="genderData" [options]="genderOptions"></p-chart>
+      @if (genderData) {
+        <p-chart type="doughnut" [data]="genderData" [options]="genderOptions"></p-chart>
+      }
     </div>
     <div class="chart-container">
       <h5 class="chart-title">Marital Status Distribution</h5>
-      <p-chart type="doughnut" [data]="maritalStatusData" [options]="maritalStatusOptions"></p-chart>
+      @if (maritalStatusData) {
+        <p-chart type="doughnut" [data]="maritalStatusData" [options]="maritalStatusOptions"></p-chart>
+      }
     </div>
   </div>
+
   <div class="table-container">
     <h5 class="table-title">Latest Imports</h5>
     <div class="table-responsive">
@@ -132,16 +149,16 @@
           <tr *ngFor="let import of latestImports">
             <td>{{ import.fileName }}</td>
             <td>
-              <span class="status"
-                [ngClass]="{'status-success': import.status === 'Success', 'status-failed': import.status === 'Failed'}">
+              <span class="status status-success">
                 {{ import.status }}
               </span>
             </td>
-            <td>{{ import.rowsProcessed | number }}</td>
-            <td>{{ import.errors | number }}</td>
+            <td>{{ import.rowsProcessed }}</td>
+            <td>{{ import.errors }}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+}

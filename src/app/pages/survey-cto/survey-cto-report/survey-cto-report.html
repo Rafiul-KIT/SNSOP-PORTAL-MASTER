@@ -1,1 +1,117 @@
-<p>survey-cto-report works!</p>
+@if (isLoading) {
+<app-loader></app-loader>
+} @else {
+<div class="breadcrumb-wrapper">
+  <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
+</div>
+
+<div class="card p-3 mb-2">
+  <form [formGroup]="searchForm" class="row g-3">
+    <!-- State -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="states" optionLabel="name" formControlName="state" (onChange)="onStateChange($event)" />
+        <label>State Name</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- County -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="counties" optionLabel="name" formControlName="county" (onChange)="onCountyChange($event)" />
+        <label>County Name</label>
+      </p-floatlabel>
+    </div>
+    <!-- Payam -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="payams" optionLabel="name" formControlName="payam" (onChange)="onPayamChange($event)" />
+        <label>Payam Name</label>
+      </p-floatlabel>
+    </div>
+    <!-- Boma -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="bomas" optionLabel="name" formControlName="boma" />
+        <label>Boma Name</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Support Type -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="supportTypes" optionLabel="name" optionValue="value" formControlName="supportType" />
+        <label>Support Type</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Registration Phase -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="registrationPhases" optionLabel="name" optionValue="value"
+          formControlName="registrationPhase" />
+        <label>Registration Phase</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-12">
+      <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
+        <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" [outlined]="true"
+          (onClick)="resetForm()">
+        </p-button>
+
+        <p-button label="Download Latest Saved" icon="fas fa-file-download" severity="info" size="small"
+          (onClick)="downloadLatestSaved()" [disabled]="searchForm.invalid || totalRecords === 0">
+        </p-button>
+
+        <p-button label="Search" icon="fas fa-search" severity="success" size="small"
+          (onClick)="fetchSavedData()">
+        </p-button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+@if (surveyData.length > 0 || isTableLoading) {
+<div class="card p-3 mb-2">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div style="flex: 1;"></div>
+    <h5 class="m-0 fw-bold text-primary text-center" style="flex: 2;">Survey CTO Saved Data</h5>
+    <div class="text-end" style="flex: 1;">
+      <span class="badge bg-info text-dark">Total Records: {{totalRecords}}</span>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <p-table [value]="surveyData" [columns]="cols" [scrollable]="true" scrollHeight="500px" [loading]="isTableLoading"
+      styleClass="p-datatable-sm p-datatable-gridlines" [tableStyle]="{'min-width': '600rem'}"
+      [paginator]="true" [rows]="rowsPerPage" [totalRecords]="totalRecords" [lazy]="true" (onPage)="onPageChange($event)"
+      [first]="first" [rowsPerPageOptions]="[10, 25, 50, 100]">
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          @for (col of columns; track col.field) {
+          <th style="white-space: nowrap;">
+            {{col.header}}
+          </th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+        <tr>
+          @for (col of columns; track col.field) {
+          <td>
+            @if (col.field === 'slNo') {
+            {{rowIndex + 1}}
+            } @else {
+            {{rowData[col.field]}}
+            }
+          </td>
+          }
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+}
+
+}

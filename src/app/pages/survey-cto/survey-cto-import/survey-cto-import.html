@@ -5,105 +5,38 @@
   <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
 </div>
 
-<div class="card p-3 mb-2">
-  <form [formGroup]="searchForm" class="row g-3">
-    <!-- State -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="states" optionLabel="name" formControlName="state" (onChange)="onStateChange($event)" />
-        <label>State Name</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- County -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="counties" optionLabel="name" formControlName="county" (onChange)="onCountyChange($event)" />
-        <label>County Name</label>
-      </p-floatlabel>
-    </div>
-    <!-- Payam -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="payams" optionLabel="name" formControlName="payam" (onChange)="onPayamChange($event)" />
-        <label>Payam Name</label>
-      </p-floatlabel>
-    </div>
-    <!-- Boma -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="bomas" optionLabel="name" formControlName="boma" />
-        <label>Boma Name</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Support Type -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="supportTypes" optionLabel="name" optionValue="value" formControlName="supportType" />
-        <label>Support Type</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Registration Phase -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="registrationPhases" optionLabel="name" optionValue="value"
-          formControlName="registrationPhase" />
-        <label>Registration Phase</label>
-      </p-floatlabel>
-    </div>
-
-    <div class="col-12">
-      <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
-        <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" [outlined]="true"
-          (onClick)="resetForm()">
-        </p-button>
-
-        <p-button label="Search" icon="fas fa-search" severity="success" size="small"
-          (onClick)="fetchSavedData()">
-        </p-button>
-      </div>
-    </div>
-
-  </form>
-</div>
-
-<div class="card p-3">
+<div class="card p-4 mb-3">
+  <h5 class="mb-4 fw-bold text-primary">Survey CTO Data Import</h5>
   <div class="d-flex flex-wrap align-items-center gap-3">
     <div class="d-flex align-items-center gap-2 flex-grow-1">
-      <label class="fw-bold">Import CSV:</label>
+      <label class="fw-bold">Select CSV File:</label>
       <input type="file" #csvUploader class="form-control" (change)="onFileSelect($event)" accept=".csv"
-        style="max-width: 300px;" />
+        style="max-width: 400px;" />
       <p-button icon="fas fa-times" (onClick)="clearSelectedFile(true)" [disabled]="!selectedFile" size="small"
-        severity="secondary"></p-button>
+        severity="secondary" pTooltip="Clear Selection"></p-button>
       <p-button label="Import Data" icon="fas fa-upload" (onClick)='importData()' size="small" severity="primary"
         [disabled]="!selectedFile"></p-button>
     </div>
-
-    <div class="d-flex align-items-center gap-2">
-      <p-button label="Download Latest Saved" icon="fas fa-file-download" (onClick)="downloadLatestSaved()" size="small"
-        severity="info" class="no-wrap-label" [disabled]="searchForm.invalid"></p-button>
-    </div>
+  </div>
+  <div class="mt-3 text-muted small">
+    <i class="fas fa-info-circle me-1"></i> Only .csv files are supported for import.
   </div>
 </div>
 
-@if (surveyData.length > 0 || isTableLoading) {
-<div class="card p-3 mb-2">
+@if (previewData.length > 0) {
+<div class="card p-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <div style="flex: 1;"></div>
-    <h5 class="m-0 fw-bold text-primary text-center" style="flex: 2;">Survey CTO Saved Data</h5>
-    <div class="text-end" style="flex: 1;">
-      <span class="badge bg-info text-dark">Total Records: {{surveyData.length}}</span>
-    </div>
+    <h5 class="m-0 fw-bold text-primary">File Preview</h5>
+    <span class="badge bg-info text-dark">Total Records: {{totalRowsInFile}}</span>
   </div>
-  <div class="table-responsive">
-    <p-table [value]="surveyData" [columns]="cols" [scrollable]="true" scrollHeight="500px" [loading]="isTableLoading"
-      styleClass="p-datatable-sm p-datatable-gridlines" [tableStyle]="{'min-width': '600rem'}"
-      [paginator]="true" [rows]="rowsPerPage" [totalRecords]="totalRecords" [lazy]="true" (onPage)="onPageChange($event)"
-      [first]="first" [rowsPerPageOptions]="[10, 25, 50, 100]">
+  
+  <div class="table-container">
+    <p-table [value]="previewData" [columns]="previewCols" [scrollable]="true" scrollHeight="400px"
+      styleClass="p-datatable-sm p-datatable-gridlines" [tableStyle]="{'min-width': '50rem'}"
+      [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50, 100]">
       <ng-template pTemplate="header" let-columns>
         <tr>
+          <th style="width: 50px;">#</th>
           @for (col of columns; track col.field) {
           <th style="white-space: nowrap;">
             {{col.header}}
@@ -113,13 +46,10 @@
       </ng-template>
       <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
         <tr>
+          <td>{{rowIndex + 1}}</td>
           @for (col of columns; track col.field) {
           <td>
-            @if (col.field === 'slNo') {
-            {{rowIndex + 1}}
-            } @else {
             {{rowData[col.field]}}
-            }
           </td>
           }
         </tr>
@@ -128,6 +58,4 @@
   </div>
 </div>
 }
-
-
 }

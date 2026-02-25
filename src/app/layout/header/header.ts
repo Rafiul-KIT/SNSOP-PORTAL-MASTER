@@ -138,26 +138,25 @@ export class Header {
   getSurveyCtoMenus(): MenuItem[] {
     return [
       {
-        label: 'CTO Dashboard',
+        label: 'SurveyCTO Dashboard',
         icon: 'fas fa-chart-line',
         routerLink: ['/cto-dashboard'],
       },
       {
-        label: 'Survey CTO',
+        label: 'Template Export',
         icon: 'fas fa-poll',
-        items: [
-      {
-        label: 'Survey CTO Export',
-        icon: 'fas fa-poll',
-        routerLink: ['/survey-cto/survey-cto-export'],
+        routerLink: ['/survey-cto-export'],
       },
       {
-        label: 'Survey CTO Import',
-        icon: 'fas fa-poll',
-        routerLink: ['/survey-cto/survey-cto-import'],
+        label: 'Data Import',
+        icon: 'fas fa-upload',
+        routerLink: ['/survey-cto-import'],
+      },
+      {
+        label: 'Survey Data View',
+        icon: 'fas fa-file-alt',
+        routerLink: ['/survey-cto-report'],
       }
-        ],
-      },
     ];
   }
 

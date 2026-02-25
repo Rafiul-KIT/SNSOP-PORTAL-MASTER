@@ -335,27 +335,22 @@ export class SurveyCto implements OnInit {
       });
 
       const formValues = this.searchForm.value;
-      const params: { [key: string]: any } = {
+      const requestBody: { [key: string]: any } = {
         page: 0,
         size: -1,
+        stateId: formValues.state?.id || 0,
+        countyId: formValues.county?.id || 0,
+        payamId: formValues.payam?.id || 0,
+        bomaId: formValues.boma?.id || 0,
+        registrationPhase: formValues.registrationPhase === 'ALL' ? null : formValues.registrationPhase,
+        criteria: formValues.supportType === 'ALL' ? null : formValues.supportType
       };
-
-      if (formValues.state?.id) params['stateId'] = formValues.state.id;
-      if (formValues.county?.id) params['countyId'] = formValues.county.id;
-      if (formValues.payam?.id) params['payamId'] = formValues.payam.id;
-      if (formValues.boma?.id) params['bomaId'] = formValues.boma.id;
-      if (formValues.supportType && formValues.supportType !== 'ALL') {
-        params['criteria'] = formValues.supportType;
-      }
-      if (formValues.registrationPhase && formValues.registrationPhase !== 'ALL') {
-        params['registrationPhase'] = formValues.registrationPhase;
-      }
 
       const config = {
         responseType: 'blob' as 'blob',
       };
 
-      this.apiService.GET('/api/surveycto/revisiting/download-template', params, 'global', config)
+      this.apiService.POST('/api/surveycto/revisiting/download-template', requestBody, 'global', config)
         .then((response: any) => {
           Swal.close();
           const blob = new Blob([response.data], { type: 'text/csv' });
