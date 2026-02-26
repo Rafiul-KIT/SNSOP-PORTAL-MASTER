@@ -95,16 +95,16 @@ export class SurveyCto implements OnInit {
           this.exportFormat = 'csv';
           this.exportAs(this.exportFormat);
         }
-      },
-      {
-        label: 'Export as Excel',
-        icon: 'pi pi-file-excel',
-        command: () => {
-          this.exportLabel = 'Export as Excel';
-          this.exportFormat = 'excel';
-          this.exportAs(this.exportFormat);
-        }
       }
+      // {
+      //   label: 'Export as Excel',
+      //   icon: 'pi pi-file-excel',
+      //   command: () => {
+      //     this.exportLabel = 'Export as Excel';
+      //     this.exportFormat = 'excel';
+      //     this.exportAs(this.exportFormat);
+      //   }
+      // }
     ];
 
     this.supportTypes = [

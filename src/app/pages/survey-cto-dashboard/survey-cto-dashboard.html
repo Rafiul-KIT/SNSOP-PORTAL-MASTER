@@ -18,26 +18,8 @@
         <i class="fas fa-home"></i>
       </div>
       <div class="card-info">
-        <div class="card-title">Total Households</div>
+        <div class="card-title">Number of Revisit Households</div>
         <div class="card-value">{{ totalHouseholds | number }}</div>
-      </div>
-    </div>
-    <div class="card card-3">
-      <div class="card-icon">
-        <i class="fas fa-map-marked-alt"></i>
-      </div>
-      <div class="card-info">
-        <div class="card-title">States Covered</div>
-        <div class="card-value">{{ statesCovered | number }}</div>
-      </div>
-    </div>
-    <div class="card card-4">
-      <div class="card-icon">
-        <i class="fas fa-globe-africa"></i>
-      </div>
-      <div class="card-info">
-        <div class="card-title">Counties Covered</div>
-        <div class="card-value">{{ countiesCovered | number }}</div>
       </div>
     </div>
     <div class="card card-5">
@@ -62,6 +44,24 @@
 
   <!-- Revisit Statistics row -->
   <div class="summary-cards">
+    <div class="card card-3">
+      <div class="card-icon">
+        <i class="fas fa-map-marked-alt"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">States Covered</div>
+        <div class="card-value">{{ statesCovered | number }}</div>
+      </div>
+    </div>
+    <div class="card card-4">
+      <div class="card-icon">
+        <i class="fas fa-globe-africa"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">Counties Covered</div>
+        <div class="card-value">{{ countiesCovered | number }}</div>
+      </div>
+    </div>
     <div class="card card-1">
       <div class="card-icon">
         <i class="fas fa-map-marked-alt"></i>
@@ -71,16 +71,7 @@
         <div class="card-value">{{ numRevisitBoma | number }}</div>
       </div>
     </div>
-    <div class="card card-2">
-      <div class="card-icon">
-        <i class="fas fa-users"></i>
-      </div>
-      <div class="card-info">
-        <div class="card-title">Number of Revisit Beneficiary</div>
-        <div class="card-value">{{ numRevisitBeneficiary | number }}</div>
-      </div>
-    </div>
-    <div class="card card-3">
+    <!-- <div class="card card-3">
       <div class="card-icon">
         <i class="fas fa-user-edit"></i>
       </div>
@@ -97,7 +88,7 @@
         <div class="card-title">Number of Missing Payment</div>
         <div class="card-value">{{ missingPaymentCount | number }}</div>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <div class="charts-grid">
