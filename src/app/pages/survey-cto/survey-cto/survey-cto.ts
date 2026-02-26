@@ -350,7 +350,7 @@ export class SurveyCto implements OnInit {
         responseType: 'blob' as 'blob',
       };
 
-      this.apiService.POST('/api/surveycto/revisiting/download-template', requestBody, 'global', config)
+      this.apiService.GET('/api/surveycto/revisiting/download-template', requestBody, 'global', config)
         .then((response: any) => {
           Swal.close();
           const blob = new Blob([response.data], { type: 'text/csv' });
