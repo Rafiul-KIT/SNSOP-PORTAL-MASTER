@@ -77,7 +77,7 @@
         <!-- Support Type -->
         <div class="col-md-3">
             <p-floatlabel variant="on" class="w-100">
-                <p-select [options]="supportTypes" optionLabel="name" formControlName="supportType" />
+                <p-select [options]="supportTypes" optionLabel="name" optionValue="value" formControlName="supportType" />
                 <label>Support Type</label>
             </p-floatlabel>
         </div>
@@ -94,6 +94,10 @@
         <div class="col-12">
             <!-- Mobile: stacked full width; ≥sm: right-aligned row -->
             <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
+                <p-splitButton [label]="exportLabel" icon="fas fa-download" (onClick)="exportAs(exportFormat)"
+                    [model]="exportItems" size="small" severity="secondary" class="no-wrap-label"
+                    [disabled]="searchForm.invalid"></p-splitButton>
+
                 <p-button [label]="showAdvancedSearch ? 'Close' : 'Advance Search'" icon="fas fa-filter"
                     (onClick)="toggleAdvancedSearch()" severity="warn" size="small" [outlined]="true" size="small">
                 </p-button>
@@ -112,28 +116,16 @@
 </div>
 
 <p-table [value]="surveyData" [scrollable]="true" [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px'  }"
-    size="small">
+    styleClass="p-datatable-gridlines" size="small">
 
     <ng-template pTemplate="header">
         <tr>
             <th colspan="11">
-                <!-- Flexbox container to manage button and text placement -->
-                <div class="d-flex justify-content-between">
-                    <!-- Left-aligned Buttons -->
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="file" #csvUploader class="form-control" (change)="onFileSelect($event)"
-                            accept=".csv" />
-                        <p-button icon="fas fa-times" (onClick)="clearSelectedFile(true)" [disabled]="!selectedFile"
-                            size="small" severity="secondary"></p-button>
-                        <p-button label="Import" icon="fas fa-upload" (onClick)="importData()" size="small"
-                            severity="primary" [disabled]="!selectedFile"></p-button>
-                        <p-splitButton [label]="exportLabel" icon="fas fa-download" (onClick)="exportAs(exportFormat)"
-                            [model]="exportItems" size="small" severity="secondary"
-                            class="no-wrap-label"></p-splitButton>
-                    </div>
-
+                <div class="d-flex justify-content-between align-items-center">
+                    <div style="flex: 1;"></div>
+                    <h5 class="m-0 fw-bold text-primary text-center" style="flex: 2;">Survey CTO Template Data</h5>
                     <!-- Right-aligned Text (Showing record count) -->
-                    <p class="fw-bold mb-2 text-end">
+                    <p class="fw-bold mb-0 text-end" style="flex: 1;">
                         Showing <kbd>{{ surveyData.length }}</kbd> of
                         <kbd>{{ totalRecords }}</kbd> Beneficiaries
                     </p>
@@ -172,11 +164,13 @@
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
+        @if (isFilteredSearch) {
         <tr>
             <td colspan="11" class="text-center text-danger">
                 <b>No Survey CTO data found!</b>
             </td>
         </tr>
+        }
     </ng-template>
 </p-table>
 

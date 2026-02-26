@@ -194,7 +194,6 @@ export const appConfig: ApplicationConfig = {
       },
  zIndex: { modal: 1100, overlay: 1000, menu: 1000, tooltip: 1100 },
     }),
-
     { provide: MSAL_INSTANCE, useFactory: msalInstanceFactory },
     { provide: MSAL_GUARD_CONFIG, useFactory: msalGuardConfigFactory },
     {
