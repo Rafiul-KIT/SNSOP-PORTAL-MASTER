@@ -23,8 +23,6 @@ export class SurveyCtoDashboard implements OnInit {
 
   numRevisitBoma: number = 0;
   numRevisitBeneficiary: number = 0;
-  alternateNomineeChanges: number = 0;
-  missingPaymentCount: number = 0;
 
   supportTypeData: any;
   supportTypeOptions: any;
@@ -66,9 +64,6 @@ export class SurveyCtoDashboard implements OnInit {
 
           this.numRevisitBoma = data.totalNumberOfRevisitBoma || 0;
           this.numRevisitBeneficiary = data.totalNumberOfRevisitBeneficiary || 0;
-          // Placeholder for fields not currently in API
-          this.alternateNomineeChanges = 0;
-          this.missingPaymentCount = 0;
 
           this.setupCharts(data);
           this.latestImports = (data.latestListOfFileName || []).map((name: string) => ({
