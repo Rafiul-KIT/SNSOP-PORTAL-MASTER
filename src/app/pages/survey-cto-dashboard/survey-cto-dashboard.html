@@ -18,11 +18,10 @@
         <i class="fas fa-home"></i>
       </div>
       <div class="card-info">
-        <div class="card-title">Total Households</div>
+        <div class="card-title">Number of Revisit Households</div>
         <div class="card-value">{{ totalHouseholds | number }}</div>
       </div>
     </div>
-    
     <div class="card card-5">
       <div class="card-icon">
         <i class="fas fa-birthday-cake"></i>
@@ -72,13 +71,22 @@
         <div class="card-value">{{ numRevisitBoma | number }}</div>
       </div>
     </div>
-    <!-- <div class="card card-2">
+    <!-- <div class="card card-3">
       <div class="card-icon">
-        <i class="fas fa-users"></i>
+        <i class="fas fa-user-edit"></i>
       </div>
       <div class="card-info">
-        <div class="card-title">Number of Revisit Beneficiary</div>
-        <div class="card-value">{{ numRevisitBeneficiary | number }}</div>
+        <div class="card-title">Alternate/Nominee changes</div>
+        <div class="card-value">{{ alternateNomineeChanges | number }}</div>
+      </div>
+    </div>
+    <div class="card card-4">
+      <div class="card-icon">
+        <i class="fas fa-money-bill-wave"></i>
+      </div>
+      <div class="card-info">
+        <div class="card-title">Number of Missing Payment</div>
+        <div class="card-value">{{ missingPaymentCount | number }}</div>
       </div>
     </div> -->
   </div>

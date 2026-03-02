@@ -147,28 +147,58 @@ export class SurveyCtoImport implements OnInit {
       .then((response) => {
         Swal.close();
         const result = response.data;
+        
+        let errorHtml = '';
+        if (result.errors && result.errors.length > 0) {
+          const errorList = result.errors.map((e: string) => `<li class="mb-1 text-danger">${e}</li>`).join('');
+          errorHtml = `
+            <div class="mt-3">
+              <b class="text-danger">Errors Found:</b>
+              <ul class="list-unstyled mt-1" style="max-height: 120px; overflow-y: auto; font-size: 0.85rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.5rem 1rem;">
+                ${errorList}
+              </ul>
+            </div>
+          `;
+        }
+
         const successMessage = `
-          <div style="text-align: left; padding: 0 1rem;">
+          <div style="text-align: left;">
             <p class="mb-1"><b>File:</b> ${result.fileName}</p>
             <p class="mb-1"><b>Total Rows:</b> ${result.totalRows}</p>
             <p class="mb-1"><b>Saved:</b> ${result.savedRows}</p>
             <p class="mb-1"><b>Skipped:</b> ${result.skippedRows}</p>
-            ${result.errors && result.errors.length > 0 ? `<p class="text-danger mb-1"><b>Errors:</b> ${result.errors.length}</p>` : ''}
+            ${errorHtml}
           </div>
         `;
+
         Swal.fire({
-          icon: 'success',
-          title: 'Import Successful',
+          icon: result.errors && result.errors.length > 0 ? 'warning' : 'success',
+          title: result.errors && result.errors.length > 0 ? 'Import Complete with Errors' : 'Import Successful',
           html: successMessage,
+          width: '600px',
         });
         this.clearSelectedFile(false);
       })
       .catch((err) => {
         Swal.close();
+        // Extract the most specific error message available from the API response
+        const serverMessage = err.response?.data?.message;
+        const fallbackMessage = err.message;
+        const displayMessage = serverMessage || fallbackMessage;
+
         Swal.fire({
           icon: 'error',
           title: 'Upload Failed',
-          text: `Could not import ${this.selectedFile?.name}. Error: ${err.message}`,
+          html: `
+            <div style="text-align: left; margin-top: 1rem;">
+              <p>Could not import <strong>${this.selectedFile?.name}</strong>.</p>
+              <p class="mt-2"><strong>Reason:</strong></p>
+              <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 0.5rem; max-height: 150px; overflow-y: auto;">
+                <code style="color: #d63384; white-space: pre-wrap; word-break: break-word;">${displayMessage}</code>
+              </div>
+            </div>
+          `,
+          width: '600px',
         });
       });
   }
