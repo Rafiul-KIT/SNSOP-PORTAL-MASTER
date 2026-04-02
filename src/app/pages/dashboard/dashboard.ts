@@ -50,6 +50,12 @@ export class Dashboard {
         icon: 'fas fa-poll',
         routerLink: '/cto-dashboard'
       },
+      {
+        label: 'M&E',
+        icon: 'fas fa-chart-bar',
+        routerLink: '/monitoring-evaluation/beneficiary-enrolment-summary',
+        tooltipText: 'Monitoring & Evaluation'
+      },
     ];
   }
 }

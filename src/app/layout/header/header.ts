@@ -24,6 +24,7 @@ export class Header {
   isPortalsPage = false;
   isLandingPage = false;
   isSurveyCtoPage = false;
+  isMonitoringPage = false;
   isLoading = false;
   private authService = inject(AzureAdAuthService);
 
@@ -46,7 +47,8 @@ export class Header {
           '/user-management/'
         );
         this.isSurveyCtoPage = event.urlAfterRedirects.startsWith('/survey-cto') || event.urlAfterRedirects.startsWith('/cto-dashboard');
-        this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage);
+        this.isMonitoringPage = event.urlAfterRedirects.startsWith('/monitoring-evaluation');
+        this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage, this.isMonitoringPage);
       });
 
     // Watch login state
@@ -56,7 +58,8 @@ export class Header {
         '/user-management/'
       );
       this.isSurveyCtoPage = this.router.url.startsWith('/survey-cto') || this.router.url.startsWith('/cto-dashboard');
-      this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage);
+      this.isMonitoringPage = this.router.url.startsWith('/monitoring-evaluation');
+      this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage, this.isMonitoringPage);
     });
 
     // Static portal links (unchanged)
@@ -97,6 +100,14 @@ export class Header {
         icon: 'fas fa-poll',
         command: () => {
           this.router.navigate(['/cto-dashboard']);
+          this.showPortalOptions = false;
+        },
+      },
+      {
+        label: 'M&E',
+        icon: 'fas fa-chart-bar',
+        command: () => {
+          this.router.navigate(['/monitoring-evaluation/beneficiary-enrolment-summary']);
           this.showPortalOptions = false;
         },
       },
@@ -160,7 +171,27 @@ export class Header {
     ];
   }
 
-  updateMenuList(isUserManagementPage: boolean, isSurveyCtoPage: boolean) {
+  getMonitoringMenus(): MenuItem[] {
+    return [
+      {
+        label: 'Beneficiary Enrolment Summary',
+        icon: 'fas fa-clipboard-list',
+        routerLink: ['/monitoring-evaluation/beneficiary-enrolment-summary'],
+      },
+      {
+        label: 'Cash Transfer Summary',
+        icon: 'fas fa-money-bill-wave',
+        routerLink: ['/monitoring-evaluation/cash-transfer-summary'],
+      },
+      {
+        label: 'Result Framework',
+        icon: 'fas fa-bullseye',
+        routerLink: ['/monitoring-evaluation/result-framework'],
+      },
+    ];
+  }
+
+  updateMenuList(isUserManagementPage: boolean, isSurveyCtoPage: boolean, isMonitoringPage: boolean = false) {
     if (this.isLandingPage) {
       this.menuList = [];
       return;
@@ -168,6 +199,11 @@ export class Header {
 
     if (isSurveyCtoPage) {
       this.menuList = this.getSurveyCtoMenus();
+      return;
+    }
+
+    if (isMonitoringPage) {
+      this.menuList = this.getMonitoringMenus();
       return;
     }
 

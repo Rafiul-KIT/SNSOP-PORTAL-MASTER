@@ -17,6 +17,9 @@ import { SurveyCto } from './pages/survey-cto/survey-cto/survey-cto';
 import { SurveyCtoImport } from './pages/survey-cto/survey-cto-import/survey-cto-import';
 import { SurveyCtoReport } from './pages/survey-cto/survey-cto-report/survey-cto-report';
 import { SurveyCtoDashboard } from './pages/survey-cto-dashboard/survey-cto-dashboard';
+import { BeneficiaryEnrolmentSummary } from './pages/monitoring-evaluation/beneficiary-enrolment-summary/beneficiary-enrolment-summary';
+import { CashTransferSummary } from './pages/monitoring-evaluation/cash-transfer-summary/cash-transfer-summary';
+import { ResultFramework } from './pages/monitoring-evaluation/result-framework/result-framework';
 
 
 
@@ -69,6 +72,16 @@ export const routes: Routes = [
   { path: 'cto-dashboard',
     canActivate: [routeGuard],
     component: SurveyCtoDashboard
+  },
+  {
+    path: 'monitoring-evaluation',
+    canActivate: [routeGuard],
+    children: [
+      { path: 'beneficiary-enrolment-summary', component: BeneficiaryEnrolmentSummary, canActivate: [routeGuard], },
+      { path: 'cash-transfer-summary', component: CashTransferSummary, canActivate: [routeGuard], },
+      { path: 'result-framework', component: ResultFramework, canActivate: [routeGuard], },
+      { path: '', redirectTo: 'beneficiary-enrolment-summary', pathMatch: 'full' }
+    ],
   },
   { path: 'unauthorized', component: Unauthorized },
   { path: 'under-construction', component: UnderConstruction },
