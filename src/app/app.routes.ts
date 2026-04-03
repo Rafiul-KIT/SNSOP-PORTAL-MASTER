@@ -24,6 +24,11 @@ import { HelpDeskSupportManagement } from './pages/help-desk/support-management/
 import { HelpDeskStatusTracker } from './pages/help-desk/status-tracker/help-desk-status-tracker';
 import { HelpDeskReports } from './pages/help-desk/reports/help-desk-reports';
 import { HelpDeskUserManual } from './pages/help-desk/user-manual/help-desk-user-manual';
+import { BeneficiaryEnrolmentSummary } from './pages/monitoring-evaluation/beneficiary-enrolment-summary/beneficiary-enrolment-summary';
+import { CashTransferSummary } from './pages/monitoring-evaluation/cash-transfer-summary/cash-transfer-summary';
+import { ResultFramework } from './pages/monitoring-evaluation/result-framework/result-framework';
+
+
 
 export const routes: Routes = [
   {
@@ -87,6 +92,17 @@ export const routes: Routes = [
       { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
       { path: 'user-manual', component: HelpDeskUserManual, canActivate: [routeGuard] },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+   
+  },
+  {
+     path: 'monitoring-evaluation',
+    canActivate: [routeGuard],
+    children: [
+      { path: 'beneficiary-enrolment-summary', component: BeneficiaryEnrolmentSummary, canActivate: [routeGuard], },
+      { path: 'cash-transfer-summary', component: CashTransferSummary, canActivate: [routeGuard], },
+      { path: 'result-framework', component: ResultFramework, canActivate: [routeGuard], },
+      { path: '', redirectTo: 'beneficiary-enrolment-summary', pathMatch: 'full' }
     ]
   },
   { path: 'unauthorized', component: Unauthorized },
