@@ -25,6 +25,9 @@ export class Header {
   isLandingPage = false;
   isSurveyCtoPage = false;
   isLoading = false;
+  canAccessHelpDesk: boolean = false;
+  showHelpDeskDropdown: boolean = false;
+  helpDeskChildren: any[] = this.getHelpDeskMenuItems();
   private authService = inject(AzureAdAuthService);
 
   constructor(
@@ -51,12 +54,22 @@ export class Header {
 
     // Watch login state
     effect(() => {
-      this.userInfo = this.azureService.loginState()?.user;
+      const state = this.azureService.loginState();
+      this.userInfo = state?.user;
       const isUserManagementPage = this.router.url.startsWith(
         '/user-management/'
       );
       this.isSurveyCtoPage = this.router.url.startsWith('/survey-cto') || this.router.url.startsWith('/cto-dashboard');
       this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage);
+
+      // Help Desk access: show when user is logged in
+      if (this.userInfo) {
+        const permittedMenus = state?.menus || [];
+        const allPermittedNames = permittedMenus.map((m: any) => m.name);
+        this.canAccessHelpDesk = allPermittedNames.includes('Help Desk') || true;
+      } else {
+        this.canAccessHelpDesk = false;
+      }
     });
 
     // Static portal links (unchanged)
@@ -209,6 +222,26 @@ export class Header {
   trackByFn(index: number, item: MenuItem): string {
     return item.label ?? index.toString(); // fallback to index if label is undefined
   }
+
+  getHelpDeskMenuItems(): any[] {
+    return [
+      { label: 'Help Desk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
+      { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
+      { label: 'My Requests', routerLink: '/help-desk/my-requests', icon: 'fas fa-clipboard-list' },
+      { label: 'Support Management', routerLink: '/help-desk/support-management', icon: 'fas fa-users-cog' },
+      { label: 'Status Tracker', routerLink: '/help-desk/status-tracker', icon: 'fas fa-search' },
+      { label: 'Reports', routerLink: '/help-desk/reports', icon: 'fas fa-chart-bar' },
+      { separator: true, label: 'User Manual', routerLink: '/help-desk/user-manual', icon: 'fas fa-book' }
+    ];
+  }
+
+  toggleHelpDeskDropdown = () => {
+    this.showHelpDeskDropdown = !this.showHelpDeskDropdown;
+  };
+
+  hideHelpDeskDropdown = () => {
+    this.showHelpDeskDropdown = false;
+  };
 
   goToProfile = () => {
     this.router.navigateByUrl('/home/profile');

@@ -17,8 +17,13 @@ import { SurveyCto } from './pages/survey-cto/survey-cto/survey-cto';
 import { SurveyCtoImport } from './pages/survey-cto/survey-cto-import/survey-cto-import';
 import { SurveyCtoReport } from './pages/survey-cto/survey-cto-report/survey-cto-report';
 import { SurveyCtoDashboard } from './pages/survey-cto-dashboard/survey-cto-dashboard';
-
-
+import { HelpDeskDashboard } from './pages/help-desk/dashboard/help-desk-dashboard';
+import { HelpDeskSubmitRequest } from './pages/help-desk/submit-request/help-desk-submit-request';
+import { HelpDeskMyRequests } from './pages/help-desk/my-requests/help-desk-my-requests';
+import { HelpDeskSupportManagement } from './pages/help-desk/support-management/help-desk-support-management';
+import { HelpDeskStatusTracker } from './pages/help-desk/status-tracker/help-desk-status-tracker';
+import { HelpDeskReports } from './pages/help-desk/reports/help-desk-reports';
+import { HelpDeskUserManual } from './pages/help-desk/user-manual/help-desk-user-manual';
 
 export const routes: Routes = [
   {
@@ -69,6 +74,20 @@ export const routes: Routes = [
   { path: 'cto-dashboard',
     canActivate: [routeGuard],
     component: SurveyCtoDashboard
+  },
+  {
+    path: 'help-desk',
+    canActivate: [routeGuard],
+    children: [
+      { path: 'dashboard', component: HelpDeskDashboard, canActivate: [routeGuard] },
+      { path: 'submit-request', component: HelpDeskSubmitRequest, canActivate: [routeGuard] },
+      { path: 'my-requests', component: HelpDeskMyRequests, canActivate: [routeGuard] },
+      { path: 'support-management', component: HelpDeskSupportManagement, canActivate: [routeGuard] },
+      { path: 'status-tracker', component: HelpDeskStatusTracker, canActivate: [routeGuard] },
+      { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
+      { path: 'user-manual', component: HelpDeskUserManual, canActivate: [routeGuard] },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
   },
   { path: 'unauthorized', component: Unauthorized },
   { path: 'under-construction', component: UnderConstruction },
