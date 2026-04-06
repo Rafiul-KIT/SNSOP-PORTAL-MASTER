@@ -51,15 +51,14 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
   payams: IdName[] = [];
   bomas: IdName[] = [];
 
-  genderOptions = [
-    { label: 'Male', value: 'Male' },
-    { label: 'Female', value: 'Female' },
-  ];
+  get genderOptions() { return this.lookupService.genderOptions; }
+  get selectionCriteriaOptions() { return this.lookupService.selectionCriteriaOptions; }
 
-  selectionCriteriaOptions = [
-    { label: 'PMT', value: 'PMT' },
-    { label: 'Community Based', value: 'Community Based' },
+  reportFormatOptions = [
+    { label: 'PDF', value: 'PDF' },
+    { label: 'Excel', value: 'EXCEL' },
   ];
+  selectedReportFormat: string = 'PDF';
 
   // Filters
   filters: any = {
@@ -198,6 +197,59 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
     this.currentPage = event.page;
     this.pageSize = event.rows;
     this.loadBeneficiaries();
+  }
+
+  async download(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+
+      const payload: any = {
+        reportFormat: this.selectedReportFormat,
+      };
+
+      if (this.filters.stateId) payload.stateId = this.filters.stateId;
+      if (this.filters.countyId) payload.countyId = this.filters.countyId;
+      if (this.filters.payamId) payload.payamId = this.filters.payamId;
+      if (this.filters.bomaId) payload.bomaId = this.filters.bomaId;
+      if (this.filters.age) payload.age = this.filters.age;
+      if (this.filters.gender != null) payload.gender = this.filters.gender;
+      if (this.filters.selectionCriteria) payload.selectionCriteria = this.filters.selectionCriteria;
+
+      const res = await this.api.POST(
+        '/api/monitoring/beneficiaryEnrollment/download',
+        payload,
+        'global',
+        { responseType: 'blob' }
+      );
+
+      const blob = new Blob([res.data], {
+        type: this.selectedReportFormat === 'PDF' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const ext = this.selectedReportFormat === 'PDF' ? 'pdf' : 'xlsx';
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Beneficiary_Enrolment_Summary.${ext}`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      this.msg.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Report downloaded successfully.',
+      });
+    } catch (err) {
+      console.error('Failed to download report', err);
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to download report.',
+      });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   resetFilters(): void {

@@ -49,15 +49,15 @@ export class CashTransferSummary implements OnInit {
   payams: IdName[] = [];
   bomas: IdName[] = [];
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  get statusOptions() { return this.lookupService.wageRequestStatusOptions; }
+  get paidStatusOptions() { return this.lookupService.paidStatusOptions; }
+  get paymentCycleOptions() { return this.lookupService.paymentCycleOptions; }
 
-  paidStatusOptions = [
-    { label: 'Paid', value: 'Paid' },
-    { label: 'Unpaid', value: 'Unpaid' },
+  reportFormatOptions = [
+    { label: 'PDF', value: 'PDF' },
+    { label: 'Excel', value: 'EXCEL' },
   ];
+  selectedReportFormat: string = 'PDF';
 
   // Filters
   filters: any = {
@@ -184,6 +184,59 @@ export class CashTransferSummary implements OnInit {
       });
       this.transfers = [];
       this.totalRecords = 0;
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async download(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+
+      const payload: any = {
+        reportFormat: this.selectedReportFormat,
+      };
+
+      if (this.filters.stateId) payload.stateId = this.filters.stateId;
+      if (this.filters.countyId) payload.countyId = this.filters.countyId;
+      if (this.filters.payamId) payload.payamId = this.filters.payamId;
+      if (this.filters.bomaId) payload.bomaId = this.filters.bomaId;
+      if (this.filters.paymentCycle) payload.paymentCycle = this.filters.paymentCycle;
+      if (this.filters.status != null) payload.status = this.filters.status;
+      if (this.filters.paidStatus) payload.paidStatus = this.filters.paidStatus;
+
+      const res = await this.api.POST(
+        '/api/monitoring/cashTransfer/download',
+        payload,
+        'global',
+        { responseType: 'blob' }
+      );
+
+      const blob = new Blob([res.data], {
+        type: this.selectedReportFormat === 'PDF' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const ext = this.selectedReportFormat === 'PDF' ? 'pdf' : 'xlsx';
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Cash_Transfer_Summary.${ext}`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      this.msg.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Report downloaded successfully.',
+      });
+    } catch (err) {
+      console.error('Failed to download report', err);
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to download report.',
+      });
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();

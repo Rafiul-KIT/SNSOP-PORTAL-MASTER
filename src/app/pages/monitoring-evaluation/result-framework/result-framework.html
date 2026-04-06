@@ -27,7 +27,7 @@
         <p-select [options]="indicatorOptions" optionLabel="label" optionValue="value"
           [(ngModel)]="filters.indicatorId" name="indicatorId" [filter]="true"
           filterBy="label" [showClear]="true" [disabled]="!filters.indicatorType"
-          class="w-100"></p-select>
+          (onChange)="onIndicatorChange()" class="w-100"></p-select>
         <label>Indicator *</label>
       </p-floatlabel>
     </div>
@@ -76,7 +76,44 @@
       </p-floatlabel>
     </div>
 
-    <!-- Legal Status -->
+    <!-- Gender (conditional) -->
+    @if (showSex) {
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="sexOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.sex" name="sex" [showClear]="true"
+          class="w-100"></p-select>
+        <label>Gender</label>
+      </p-floatlabel>
+    </div>
+    }
+
+    <!-- Age Range (conditional) -->
+    @if (showAgeRange) {
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="ageRangeOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.ageRange" name="ageRange" [showClear]="true"
+          class="w-100"></p-select>
+        <label>Age Range</label>
+      </p-floatlabel>
+    </div>
+    }
+
+    <!-- Support Type (conditional) -->
+    @if (showSupportType) {
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="selectionCriteriaOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.supportType" name="supportType" [showClear]="true"
+          class="w-100"></p-select>
+        <label>Selection Criteria</label>
+      </p-floatlabel>
+    </div>
+    }
+
+    <!-- Legal Status (conditional) -->
+    @if (showLegalStatus) {
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="legalStatusOptions" optionLabel="label" optionValue="value"
@@ -85,50 +122,31 @@
         <label>Legal Status</label>
       </p-floatlabel>
     </div>
+    }
 
-    <!-- Support Type -->
+    <!-- Payment Cycle (conditional) -->
+    @if (showPaymentCycle) {
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="supportTypeOptions" optionLabel="label" optionValue="value"
-          [(ngModel)]="filters.supportType" name="supportType" [showClear]="true"
+        <p-select [options]="paymentCycleOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.paymentCycle" name="paymentCycle" [showClear]="true"
           class="w-100"></p-select>
-        <label>Support Type</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Sex -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="sexOptions" optionLabel="label" optionValue="value"
-          [(ngModel)]="filters.sex" name="sex" [showClear]="true"
-          class="w-100"></p-select>
-        <label>Sex</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Age Range -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on">
-        <input pInputText class="form-control" [(ngModel)]="filters.ageRange" name="ageRange" />
-        <label>Age Range</label>
-      </p-floatlabel>
-    </div>
-
-    <!-- Payment Cycle -->
-    <div class="col-md-3">
-      <p-floatlabel variant="on">
-        <input pInputText class="form-control" [(ngModel)]="filters.paymentCycle" name="paymentCycle" />
         <label>Payment Cycle</label>
       </p-floatlabel>
     </div>
+    }
 
-    <!-- Grievance Category -->
+    <!-- Grievance Category (conditional) -->
+    @if (showGrievanceCategory) {
     <div class="col-md-3">
-      <p-floatlabel variant="on">
-        <input pInputText class="form-control" [(ngModel)]="filters.grievanceCategory" name="grievanceCategory" />
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="grievanceCategoryOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.grievanceCategory" name="grievanceCategory" [showClear]="true"
+          class="w-100"></p-select>
         <label>Grievance Category</label>
       </p-floatlabel>
     </div>
+    }
 
     <!-- Buttons -->
     <div class="col-md-3">
