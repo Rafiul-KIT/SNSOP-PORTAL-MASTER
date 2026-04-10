@@ -101,6 +101,13 @@
     <h5 class="mb-0 fw-semibold">
       <i class="fas fa-clipboard-list me-2"></i> Beneficiary Enrolment Summary
     </h5>
+    <div class="d-flex align-items-center gap-2">
+      <p-select [options]="reportFormatOptions" optionLabel="label" optionValue="value"
+        [(ngModel)]="selectedReportFormat" name="reportFormat"
+        [style]="{ 'min-width': '120px' }"></p-select>
+      <p-button label="Download" icon="fas fa-download" severity="success" size="small"
+        (onClick)="download()"></p-button>
+    </div>
   </div>
 
   <p-table [value]="beneficiaries" [scrollHeight]="'60vh'"
