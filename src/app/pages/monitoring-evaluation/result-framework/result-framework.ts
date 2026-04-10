@@ -45,7 +45,7 @@ export class ResultFramework implements OnInit {
   payams: IdName[] = [];
   bomas: IdName[] = [];
 
-  get sexOptions() { return this.lookupService.sexOptions; }
+  get genderOptions() { return this.lookupService.genderOptions; }
   get legalStatusOptions() { return this.lookupService.legalStatusOptions; }
   get selectionCriteriaOptions() { return this.lookupService.selectionCriteriaOptions; }
   get paymentCycleOptions() { return this.lookupService.paymentCycleOptions; }

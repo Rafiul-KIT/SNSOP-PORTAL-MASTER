@@ -178,13 +178,6 @@ async getMenuList(): Promise<MenuItem[]> {
     ];
   }
 
-  get sexOptions() {
-    return [
-      { label: 'Male', value: 'M' },
-      { label: 'Female', value: 'F' },
-    ];
-  }
-
   get selectionCriteriaOptions() {
     return [
       { label: 'LIPW', value: 0 },

@@ -169,9 +169,9 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
       if (this.filters.countyId) params.countyId = this.filters.countyId;
       if (this.filters.payamId) params.payamId = this.filters.payamId;
       if (this.filters.bomaId) params.bomaId = this.filters.bomaId;
-      if (this.filters.age) params.age = this.filters.age;
-      if (this.filters.gender) params.gender = this.filters.gender;
-      if (this.filters.selectionCriteria) params.selectionCriteria = this.filters.selectionCriteria;
+      if (this.filters.age != null) params.age = this.filters.age;
+      if (this.filters.gender != null) params.gender = this.filters.gender;
+      if (this.filters.selectionCriteria != null) params.selectionCriteria = this.filters.selectionCriteria;
 
       const res = await this.api.GET('/api/monitoring/beneficiariry/enrollment', params);
       const data = res?.data ?? {};
@@ -212,9 +212,9 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
       if (this.filters.countyId) payload.countyId = this.filters.countyId;
       if (this.filters.payamId) payload.payamId = this.filters.payamId;
       if (this.filters.bomaId) payload.bomaId = this.filters.bomaId;
-      if (this.filters.age) payload.age = this.filters.age;
+      if (this.filters.age != null) payload.age = this.filters.age;
       if (this.filters.gender != null) payload.gender = this.filters.gender;
-      if (this.filters.selectionCriteria) payload.selectionCriteria = this.filters.selectionCriteria;
+      if (this.filters.selectionCriteria != null) payload.selectionCriteria = this.filters.selectionCriteria;
 
       const res = await this.api.POST(
         '/api/monitoring/beneficiaryEnrollment/download',
