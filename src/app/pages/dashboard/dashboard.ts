@@ -36,7 +36,7 @@ export class Dashboard {
       },
       {
         label: 'Report',
-        routerLink: '/under-construction',
+        routerLink: '/home/metabase',
         icon: 'fas fa-chart-line',
       },
       {
