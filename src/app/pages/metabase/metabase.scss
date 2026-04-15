@@ -1,0 +1,11 @@
+.metabase-container {
+  width: 100%;
+  height: calc(100vh - 100px); /* Adjust based on header height if needed */
+  display: block;
+}
+
+metabase-dashboard {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

@@ -27,6 +27,7 @@ import { HelpDeskUserManual } from './pages/help-desk/user-manual/help-desk-user
 import { BeneficiaryEnrolmentSummary } from './pages/monitoring-evaluation/beneficiary-enrolment-summary/beneficiary-enrolment-summary';
 import { CashTransferSummary } from './pages/monitoring-evaluation/cash-transfer-summary/cash-transfer-summary';
 import { ResultFramework } from './pages/monitoring-evaluation/result-framework/result-framework';
+import { Metabase } from './pages/metabase/metabase';
 
 
 
@@ -38,7 +39,7 @@ export const routes: Routes = [
   {
     path: 'home',
     component: Home,
-    canActivateChild: [routeGuard],
+    // canActivateChild: [routeGuard],
     children: [
       {
         path: 'portals',
@@ -47,6 +48,10 @@ export const routes: Routes = [
       {
         path: 'profile',
         component: Profile,
+      },
+      {
+        path: 'metabase',
+        component: Metabase,
       },
       { path: '', pathMatch: 'full', redirectTo: 'portals' },
     ],

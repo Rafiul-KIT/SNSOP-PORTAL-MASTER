@@ -24,5 +24,6 @@ export const environment = {
     }
   },
   authBackend: 'https://qa-gwapp.southsudansafetynet.info/mis_auth',
+  
   cookie_name:'mis_ta'
 };

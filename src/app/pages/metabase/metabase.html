@@ -1,0 +1,16 @@
+<div class="metabase-container">
+  @if (token) {
+    <metabase-dashboard 
+      [attr.token]="token" 
+      with-title="true" 
+      with-downloads="true">
+    </metabase-dashboard>
+  } @else if (error) {
+    <div class="error-message">
+      <p>Error generating Metabase token:</p>
+      <code>{{ error }}</code>
+    </div>
+  } @else {
+    <div class="loading-message">Generating token...</div>
+  }
+</div>
