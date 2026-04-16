@@ -1,11 +1,12 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SignJWT } from 'jose';
 
-// you will need to install via 'npm install jose' or in your package.json
-const METABASE_SECRET_KEY = "900a8210d5a03e1982ed4621f9bc5192d26de8422bdf2617f5baa83e5aa4efad";
+const METABASE_SITE_URL = "https://analytics.southsudansafetynet.info";
+const METABASE_SECRET_KEY = "4aa8ebbd68eb349b3a5559d321f4ae8b1d10382ecc2724bce7fddc179d964859";
 
 const payload = {
-  resource: { dashboard: 4 },
+  resource: { dashboard: 2 },
   params: {},
 };
 
@@ -14,14 +15,17 @@ const payload = {
   standalone: true,
   imports: [],
   templateUrl: './metabase.html',
-  styleUrl: './metabase.scss',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  styleUrl: './metabase.scss'
 })
 export class Metabase implements OnInit {
   token: string = "";
+  iframeUrl: SafeResourceUrl | null = null;
   error: string = "";
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
+  ) {}
 
   async ngOnInit() {
     try {
@@ -43,7 +47,10 @@ export class Metabase implements OnInit {
       .setExpirationTime('10m')
       .sign(secret);
 
-    console.log("Token generated successfully");
+    const url = `${METABASE_SITE_URL}/embed/dashboard/${this.token}#bordered=true&titled=true`;
+    this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+    console.log("Token and iframe URL generated successfully");
     this.cdr.detectChanges();
   }
 }

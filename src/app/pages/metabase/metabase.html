@@ -1,16 +1,19 @@
 <div class="metabase-container">
-  @if (token) {
-    <metabase-dashboard 
-      [attr.token]="token" 
-      with-title="true" 
-      with-downloads="true">
-    </metabase-dashboard>
+  @if (iframeUrl) {
+    <iframe
+      [src]="iframeUrl"
+      title="Metabase Dashboard"
+      frameborder="0"
+      width="100%"
+      height="800"
+      allowtransparency>
+    </iframe>
   } @else if (error) {
     <div class="error-message">
       <p>Error generating Metabase token:</p>
       <code>{{ error }}</code>
     </div>
   } @else {
-    <div class="loading-message">Generating token...</div>
+    <div class="loading-message">Generating dashboard...</div>
   }
 </div>
