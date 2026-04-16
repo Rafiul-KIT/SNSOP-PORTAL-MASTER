@@ -45,62 +45,23 @@ export class ResultFramework implements OnInit {
   payams: IdName[] = [];
   bomas: IdName[] = [];
 
-  sexOptions = [
-    { label: 'Male', value: 1 },
-    { label: 'Female', value: 2 },
-  ];
-
-  legalStatusOptions = [
-    { label: 'Refugee', value: 1 },
-    { label: 'Host Community', value: 2 },
-    { label: 'IDP', value: 3 },
-  ];
-
-  supportTypeOptions = [
-    { label: 'Cash Transfer', value: 1 },
-    { label: 'In-Kind', value: 2 },
-  ];
-
-  indicatorTypeOptions = [
-    { label: 'Project Development Objective Indicators by Objectives/Outcomes', value: 1 },
-    { label: 'Monitoring & Evaluation Plan: Intermediate Results Indicators', value: 2 },
-  ];
+  get genderOptions() { return this.lookupService.genderOptions; }
+  get legalStatusOptions() { return this.lookupService.legalStatusOptions; }
+  get selectionCriteriaOptions() { return this.lookupService.selectionCriteriaOptions; }
+  get paymentCycleOptions() { return this.lookupService.paymentCycleOptions; }
+  get indicatorTypeOptions() { return this.lookupService.indicatorTypeOptions; }
+  get ageRangeOptions() { return this.lookupService.ageRangeOptions; }
+  get grievanceCategoryOptions() { return this.lookupService.grievanceCategoryOptions; }
 
   indicatorOptions: any[] = [];
 
-  private indicatorsByType: Record<number, any[]> = {
-    1: [
-      { label: 'Beneficiaries of social safety net programs', value: 1 },
-      { label: 'Beneficiaries of social safety net programs - Female', value: 2 },
-      { label: 'Beneficiary households of social safety net programs- Refugees', value: 3 },
-      { label: 'Beneficiary households of social safety net programs- Host Communities', value: 4 },
-      { label: 'Beneficiary households of social safety net programs- Female Refugees (Number)', value: 5 },
-      { label: 'Beneficiary households of social safety net programs- Female Host Communities (Number)', value: 6 },
-      { label: 'Beneficiary and non-beneficiary households reporting satisfaction with community assets created through LIPW (Outside MIS-Survey)', value: 7 },
-      { label: 'Beneficiary households receiving economic opportunities', value: 8 },
-      { label: 'Eligible beneficiary households with functional income-generating investments four months after the receipt of the full economic opportunities package', value: 9 },
-      { label: 'Percentage of beneficiaries paid using the enhanced integrated biometric and Management Information Systems', value: 10 },
-    ],
-    2: [
-      { label: 'Number of beneficiary households receiving cash for performing labor intensive public works', value: 11 },
-      { label: 'Number of beneficiaries receiving cash for performing labor intensive public works who are female', value: 12 },
-      { label: 'Number of beneficiary households participating in all sessions of the in-depth Cash Plus training', value: 13 },
-      { label: 'Number of beneficiary households participating in all the sessions of the in-depth Cash Plus training - refugees number', value: 14 },
-      { label: 'Number of beneficiary households participating in all the sessions of the in-depth Cash Plus training - host communities', value: 15 },
-      { label: 'Number of beneficiary households receiving cash transfer for participating in the behavioral change communication training', value: 16 },
-      { label: 'Number of beneficiary households receiving Direct Income Support', value: 17 },
-      { label: 'Percentage of Labor Intensive Public Works subprojects that mitigate climate-induced shocks', value: 18 },
-      { label: 'Number of LIPW work days created', value: 19 },
-      { label: 'Number of beneficiaries receiving cash for performing labor intensive public works who are refugees or host communities', value: 20 },
-      { label: 'Number of beneficiary households receiving Direct Income Support who have a female primary beneficiary (Number)', value: 21 },
-      { label: 'Number of beneficiaries receiving economic opportunities who are youth', value: 22 },
-      { label: 'Number of beneficiaries receiving Economic Opportunities who are female youth', value: 23 },
-      { label: 'Percentage of grievances resolved through the GRM', value: 24 },
-      { label: 'Percentage of cash transfers to beneficiary households made on time', value: 25 },
-      { label: 'Increased participation by women in community level governance and coordination structures', value: 26 },
-      { label: 'Capacity Building Plan for Safety Net is implemented by the Ministry of Gender, Child and Social Welfare', value: 27 },
-    ],
-  };
+  // Conditional filter visibility based on selected indicator
+  showSex = false;
+  showAgeRange = false;
+  showSupportType = false;
+  showLegalStatus = false;
+  showPaymentCycle = false;
+  showGrievanceCategory = false;
 
   // Filters
   filters: any = {
@@ -139,8 +100,97 @@ export class ResultFramework implements OnInit {
   onIndicatorTypeChange(): void {
     this.filters.indicatorId = null;
     this.indicatorOptions = this.filters.indicatorType
-      ? this.indicatorsByType[this.filters.indicatorType] || []
+      ? this.lookupService.getIndicatorsByType(this.filters.indicatorType)
       : [];
+    this.hideAllFilterFields();
+    this.clearConditionalFilters();
+  }
+
+  onIndicatorChange(): void {
+    this.hideAllFilterFields();
+    this.clearConditionalFilters();
+
+    const id = this.filters.indicatorId;
+    if (!id) return;
+
+    switch (id) {
+      case 1:
+      case 10:
+        this.showSex = true;
+        this.showAgeRange = true;
+        this.showSupportType = true;
+        break;
+      case 2:
+      case 3:
+      case 4:
+        this.showAgeRange = true;
+        this.showSupportType = true;
+        break;
+      case 5:
+      case 6:
+        this.showSupportType = true;
+        break;
+      case 8:
+        this.showSex = true;
+        this.showSupportType = true;
+        break;
+      case 9:
+      case 14:
+      case 15:
+        this.showSex = true;
+        this.showAgeRange = true;
+        break;
+      case 11:
+        this.showPaymentCycle = true;
+        this.showAgeRange = true;
+        this.showSex = true;
+        break;
+      case 12:
+      case 19:
+        break;
+      case 13:
+        this.showAgeRange = true;
+        this.showSex = true;
+        this.showLegalStatus = true;
+        break;
+      case 16:
+        this.showSex = true;
+        break;
+      case 17:
+        this.showSex = true;
+        this.showPaymentCycle = true;
+        break;
+      case 20:
+      case 22:
+        this.showSex = true;
+        this.showLegalStatus = true;
+        break;
+      case 21:
+      case 23:
+        this.showLegalStatus = true;
+        break;
+      case 24:
+        this.showGrievanceCategory = true;
+        break;
+    }
+  }
+
+  private hideAllFilterFields(): void {
+    this.showSex = false;
+    this.showAgeRange = false;
+    this.showSupportType = false;
+    this.showLegalStatus = false;
+    this.showPaymentCycle = false;
+    this.showGrievanceCategory = false;
+  }
+
+  private clearConditionalFilters(): void {
+    this.filters.sex = null;
+    this.filters.ageRange = null;
+    this.filters.supportType = null;
+    this.filters.legalStatus = null;
+    this.filters.paymentCycle = null;
+    this.filters.grievanceCategory = null;
   }
 
   async loadStates(): Promise<void> {
@@ -258,6 +308,7 @@ export class ResultFramework implements OnInit {
 
   resetFilters(): void {
     this.indicatorOptions = [];
+    this.hideAllFilterFields();
     this.filters = {
       indicatorType: null,
       indicatorId: null,
