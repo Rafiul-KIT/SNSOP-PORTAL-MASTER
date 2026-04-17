@@ -5,7 +5,7 @@ import { Home } from './pages/home/home';
 import { Profile } from './pages/profile/profile';
 import { Landing } from './pages/landing/landing';
 import { routeGuard } from './route.guard';
-import { authGuard } from './auth.guard';
+
 import { Users } from './pages/user-management/users/users';
 import { Register } from './pages/user-management/register/register';
 import { Role } from './pages/user-management/role/role';
