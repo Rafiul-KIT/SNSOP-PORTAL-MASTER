@@ -13,7 +13,6 @@ import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITCategory, ITModule, ItSupportService } from '../../../../services/it-support.service';
 
-
 @Component({
   selector: 'app-help-desk-submit-request',
   standalone: true,

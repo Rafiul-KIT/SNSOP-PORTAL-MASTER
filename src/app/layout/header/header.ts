@@ -118,6 +118,22 @@ export class Header {
         },
       },
       {
+        label: 'Help Desk',
+        icon: 'fas fa-headset',
+        command: () => {
+          this.router.navigate(['/help-desk/dashboard']);
+          this.showPortalOptions = false;
+        },
+      },
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        command: () => {
+          this.router.navigate(['/under-construction']);
+          this.showPortalOptions = false;
+        },
+      },
+      {
         label: 'M&E',
         icon: 'fas fa-chart-bar',
         command: () => {
@@ -125,6 +141,7 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
+    
     ];
   }
 

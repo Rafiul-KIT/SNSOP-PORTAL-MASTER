@@ -56,6 +56,18 @@ export class Dashboard {
         routerLink: '/monitoring-evaluation/beneficiary-enrolment-summary',
         tooltipText: 'Monitoring & Evaluation'
       },
+      {
+        label: 'Help Desk',
+        icon: 'fas fa-headset',
+        routerLink: '/help-desk/dashboard',
+        tooltipText: 'IT Support Help Desk'
+      },
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        routerLink: '/under-construction',
+        tooltipText: 'Economic Opportunities (Coming Soon)'
+      },
     ];
   }
 }
