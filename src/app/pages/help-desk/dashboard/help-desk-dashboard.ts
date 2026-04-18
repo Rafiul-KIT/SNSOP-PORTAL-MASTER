@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ChartModule } from 'primeng/chart';
 import { Loader } from '../../../components/loader/loader';
+import { LoadingService } from '../../../../services/loading.service';
 import { ITDashboardCount, ITDashboardData, ITDashboardModuleSummary, ITDashboardMonthReport, ItSupportService } from '../../../../services/it-support.service';
 
 @Component({
@@ -46,7 +47,8 @@ export class HelpDeskDashboard implements OnInit {
     private router: Router,
     private itSupportService: ItSupportService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private loadingService: LoadingService
   ) {}
 
   private detectChanges(): void {
@@ -100,6 +102,7 @@ export class HelpDeskDashboard implements OnInit {
 
   async loadDashboardData(): Promise<void> {
     this.isLoading = true;
+    this.loadingService.show();
     this.detectChanges();
 
     this.zone.runOutsideAngular(async () => {
@@ -129,6 +132,7 @@ export class HelpDeskDashboard implements OnInit {
           this.buildCharts();
 
           this.isLoading = false;
+          this.loadingService.hide();
           this.detectChanges();
         });
       } catch (error) {
@@ -140,6 +144,7 @@ export class HelpDeskDashboard implements OnInit {
           this.moduleChartData = null;
           this.sixMonthsChartData = null;
           this.isLoading = false;
+          this.loadingService.hide();
           this.detectChanges();
         });
       }
