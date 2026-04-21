@@ -13,7 +13,7 @@
     @if (isLoading) {
       <div class="loading-message">
         <div class="spinner"></div>
-        <p>Loading {{ dashboards[currentDashboardId]?.name || 'Dashboard' }}...</p>
+        <p>Loading {{ dashboards[currentDashboardId].name || 'Dashboard' }}...</p>
       </div>
     } @else if (iframeUrl) {
       <iframe

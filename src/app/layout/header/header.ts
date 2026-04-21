@@ -25,6 +25,7 @@ export class Header {
   isLandingPage = false;
   isSurveyCtoPage = false;
   isMonitoringPage = false;
+  isEconomicOpportunitiesPage = false;
   isLoading = false;
   canAccessHelpDesk: boolean = false;
   showHelpDeskDropdown: boolean = false;
@@ -51,7 +52,13 @@ export class Header {
         );
         this.isSurveyCtoPage = event.urlAfterRedirects.startsWith('/survey-cto') || event.urlAfterRedirects.startsWith('/cto-dashboard');
         this.isMonitoringPage = event.urlAfterRedirects.startsWith('/monitoring-evaluation');
-        this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage, this.isMonitoringPage);
+        this.isEconomicOpportunitiesPage = event.urlAfterRedirects.startsWith('/economic-opportunities');
+        this.updateMenuList(
+          isUserManagementPage,
+          this.isSurveyCtoPage,
+          this.isMonitoringPage,
+          this.isEconomicOpportunitiesPage
+        );
       });
 
     // Watch login state
@@ -73,7 +80,13 @@ export class Header {
         this.canAccessHelpDesk = false;
       }
       this.isMonitoringPage = this.router.url.startsWith('/monitoring-evaluation');
-      this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage, this.isMonitoringPage);
+      this.isEconomicOpportunitiesPage = this.router.url.startsWith('/economic-opportunities');
+      this.updateMenuList(
+        isUserManagementPage,
+        this.isSurveyCtoPage,
+        this.isMonitoringPage,
+        this.isEconomicOpportunitiesPage
+      );
     });
 
     // Static portal links (unchanged)
@@ -125,22 +138,23 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
-      {
-        label: 'Economic Opportunities',
-        icon: 'fas fa-briefcase',
-        command: () => {
-          this.router.navigate(['/under-construction']);
-          this.showPortalOptions = false;
-        },
-      },
-      {
-        label: 'M&E',
+         {
+        label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
         command: () => {
           this.router.navigate(['/monitoring-evaluation/beneficiary-enrolment-summary']);
           this.showPortalOptions = false;
         },
       },
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        command: () => {
+          this.router.navigate(['/economic-opportunities/dashboard']);
+          this.showPortalOptions = false;
+        },
+      },
+   
     
     ];
   }
@@ -222,7 +236,37 @@ export class Header {
     ];
   }
 
-  updateMenuList(isUserManagementPage: boolean, isSurveyCtoPage: boolean, isMonitoringPage: boolean = false) {
+  getEconomicOpportunitiesMenus(): MenuItem[] {
+    return [
+      {
+        label: 'Economic Opportunities Dashboard',
+        icon: 'fas fa-chart-bar',
+        routerLink: ['/economic-opportunities/dashboard'],
+      },
+      {
+        label: 'Template Importing',
+        icon: 'fas fa-file-import',
+        routerLink: ['/economic-opportunities/template-importing'],
+      },
+      {
+        label: 'Household Group View',
+        icon: 'fas fa-users',
+        routerLink: ['/economic-opportunities/household-group-view'],
+      },
+      {
+        label: 'Audit Record Download',
+        icon: 'fas fa-file-download',
+        routerLink: ['/economic-opportunities/audit-record-download'],
+      },
+    ];
+  }
+
+  updateMenuList(
+    isUserManagementPage: boolean,
+    isSurveyCtoPage: boolean,
+    isMonitoringPage: boolean = false,
+    isEconomicOpportunitiesPage: boolean = false
+  ) {
     if (this.isLandingPage) {
       this.menuList = [];
       return;
@@ -235,6 +279,11 @@ export class Header {
 
     if (isMonitoringPage) {
       this.menuList = this.getMonitoringMenus();
+      return;
+    }
+
+    if (isEconomicOpportunitiesPage) {
+      this.menuList = this.getEconomicOpportunitiesMenus();
       return;
     }
 
