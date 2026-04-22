@@ -5,7 +5,7 @@ import { Home } from './pages/home/home';
 import { Profile } from './pages/profile/profile';
 import { Landing } from './pages/landing/landing';
 import { routeGuard } from './route.guard';
-import { authGuard } from './auth.guard';
+
 import { Users } from './pages/user-management/users/users';
 import { Register } from './pages/user-management/register/register';
 import { Role } from './pages/user-management/role/role';
@@ -17,16 +17,13 @@ import { SurveyCto } from './pages/survey-cto/survey-cto/survey-cto';
 import { SurveyCtoImport } from './pages/survey-cto/survey-cto-import/survey-cto-import';
 import { SurveyCtoReport } from './pages/survey-cto/survey-cto-report/survey-cto-report';
 import { SurveyCtoDashboard } from './pages/survey-cto-dashboard/survey-cto-dashboard';
-import { HelpDeskDashboard } from './pages/help-desk/dashboard/help-desk-dashboard';
-import { HelpDeskSubmitRequest } from './pages/help-desk/submit-request/help-desk-submit-request';
-import { HelpDeskMyRequests } from './pages/help-desk/my-requests/help-desk-my-requests';
-import { HelpDeskSupportManagement } from './pages/help-desk/support-management/help-desk-support-management';
-import { HelpDeskStatusTracker } from './pages/help-desk/status-tracker/help-desk-status-tracker';
-import { HelpDeskReports } from './pages/help-desk/reports/help-desk-reports';
-import { HelpDeskUserManual } from './pages/help-desk/user-manual/help-desk-user-manual';
 import { BeneficiaryEnrolmentSummary } from './pages/monitoring-evaluation/beneficiary-enrolment-summary/beneficiary-enrolment-summary';
 import { CashTransferSummary } from './pages/monitoring-evaluation/cash-transfer-summary/cash-transfer-summary';
 import { ResultFramework } from './pages/monitoring-evaluation/result-framework/result-framework';
+import { EconomicOpportunitiesDashboard } from './pages/economic-opportunities/dashboard/economic-opportunities-dashboard';
+import { EconomicOpportunitiesTemplateImporting } from './pages/economic-opportunities/template-importing/economic-opportunities-template-importing';
+import { EconomicOpportunitiesHouseholdGroupView } from './pages/economic-opportunities/household-group-view/economic-opportunities-household-group-view';
+import { EconomicOpportunitiesAuditRecordDownload } from './pages/economic-opportunities/audit-record-download/economic-opportunities-audit-record-download';
 import { Metabase } from './pages/metabase/metabase';
 
 
@@ -88,17 +85,7 @@ export const routes: Routes = [
   {
     path: 'help-desk',
     canActivate: [routeGuard],
-    children: [
-      { path: 'dashboard', component: HelpDeskDashboard, canActivate: [routeGuard] },
-      { path: 'submit-request', component: HelpDeskSubmitRequest, canActivate: [routeGuard] },
-      { path: 'my-requests', component: HelpDeskMyRequests, canActivate: [routeGuard] },
-      { path: 'support-management', component: HelpDeskSupportManagement, canActivate: [routeGuard] },
-      { path: 'status-tracker', component: HelpDeskStatusTracker, canActivate: [routeGuard] },
-      { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
-      { path: 'user-manual', component: HelpDeskUserManual, canActivate: [routeGuard] },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-    ]
-   
+    loadChildren: () => import('./pages/help-desk/help-desk.routes').then(m => m.HELP_DESK_ROUTES)
   },
   {
      path: 'monitoring-evaluation',
@@ -108,6 +95,17 @@ export const routes: Routes = [
       { path: 'cash-transfer-summary', component: CashTransferSummary, canActivate: [routeGuard], },
       { path: 'result-framework', component: ResultFramework, canActivate: [routeGuard], },
       { path: '', redirectTo: 'beneficiary-enrolment-summary', pathMatch: 'full' }
+    ]
+  },
+  {
+     path: 'economic-opportunities',
+    canActivate: [routeGuard],
+    children: [
+      { path: 'dashboard', component: EconomicOpportunitiesDashboard, canActivate: [routeGuard], },
+      { path: 'template-importing', component: EconomicOpportunitiesTemplateImporting, canActivate: [routeGuard], },
+      { path: 'household-group-view', component: EconomicOpportunitiesHouseholdGroupView, canActivate: [routeGuard], },
+      { path: 'audit-record-download', component: EconomicOpportunitiesAuditRecordDownload, canActivate: [routeGuard], },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
   { path: 'unauthorized', component: Unauthorized },

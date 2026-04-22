@@ -1,0 +1,122 @@
+.eo-page {
+  padding: 0.75rem 0.25rem;
+}
+
+.eo-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin: 0.35rem 0 1rem;
+  font-size: 1.1rem;
+}
+
+.crumb-muted {
+  color: #101828;
+}
+
+.crumb-link,
+.crumb-current {
+  color: #2b6eb3;
+}
+
+.eo-panel {
+  border: 1px solid #2f76b5;
+  border-radius: 4px;
+  background: #f7f7f7;
+}
+
+.eo-panel-header {
+  background: #3579b4;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.9rem;
+  padding: 0.9rem 1.1rem;
+}
+
+.eo-panel-body {
+  padding: 2.2rem 2rem;
+}
+
+.eo-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 4rem;
+  margin-bottom: 1.8rem;
+}
+
+.eo-field {
+  display: grid;
+  grid-template-columns: 230px minmax(220px, 260px);
+  align-items: center;
+  gap: 1rem;
+}
+
+.eo-field label {
+  color: #202731;
+  font-size: 1.95rem;
+  line-height: 1.2;
+}
+
+.form-select {
+  height: 40px;
+  font-size: 1.6rem;
+}
+
+.required-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.required-star {
+  color: #d10000;
+  font-size: 1.35rem;
+}
+
+.eo-action-row {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.6rem;
+}
+
+.eo-action-row .btn {
+  font-size: 1.6rem;
+}
+
+@media (max-width: 991.98px) {
+  .eo-breadcrumb {
+    flex-wrap: wrap;
+    gap: 0.8rem 1.4rem;
+    font-size: 1rem;
+  }
+
+  .eo-panel-header {
+    font-size: 1.25rem;
+  }
+
+  .eo-panel-body {
+    padding: 1rem;
+  }
+
+  .eo-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .eo-field {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .eo-field label {
+    font-size: 1rem;
+  }
+
+  .form-select {
+    font-size: 1rem;
+  }
+
+  .eo-action-row .btn {
+    font-size: 1rem;
+  }
+}

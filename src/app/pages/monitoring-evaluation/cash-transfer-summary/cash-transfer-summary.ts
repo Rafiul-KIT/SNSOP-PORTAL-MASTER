@@ -30,7 +30,6 @@ import { Select } from 'primeng/select';
     Toast,
     Loader,
     Paginator,
-    InputText,
     FloatLabel,
     Select,
   ],
