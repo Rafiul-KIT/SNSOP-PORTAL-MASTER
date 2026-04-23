@@ -109,7 +109,7 @@ export class Header {
       {
         label: 'Report',
         command: () => {
-          this.router.navigate(['/under-construction']);
+          this.router.navigate(['/home/metabase']);
           this.showPortalOptions = false;
         },
         icon: 'fas fa-chart-line',
@@ -154,8 +154,8 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
-   
-    
+
+
     ];
   }
 

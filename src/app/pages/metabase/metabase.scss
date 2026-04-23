@@ -13,16 +13,16 @@
   button {
     padding: 10px 20px;
     border: 1px solid #007bff;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     color: #007bff;
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
 
-    &:hover:not(:disabled) {
-      background-color: #f0f7ff;
-    }
+    // &:hover:not(:disabled) {
+    //   background-color: #007bff;
+    // }
 
     &.active {
       background-color: #007bff;
