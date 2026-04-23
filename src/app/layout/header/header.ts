@@ -291,7 +291,16 @@ export class Header {
     const permittedMenus = state?.menus || [];
 
     // Get the current route path without query parameters
-    const currentPath = this.router.url.split('?')[0];  // Strip out query parameters
+    const currentPath = this.router.url.split('?')[0]; // Strip out query parameters
+    const isHelpDeskPage = currentPath.startsWith('/help-desk/');
+    const hasHelpDeskAccess = permittedMenus
+      .map((m: any) => m.name)
+      .includes('Help Desk');
+
+    if (isHelpDeskPage) {
+      this.menuList = hasHelpDeskAccess ? this.getHelpDeskMenuItems() : [];
+      return;
+    }
 
     // Filter backend menus only for master portal ones
     const masterMenus = permittedMenus.filter(
@@ -326,7 +335,7 @@ export class Header {
     return item.label ?? index.toString(); // fallback to index if label is undefined
   }
 
-  getHelpDeskMenuItems(): any[] {
+  getHelpDeskMenuItems(): MenuItem[] {
     return [
       { label: 'Help Desk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
       { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
