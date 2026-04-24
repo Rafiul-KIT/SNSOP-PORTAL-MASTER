@@ -6,6 +6,7 @@ import { HelpDeskSupportManagement } from './support-management/help-desk-suppor
 import { HelpDeskStatusTracker } from './status-tracker/help-desk-status-tracker';
 import { HelpDeskReports } from './reports/help-desk-reports';
 import { HelpDeskUserManual } from './user-manual/help-desk-user-manual';
+import { HelpDeskRequestDetails } from './request-details/help-desk-request-details';
 import { routeGuard } from '../../route.guard';
 
 export const HELP_DESK_ROUTES: Routes = [
@@ -16,5 +17,6 @@ export const HELP_DESK_ROUTES: Routes = [
   { path: 'status-tracker', component: HelpDeskStatusTracker, canActivate: [routeGuard] },
   { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
   { path: 'user-manual', component: HelpDeskUserManual, canActivate: [routeGuard] },
+  { path: 'request-details/:id', component: HelpDeskRequestDetails, canActivate: [routeGuard] },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ];
