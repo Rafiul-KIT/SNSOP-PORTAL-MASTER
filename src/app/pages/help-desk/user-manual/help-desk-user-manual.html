@@ -3,60 +3,174 @@
 </div>
 
 <div class="helpdesk-container">
-  <!-- Page Header -->
   <div class="page-header">
     <div>
       <h2 class="page-title">User Manual / Help Menu</h2>
-      <p class="page-subtitle">Access guidance, FAQs, workflow instructions, and support usage policies.</p>
+      <p class="page-subtitle">Role-based guidance for SNSOP MIS workflows, approvals, and payment operations.</p>
     </div>
     <div class="header-actions">
-      <!-- <p-button label="Export Report" icon="fas fa-download" [outlined]="true" severity="primary" size="small"></p-button> -->
-      <p-button label="Open Guide" icon="fas fa-book-open" severity="primary" size="small"></p-button>
+      <p-button label="Open Guide" icon="fas fa-book-open" severity="primary" size="small" (onClick)="openGuide()"></p-button>
     </div>
   </div>
 
   <div class="row g-3">
-    <!-- FAQ Accordion -->
-    <div class="col-lg-8">
-      <div class="card p-3">
-        <h5 class="card-section-title mb-3">User Manual / Help Menu</h5>
-        <p-accordion [multiple]="false">
-          @for (faq of faqs; track faq.question) {
-            <p-accordion-panel>
-              <p-accordion-header>{{ faq.question }}</p-accordion-header>
-              <p-accordion-content>
-                <p class="faq-answer">{{ faq.answer }}</p>
-              </p-accordion-content>
-            </p-accordion-panel>
+    <div class="col-xl-3 col-lg-4">
+      <div class="card p-3 role-card">
+        <h5 class="card-section-title mb-2">Role Directory</h5>
+        <p class="card-muted mb-3">Choose a role to load its optimized workflow manual.</p>
+
+        <div class="role-list">
+          @for (role of roles; track role.id) {
+            <button
+              type="button"
+              class="role-item"
+              [class.active]="role.id === selectedRoleId"
+              [style.border-left-color]="role.color"
+              (click)="selectRole(role.id)"
+            >
+              <span class="role-icon" [style.color]="role.color">
+                <i [class]="role.iconClass"></i>
+              </span>
+              <span class="role-content">
+                <span class="role-name">{{ role.name }}</span>
+                <span class="role-desc">{{ role.shortDescription }}</span>
+              </span>
+            </button>
           }
-        </p-accordion>
+        </div>
+
+        <div class="summary-panel mt-3">
+          <div class="summary-item">
+            <span class="summary-label">Current Role</span>
+            <span class="summary-value">{{ selectedRole.name }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Modules</span>
+            <span class="summary-value">{{ filteredSections.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Visible Steps</span>
+            <span class="summary-value">{{ totalStepCount }}</span>
+          </div>
+        </div>
+
+        <div class="approval-chain mt-3">
+          <h6 class="mini-title">Approval Chain</h6>
+          <div class="chain-list">
+            @for (stage of approvalPath; track stage) {
+              <span class="chain-pill" [class.current]="stage === selectedRole.name">{{ stage }}</span>
+            }
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Quick Help Sidebar -->
-    <div class="col-lg-4">
-      <div class="card p-3 mb-3">
-        <h5 class="card-section-title mb-2">Quick Help</h5>
+    <div class="col-xl-9 col-lg-8">
+      <div class="card p-3 manual-card" [style.--role-accent]="selectedRole.color">
+        <div class="manual-toolbar">
+          <div class="toolbar-left">
+            <span class="manual-badge" [style.background]="selectedRole.color + '1A'" [style.color]="selectedRole.color">
+              <i [class]="selectedRole.iconClass"></i>
+              {{ selectedRole.name }}
+            </span>
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                [value]="searchTerm"
+                (input)="onSearchInput($event)"
+                placeholder="Search modules, steps, or keywords"
+                aria-label="Search manual content"
+              />
+              @if (hasSearchQuery) {
+                <button type="button" class="clear-search" (click)="clearSearch()">Clear</button>
+              }
+            </div>
+          </div>
 
-        <div class="help-section mb-3">
-          <h6 class="help-section-title">Helpdesk Contact</h6>
-          <p class="mb-1"><small>Email: support&#64;snsopmis.demo</small></p>
-          <p class="mb-0"><small>Phone: +211-000-000-000</small></p>
+          <div class="toolbar-actions">
+            <p-button
+              label="Expand All"
+              icon="fas fa-expand-alt"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              (onClick)="expandAllSections()"
+            ></p-button>
+            <p-button
+              label="Collapse All"
+              icon="fas fa-compress-alt"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              (onClick)="collapseAllSections()"
+            ></p-button>
+          </div>
         </div>
 
-        <div class="help-section mb-3">
-          <h6 class="help-section-title">Popular Topics</h6>
-          <ul class="popular-list">
-            @for (topic of popularTopics; track topic) {
-              <li>{{ topic }}</li>
+        <div class="topics-bar">
+          <span class="topics-label">Popular Topics</span>
+          <div class="topics-list">
+            @for (topic of selectedRole.popularTopics; track topic) {
+              <button type="button" class="topic-chip" (click)="applyTopicFilter(topic)">
+                {{ topic }}
+              </button>
             }
-          </ul>
+          </div>
         </div>
 
-        <div class="help-section">
-          <h6 class="help-section-title">Demo Note</h6>
-          <p class="demo-note mb-0">This is a fictional end-to-end UI demo showing how all left menu items can behave like a full module.</p>
+        <div class="toc-bar">
+          <span class="toc-label">Table of Contents</span>
+          <div class="toc-list">
+            @for (section of filteredSections; track section.id) {
+              <button type="button" class="toc-chip" (click)="scrollToSection(section.id)">
+                {{ section.title }}
+              </button>
+            }
+          </div>
         </div>
+
+        @if (filteredSections.length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <p>No manual sections matched your search. Try a broader keyword.</p>
+          </div>
+        } @else {
+          <div class="section-list">
+            @for (section of filteredSections; track section.id) {
+              <article class="manual-section" [id]="section.id" [class.expanded]="isSectionExpanded(section.id)">
+                <button type="button" class="section-header" (click)="toggleSection(section.id)">
+                  <div class="section-heading">
+                    <h6>{{ section.title }}</h6>
+                    <p>{{ section.overview }}</p>
+                  </div>
+                  <i class="fas" [class.fa-chevron-down]="!isSectionExpanded(section.id)" [class.fa-chevron-up]="isSectionExpanded(section.id)"></i>
+                </button>
+
+                @if (isSectionExpanded(section.id)) {
+                  <div class="section-body">
+                    <ol class="step-list">
+                      @for (step of section.steps; track step) {
+                        <li>{{ step }}</li>
+                      }
+                    </ol>
+
+                    @if (section.tips?.length) {
+                      <div class="tips-wrap">
+                        <div class="tips-title">Operational Notes</div>
+                        <ul>
+                          @for (tip of section.tips; track tip) {
+                            <li>{{ tip }}</li>
+                          }
+                        </ul>
+                      </div>
+                    }
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        }
       </div>
     </div>
   </div>
