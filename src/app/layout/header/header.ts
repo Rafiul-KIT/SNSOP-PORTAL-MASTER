@@ -25,6 +25,7 @@ export class Header {
   isLandingPage = false;
   isSurveyCtoPage = false;
   isMonitoringPage = false;
+  isEconomicOpportunitiesPage = false;
   isLoading = false;
   canAccessHelpDesk: boolean = false;
   showHelpDeskDropdown: boolean = false;
@@ -51,7 +52,13 @@ export class Header {
         );
         this.isSurveyCtoPage = event.urlAfterRedirects.startsWith('/survey-cto') || event.urlAfterRedirects.startsWith('/cto-dashboard');
         this.isMonitoringPage = event.urlAfterRedirects.startsWith('/monitoring-evaluation');
-        this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage, this.isMonitoringPage);
+        this.isEconomicOpportunitiesPage = event.urlAfterRedirects.startsWith('/economic-opportunities');
+        this.updateMenuList(
+          isUserManagementPage,
+          this.isSurveyCtoPage,
+          this.isMonitoringPage,
+          this.isEconomicOpportunitiesPage
+        );
       });
 
     // Watch login state
@@ -73,7 +80,13 @@ export class Header {
         this.canAccessHelpDesk = false;
       }
       this.isMonitoringPage = this.router.url.startsWith('/monitoring-evaluation');
-      this.updateMenuList(isUserManagementPage, this.isSurveyCtoPage, this.isMonitoringPage);
+      this.isEconomicOpportunitiesPage = this.router.url.startsWith('/economic-opportunities');
+      this.updateMenuList(
+        isUserManagementPage,
+        this.isSurveyCtoPage,
+        this.isMonitoringPage,
+        this.isEconomicOpportunitiesPage
+      );
     });
 
     // Static portal links (unchanged)
@@ -96,7 +109,7 @@ export class Header {
       {
         label: 'Report',
         command: () => {
-          this.router.navigate(['/under-construction']);
+          this.router.navigate(['/home/metabase']);
           this.showPortalOptions = false;
         },
         icon: 'fas fa-chart-line',
@@ -125,23 +138,24 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
-      {
-        label: 'Economic Opportunities',
-        icon: 'fas fa-briefcase',
-        command: () => {
-          this.router.navigate(['/under-construction']);
-          this.showPortalOptions = false;
-        },
-      },
-      {
-        label: 'M&E',
+         {
+        label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
         command: () => {
           this.router.navigate(['/monitoring-evaluation/beneficiary-enrolment-summary']);
           this.showPortalOptions = false;
         },
       },
-    
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        command: () => {
+          this.router.navigate(['/economic-opportunities/dashboard']);
+          this.showPortalOptions = false;
+        },
+      },
+
+
     ];
   }
 
@@ -222,7 +236,37 @@ export class Header {
     ];
   }
 
-  updateMenuList(isUserManagementPage: boolean, isSurveyCtoPage: boolean, isMonitoringPage: boolean = false) {
+  getEconomicOpportunitiesMenus(): MenuItem[] {
+    return [
+      {
+        label: 'Economic Opportunities Dashboard',
+        icon: 'fas fa-chart-bar',
+        routerLink: ['/economic-opportunities/dashboard'],
+      },
+      {
+        label: 'Template Importing',
+        icon: 'fas fa-file-import',
+        routerLink: ['/economic-opportunities/template-importing'],
+      },
+      {
+        label: 'Household Group View',
+        icon: 'fas fa-users',
+        routerLink: ['/economic-opportunities/household-group-view'],
+      },
+      {
+        label: 'Audit Record Download',
+        icon: 'fas fa-file-download',
+        routerLink: ['/economic-opportunities/audit-record-download'],
+      },
+    ];
+  }
+
+  updateMenuList(
+    isUserManagementPage: boolean,
+    isSurveyCtoPage: boolean,
+    isMonitoringPage: boolean = false,
+    isEconomicOpportunitiesPage: boolean = false
+  ) {
     if (this.isLandingPage) {
       this.menuList = [];
       return;
@@ -238,11 +282,25 @@ export class Header {
       return;
     }
 
+    if (isEconomicOpportunitiesPage) {
+      this.menuList = this.getEconomicOpportunitiesMenus();
+      return;
+    }
+
     const state = this.azureService.loginState();
     const permittedMenus = state?.menus || [];
 
     // Get the current route path without query parameters
-    const currentPath = this.router.url.split('?')[0];  // Strip out query parameters
+    const currentPath = this.router.url.split('?')[0]; // Strip out query parameters
+    const isHelpDeskPage = currentPath.startsWith('/help-desk/');
+    const hasHelpDeskAccess = permittedMenus
+      .map((m: any) => m.name)
+      .includes('Help Desk');
+
+    if (isHelpDeskPage) {
+      this.menuList = hasHelpDeskAccess ? this.getHelpDeskMenuItems() : [];
+      return;
+    }
 
     // Filter backend menus only for master portal ones
     const masterMenus = permittedMenus.filter(
@@ -277,7 +335,7 @@ export class Header {
     return item.label ?? index.toString(); // fallback to index if label is undefined
   }
 
-  getHelpDeskMenuItems(): any[] {
+  getHelpDeskMenuItems(): MenuItem[] {
     return [
       { label: 'Help Desk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
       { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },

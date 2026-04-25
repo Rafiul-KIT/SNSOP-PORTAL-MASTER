@@ -1,26 +1,18 @@
 import { inject } from '@angular/core';
-import {
-  CanActivateChildFn,
-  Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../environments/environment';
-import axios from 'axios';
-import { AzureAdAuthService } from '../services/azure-ad-auth.service';
+import { ApiService } from '../services/api.service';
 
-export const routeGuard: CanActivateChildFn = async (
-  childRoute: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
-) => {
-  const router = inject(Router);
+export const routeGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const cookieService = inject(CookieService);
-  const authService = inject(AzureAdAuthService);
-  const apiService = inject(AzureAdAuthService);
+  const router = inject(Router);
+  const apiService = inject(ApiService);
 
-  const token = cookieService.get(environment.cookie_name);
+  const ACCESS_TOKEN = environment.cookie_name;
+  const token = cookieService.get(ACCESS_TOKEN);
+
   // Check if the user is logged in
   if (!token) {
     const redirectUrl = `${environment.portals.master}/#/landing`;
@@ -43,40 +35,65 @@ export const routeGuard: CanActivateChildFn = async (
     return false;
   }
 
-  // Define routes that are always allowed for authenticated users
-  const alwaysAllowedPaths = ['portals', 'profile'];
-  const childPath = childRoute.routeConfig?.path || '';
-
-  if (alwaysAllowedPaths.includes(childPath)) {
-    return true; // Allow access to common pages
+  // Get menus from sessionStorage
+  const menus = sessionStorage.getItem(`menus_${decoded.roleId}`);
+  if (!menus) {
+    router.navigateByUrl('/unauthorized');
+    return false;
   }
 
-  // If menus not yet loaded, fetch them
-  let menus = authService.getMenus();
-  if (!menus || menus.length === 0) {
-    try {
-      const resp = await axios.get(
-        `${environment.authBackend}/api/menus/role/${decoded.roleId}`
-      );
-      menus = resp.data?.data || [];
-      const current = authService.loginState();
-      authService.loginState.set({ ...current, menus });
-    } catch (err) {
-      console.error('Failed to fetch menus in guard:', err);
-      router.navigateByUrl('/unauthorized');
-      return false;
+  const permittedMenus = JSON.parse(menus);
+  const targetUrl = state.url.split('?')[0]; // Strip query parameters
+
+  const hasAccess = (menus: any[], url: string): boolean => {
+    const cleanUrl = url.split('?')[0]; // Remove query parameters from the URL
+    const urlSegments = cleanUrl.split('/').filter(s => s.length > 0);
+
+    for (const menu of menus) {
+      if (!menu.url) continue;
+
+      const menuUrlSegments = menu.url.split('/').filter((s: string) => s.length > 0);
+
+      // Check for exact match or parameterized match
+      if (urlSegments.length === menuUrlSegments.length) {
+        let match = true;
+        for (let i = 0; i < urlSegments.length; i++) {
+          // If the menu segment is a parameter placeholder (e.g., ':id'), it matches any value
+          // Otherwise, segments must match exactly
+          if (menuUrlSegments[i].startsWith(':') || menuUrlSegments[i] === urlSegments[i]) {
+            continue;
+          } else {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          return true;
+        }
+      }
     }
-  }
+    // If the route is not found in the menu, allow access to known dynamic paths like:
+    //  - /beneficiary/details/:id
+    //  - /beneficiary/edit/:applicationId
+    //  - Any other parameterized route you want to allow
+    const dynamicRoutePrefixes = [
+    
+      '/help-desk/',
+      '/help-desk/support-management',
+      '/help-desk/support-management/',
+    ];
 
-  // Check if the target URL is in the user's permitted menus
-  const targetUrl = state.url;
+    // Check if the route starts with any of the dynamic prefixes
+    for (const prefix of dynamicRoutePrefixes) {
+      if (cleanUrl.startsWith(prefix)) {
+        return true; // Allow access to dynamic routes
+      }
+    }
 
-  // Strip query parameters from the URL (ignore the query part)
-  const urlToCheck = targetUrl.split('?')[0].startsWith('/')
-    ? targetUrl.split('?')[0].substring(1)
-    : targetUrl.split('?')[0]; // Strip query parameters and ensure no leading slashes
+    return false;
+  };
 
-  const allowed = menus.some((menu: any) => menu.url === urlToCheck);
+  const allowed = hasAccess(permittedMenus, targetUrl);
 
   if (!allowed) {
     console.warn('Access denied for route:', targetUrl);

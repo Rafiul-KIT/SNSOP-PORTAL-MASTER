@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SignJWT } from 'jose';
 
 const METABASE_SITE_URL = "https://analytics.southsudansafetynet.info";
-const METABASE_SECRET_KEY = "4aa8ebbd68eb349b3a5559d321f4ae8b1d10382ecc2724bce7fddc179d964859";
+const METABASE_SECRET_KEY = "900a8210d5a03e1982ed4621f9bc5192d26de8422bdf2617f5baa83e5aa4efad";
 
 @Component({
   selector: 'app-metabase',
@@ -14,12 +14,12 @@ const METABASE_SECRET_KEY = "4aa8ebbd68eb349b3a5559d321f4ae8b1d10382ecc2724bce7f
   styleUrl: './metabase.scss'
 })
 export class Metabase implements OnInit {
-  currentDashboardId: number = 2; // Default dashboard
+  currentDashboardId: number = 6; // Default dashboard
   dashboards = [
-    { id: 2, name: 'Main Dashboard' },
-    { id: 1, name: 'Overview' },
-    { id: 3, name: 'Analytics' },
-    { id: 4, name: 'Reports' }
+    { id: 6, name: 'Latest Beneficiaries' },
+    { id: 46, name: 'Overview' },
+    { id: 5, name: 'Payment Report' },
+    { id: 4, name: 'Reconciliation Summary Report' }
   ];
 
   token: string = "";

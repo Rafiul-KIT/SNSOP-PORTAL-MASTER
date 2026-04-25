@@ -83,14 +83,16 @@ export class HelpDeskSupportManagement implements OnInit {
     this.loadRequests();
   }
 
-  async loadRequests(): Promise<void> {
+  async loadRequests(useFilters: boolean = true): Promise<void> {
     this.isLoading = true;
     this.cdr.detectChanges();
 
     const params: any = { page: 0, size: 50 };
-    if (this.selectedStatus) params.status = this.selectedStatus;
-    if (this.selectedPriority) params.priority = this.selectedPriority;
-    if (this.searchText.trim()) params.search = this.searchText.trim();
+    if (useFilters) {
+      if (this.selectedStatus) params.status = this.selectedStatus;
+      if (this.selectedPriority) params.priority = this.selectedPriority;
+      if (this.searchText.trim()) params.search = this.searchText.trim();
+    }
 
     try {
       const result = await this.itSupportService.getRequests(params);

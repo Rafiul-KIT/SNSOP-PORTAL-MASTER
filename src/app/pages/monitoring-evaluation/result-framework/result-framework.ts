@@ -28,7 +28,6 @@ import { Select } from 'primeng/select';
     ButtonModule,
     Toast,
     Loader,
-    InputText,
     FloatLabel,
     Select,
   ],
