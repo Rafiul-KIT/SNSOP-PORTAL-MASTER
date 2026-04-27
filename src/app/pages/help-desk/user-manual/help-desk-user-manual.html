@@ -8,7 +8,7 @@
 
   </div>
 
-  @if (isLoading) {
+  @if (loading$ | async) {
    <app-loader/>
 
   } @else if (loadError) {

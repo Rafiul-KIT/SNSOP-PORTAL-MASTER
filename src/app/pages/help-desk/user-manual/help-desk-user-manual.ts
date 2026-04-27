@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { Loader } from '../../../components/loader/loader';
+import { LoadingService } from '../../../../services/loading.service';
 interface ManualSection {
   id: string;
   index: number | null;
@@ -78,11 +79,17 @@ export class HelpDeskUserManual implements OnInit {
   searchTerm = '';
   expandedSectionIds = new Set<string>();
 
-  isLoading = true;
   loadError = '';
   lightboxImageSrc = '';
 
-  constructor(private readonly http: HttpClient) {}
+  get loading$() {
+    return this.loadingService.loading$;
+  }
+
+  constructor(
+    private readonly http: HttpClient,
+    private readonly loadingService: LoadingService
+  ) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadManualContent();
@@ -254,7 +261,7 @@ export class HelpDeskUserManual implements OnInit {
   }
 
   private async loadManualContent(): Promise<void> {
-    this.isLoading = true;
+    this.loadingService.show();
     this.loadError = '';
 
     try {
@@ -269,10 +276,9 @@ export class HelpDeskUserManual implements OnInit {
       this.expandedSectionIds = new Set<string>();
       console.error(error);
     } finally {
-      this.isLoading = false;
-      
+      this.loadingService.hide();
     }
- }
+  }
 
   private normalizeRoles(payloadRoles: ManualPayloadRole[]): ManualRole[] {
     return payloadRoles.map((role) => {
