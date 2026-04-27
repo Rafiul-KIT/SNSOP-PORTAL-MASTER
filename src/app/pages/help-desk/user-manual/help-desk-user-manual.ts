@@ -4,7 +4,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
-
+import { Loader } from '../../../components/loader/loader';
 interface ManualSection {
   id: string;
   index: number | null;
@@ -54,7 +54,7 @@ interface ManualPayload {
 @Component({
   selector: 'app-help-desk-user-manual',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, BreadcrumbModule, ButtonModule],
+  imports: [CommonModule, HttpClientModule, BreadcrumbModule, ButtonModule, Loader],
   templateUrl: './help-desk-user-manual.html',
   styleUrls: ['./help-desk-user-manual.scss']
 })

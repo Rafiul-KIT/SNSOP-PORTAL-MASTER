@@ -9,10 +9,8 @@
   </div>
 
   @if (isLoading) {
-    <div class="state-card loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <span>Loading user manual content...</span>
-    </div>
+   <app-loader/>
+
   } @else if (loadError) {
     <div class="state-card error">
       <i class="fas fa-triangle-exclamation"></i>
