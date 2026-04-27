@@ -91,7 +91,12 @@ export class AzureAdAuthService {
       }
 
       // If not cached, fetch from API
-      const resp = await axios.get(`${environment.authBackend}/api/menus/role/${roleId}`);
+      const token = this.cookieService.get(this.ACCESS_TOKEN) || this.loginState().token;
+      const resp = await axios.get(`${environment.authBackend}/api/menus/role/${roleId}`, token ? {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      } : undefined);
       const menus = resp.data?.data || [];
 
       // Store in sessionStorage
@@ -130,6 +135,9 @@ export class AzureAdAuthService {
           user: userData,
           menus: null, // Set this to null or any valid menu data if available
         });
+        if (userData?.roleId) {
+          void this.fetchMenusByRole(userData.roleId);
+        }
       } catch (error) {
         console.error('Failed to decode token:', error);
         this.loginState.set({ token: null, user: null, menus: null });
