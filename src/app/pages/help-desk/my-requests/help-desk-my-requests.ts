@@ -340,6 +340,9 @@ export class HelpDeskMyRequests implements OnInit {
         ...(comment ? { comment } : {}),
       });
 
+      this.isLoading = false;
+      this.detectChanges();
+
       if (response.success) {
         await Swal.fire({
           icon: 'success',
@@ -357,6 +360,9 @@ export class HelpDeskMyRequests implements OnInit {
         });
       }
     } catch {
+      this.isLoading = false;
+      this.detectChanges();
+
       await Swal.fire({
         icon: 'error',
         title: 'Error',

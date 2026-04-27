@@ -34,6 +34,7 @@ export class HelpDeskRequestDetails implements OnInit {
   breadcrumbItems = [{ label: 'Help Desk', routerLink: '/help-desk/support-management' }, { label: 'Request Detail' }];
 
   isLoading = true;
+  isUpdatingStatus = false;
 
   detailRequest: ITRequest | null = null;
   detailHistory: ITHistory[] = [];
@@ -92,6 +93,26 @@ export class HelpDeskRequestDetails implements OnInit {
       this.router.navigate(['/help-desk/support-management']);
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async refreshDetailSilently(requestId: number): Promise<void> {
+    try {
+      const [detail, history] = await Promise.all([
+        this.itSupportService.getRequestById(requestId),
+        this.itSupportService.getRequestHistory(requestId),
+      ]);
+
+      if (detail) {
+        this.detailRequest = detail;
+        this.detailAttachments = detail.attachments || [];
+      }
+
+      this.detailHistory = history || detail?.history || [];
+    } catch (error) {
+      console.error('Failed to refresh detail:', error);
+    } finally {
       this.cdr.detectChanges();
     }
   }
@@ -409,50 +430,65 @@ export class HelpDeskRequestDetails implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-    this.cdr.detectChanges();
-    try {
-      if (!this.canTransition(request.status, selectedAction.value)) {
-        await Swal.fire({
-          icon: 'warning',
-          title: 'Invalid Transition',
-          text: `Invalid status transition from ${request.status} to ${selectedAction.value}.`,
-          confirmButtonColor: '#3085d6',
-        });
-        return;
-      }
+    if (!this.canTransition(request.status, selectedAction.value)) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Transition',
+        text: `Invalid status transition from ${request.status} to ${selectedAction.value}.`,
+        confirmButtonColor: '#3085d6',
+      });
+      return;
+    }
 
-      const response = await this.itSupportService.updateRequestStatus(request.id, {
+    this.isUpdatingStatus = true;
+    this.cdr.detectChanges();
+
+    let response: { success: boolean; request?: ITRequest; message?: string } | null = null;
+    let hasUnexpectedError = false;
+
+    try {
+      response = await this.itSupportService.updateRequestStatus(request.id, {
         status: selectedAction.value,
         ...(comment ? { comment } : {}),
       });
-
-      if (response.success) {
-        await Swal.fire({
-          icon: 'success',
-          title: 'Status Updated',
-          text: response.message || 'Request status updated successfully.',
-          confirmButtonColor: '#3085d6',
-        });
-        await this.loadDetail(request.id);
-      } else {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Update Failed',
-          text: response.message || 'Unable to update request status.',
-          confirmButtonColor: '#d33',
-        });
-      }
     } catch {
+      hasUnexpectedError = true;
+    } finally {
+      this.isUpdatingStatus = false;
+      this.cdr.detectChanges();
+    }
+
+    if (hasUnexpectedError) {
       await Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'An unexpected error occurred while updating status.',
         confirmButtonColor: '#d33',
       });
-    } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
+      return;
+    }
+
+    if (response?.success) {
+      if (response.request) {
+        this.detailRequest = response.request;
+        this.detailAttachments = response.request.attachments || this.detailAttachments;
+        this.cdr.detectChanges();
+      }
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Status Updated',
+        text: response.message || 'Request status updated successfully.',
+        confirmButtonColor: '#3085d6',
+      });
+      await this.refreshDetailSilently(request.id);
+    } else {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: response?.message || 'Unable to update request status.',
+        confirmButtonColor: '#d33',
+      });
     }
   }
 

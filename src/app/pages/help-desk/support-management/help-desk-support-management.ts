@@ -422,6 +422,9 @@ export class HelpDeskSupportManagement implements OnInit {
         ...(comment ? { comment } : {}),
       });
 
+      this.isLoading = false;
+      this.cdr.detectChanges();
+
       if (response.success) {
         await Swal.fire({
           icon: 'success',
@@ -438,6 +441,9 @@ export class HelpDeskSupportManagement implements OnInit {
         });
       }
     } catch {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+
       await Swal.fire({
         icon: 'error',
         title: 'Error',

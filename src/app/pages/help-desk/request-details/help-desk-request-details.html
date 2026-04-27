@@ -40,6 +40,8 @@
               [label]="getStatusActionLabel(detailRequest)"
               severity="info"
               size="small"
+              [loading]="isUpdatingStatus"
+              [disabled]="isUpdatingStatus"
               (onClick)="onAction(detailRequest)"
             ></p-button>
           } @else {
