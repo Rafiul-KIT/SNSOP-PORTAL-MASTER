@@ -277,12 +277,13 @@ export class HelpDeskUserManual implements OnInit {
     return payloadRoles.map((role) => {
       const sections = role.sections.map((section, index) => {
         const normalizedIndex = typeof section.index === 'number' ? section.index : index;
+        const normalizedBodyHtml = this.normalizeBodyHtml(section.bodyHtml);
 
         return {
           id: `${role.id}-gs${normalizedIndex}`,
           index: section.index,
           title: section.title,
-          bodyHtml: section.bodyHtml,
+          bodyHtml: normalizedBodyHtml,
           searchText: section.searchText
         };
       });
@@ -315,8 +316,20 @@ export class HelpDeskUserManual implements OnInit {
     this.expandedSectionIds = new Set(role.sections.slice(0, 2).map((section) => section.id));
   }
 
+  private normalizeBodyHtml(html: string): string {
+    return html
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<\/?(iframe|object|embed|link|meta)\b[^>]*>/gi, '')
+      .replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+      .replace(/\s+style\s*=\s*("[^"]*"|'[^']*')/gi, '')
+      .replace(/\s+loading\s*=\s*("[^"]*"|'[^']*')/gi, '')
+      .trim();
+  }
+
   private getRoleDescription(roleId: string): string {
     const map: Record<string, string> = {
+      'all-user': 'Full end-to-end SNSOP MIS manual across all operational roles.',
       ip: 'Registration, attendance, wage requests, payroll and invoice workflow.',
       qa: 'Sub-project approval review and payment report quality validation.',
       superadmin: 'System-wide dashboard and user management controls.',
