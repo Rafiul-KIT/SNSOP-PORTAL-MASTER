@@ -234,7 +234,7 @@ async function rewriteImages(sectionHtml, imageWriteCache) {
       imageWriteCache.add(fileName);
     }
 
-    const staticSrc = `/help-desk/manual-images/${fileName}`;
+    const staticSrc = `help-desk/manual-images/${fileName}`;
     let newTag = imgTag.replace(srcAttr[0], `src=\"${staticSrc}\"`);
 
     replaced = replaced.replace(imgTag, newTag);

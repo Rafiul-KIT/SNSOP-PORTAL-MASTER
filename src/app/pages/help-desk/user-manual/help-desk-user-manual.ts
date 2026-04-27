@@ -258,7 +258,7 @@ export class HelpDeskUserManual implements OnInit {
     this.loadError = '';
 
     try {
-      const payload = await firstValueFrom(this.http.get<ManualPayload>('/help-desk/manual-content.json'));
+      const payload = await firstValueFrom(this.http.get<ManualPayload>('help-desk/manual-content.json'));
       this.roles = this.normalizeRoles(payload.roles);
       this.selectedRoleId = this.roles[0]?.id ?? '';
       this.resetExpansionForSelectedRole();
