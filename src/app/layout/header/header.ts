@@ -239,24 +239,29 @@ export class Header {
   getEconomicOpportunitiesMenus(): MenuItem[] {
     return [
       {
-        label: 'Economic Opportunities Dashboard',
+        label: 'Dashboard',
         icon: 'fas fa-chart-bar',
         routerLink: ['/economic-opportunities/dashboard'],
       },
       {
-        label: 'Template Importing',
+        label: 'Excel Template Download',
         icon: 'fas fa-file-import',
         routerLink: ['/economic-opportunities/template-importing'],
       },
       {
-        label: 'Household Group View',
-        icon: 'fas fa-users',
-        routerLink: ['/economic-opportunities/household-group-view'],
+        label: 'Excel template Upload',
+        icon: 'fas fa-file-upload',
+        routerLink: ['/economic-opportunities/template-upload'],
       },
       {
-        label: 'Audit Record Download',
+        label: 'Household And GroupId Mapping',
+        icon: 'fas fa-object-group',
+        routerLink: ['/economic-opportunities/household-group-mapping'],
+      },
+      {
+        label: 'Audit Log',
         icon: 'fas fa-file-download',
-        routerLink: ['/economic-opportunities/audit-record-download'],
+        routerLink: ['/economic-opportunities/audit-log'],
       },
     ];
   }

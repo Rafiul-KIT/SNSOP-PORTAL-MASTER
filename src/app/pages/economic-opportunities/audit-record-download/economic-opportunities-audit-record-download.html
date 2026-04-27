@@ -1,3 +1,77 @@
-<div class="eo-page">
-<p>audit record dowmnload</p>
+<div class="breadcrumb-wrapper mb-2">
+  <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
+</div>
+
+<div class="card p-3 mb-3 shadow-sm">
+  <form class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="templateOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="selectedModule"
+          name="module"
+          [filter]="true"
+          filterBy="label"
+          [showClear]="true"
+          class="w-100"
+        ></p-select>
+        <label>Module Type</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-datepicker
+          [(ngModel)]="fromDate"
+          name="fromDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          class="w-100"
+        ></p-datepicker>
+        <label>From Date</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-datepicker
+          [(ngModel)]="toDate"
+          name="toDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          class="w-100"
+        ></p-datepicker>
+        <label>To Date</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-12">
+      <div class="d-flex justify-content-end gap-2">
+        <p-button
+          label="Reset"
+          icon="fas fa-refresh"
+          severity="danger"
+          size="small"
+          outlined="true"
+          (onClick)="resetFilters()"
+        ></p-button>
+        <p-button
+          label="Search"
+          icon="fas fa-search"
+          severity="primary"
+          size="small"
+          (onClick)="onSearch()"
+        ></p-button>
+        <p-button
+          label="Download"
+          icon="fas fa-download"
+          severity="success"
+          size="small"
+          (onClick)="onDownload()"
+        ></p-button>
+      </div>
+    </div>
+  </form>
 </div>

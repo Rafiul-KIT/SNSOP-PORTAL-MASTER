@@ -22,7 +22,8 @@ import { CashTransferSummary } from './pages/monitoring-evaluation/cash-transfer
 import { ResultFramework } from './pages/monitoring-evaluation/result-framework/result-framework';
 import { EconomicOpportunitiesDashboard } from './pages/economic-opportunities/dashboard/economic-opportunities-dashboard';
 import { EconomicOpportunitiesTemplateImporting } from './pages/economic-opportunities/template-importing/economic-opportunities-template-importing';
-import { EconomicOpportunitiesHouseholdGroupView } from './pages/economic-opportunities/household-group-view/economic-opportunities-household-group-view';
+import { EconomicOpportunitiesTemplateUpload } from './pages/economic-opportunities/template-upload/economic-opportunities-template-upload';
+import { EconomicOpportunitiesHouseholdGroupMapping } from './pages/economic-opportunities/household-group-mapping/economic-opportunities-household-group-mapping';
 import { EconomicOpportunitiesAuditRecordDownload } from './pages/economic-opportunities/audit-record-download/economic-opportunities-audit-record-download';
 import { Metabase } from './pages/metabase/metabase';
 
@@ -103,8 +104,11 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: EconomicOpportunitiesDashboard, canActivate: [routeGuard], },
       { path: 'template-importing', component: EconomicOpportunitiesTemplateImporting, canActivate: [routeGuard], },
-      { path: 'household-group-view', component: EconomicOpportunitiesHouseholdGroupView, canActivate: [routeGuard], },
-      { path: 'audit-record-download', component: EconomicOpportunitiesAuditRecordDownload, canActivate: [routeGuard], },
+      { path: 'template-upload', component: EconomicOpportunitiesTemplateUpload, canActivate: [routeGuard], },
+      { path: 'household-group-mapping', component: EconomicOpportunitiesHouseholdGroupMapping, canActivate: [routeGuard], },
+      { path: 'audit-log', component: EconomicOpportunitiesAuditRecordDownload, canActivate: [routeGuard], },
+      { path: 'audit-record-download', redirectTo: 'audit-log', pathMatch: 'full' },
+      { path: 'household-group-view', redirectTo: 'household-group-mapping', pathMatch: 'full' },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

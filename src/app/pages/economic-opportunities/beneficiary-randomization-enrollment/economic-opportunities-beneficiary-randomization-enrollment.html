@@ -1,0 +1,30 @@
+<div class="card p-3 shadow-sm mt-3">
+  <p-table
+    [value]="data"
+    [columns]="cols"
+    [paginator]="true"
+    [rows]="10"
+    [responsiveLayout]="'scroll'"
+    styleClass="p-datatable-sm p-datatable-gridlines"
+  >
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th *ngFor="let col of columns">
+          {{ col.header }}
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr>
+        <td *ngFor="let col of columns">
+          {{ rowData[col.field] }}
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="cols.length" class="text-center">No records found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
