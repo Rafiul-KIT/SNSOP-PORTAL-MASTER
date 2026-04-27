@@ -1,0 +1,87 @@
+<div class="breadcrumb-wrapper mb-2">
+  <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
+</div>
+
+<div class="card p-3 mb-3 shadow-sm">
+  <form class="row g-3 align-items-end">
+    <div class="col-md-6">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="typeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="selectedType"
+          name="type"
+          [filter]="true"
+          filterBy="label"
+          [showClear]="true"
+          class="w-100"
+        ></p-select>
+        <label>Select Template Type</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <input
+          id="file"
+          type="file"
+          class="form-control"
+          accept=".xlsx,.xls,.csv"
+          (change)="onFileChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="d-flex justify-content-end gap-2">
+        <p-button
+          label="Reset"
+          icon="fas fa-refresh"
+          severity="danger"
+          size="small"
+          outlined="true"
+          (onClick)="resetFilters()"
+        ></p-button>
+        <p-button
+          label="Upload"
+          icon="fas fa-upload"
+          severity="primary"
+          size="small"
+        ></p-button>
+      </div>
+      <br/>
+      <div class="d-flex justify-content-center gap-2">
+      <p-button
+          label="Analyze"
+          icon="fas fa-chart-line"
+          severity="info"
+          size="small"
+          outlined="true"
+          (onClick)="onAnalyze()"
+        ></p-button>
+        <p-button
+          label="Import"
+          icon="fas fa-file-import"
+          severity="success"
+          size="small"
+          outlined="true"
+          (onClick)="onImport()"
+        ></p-button>
+        <p-button
+          label="Search"
+          icon="fas fa-search"
+          severity="warn"
+          size="small"
+          outlined="true"
+          (onClick)="onSearch()"
+        ></p-button>
+    </div>
+    </div>
+  </form>
+</div>
+
+<app-economic-opportunities-beneficiary-randomization-enrollment
+  *ngIf="showBeneficiaryTable"
+  [data]="beneficiaryData"
+></app-economic-opportunities-beneficiary-randomization-enrollment>

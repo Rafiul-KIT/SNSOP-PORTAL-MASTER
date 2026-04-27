@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { asapScheduler, BehaviorSubject, distinctUntilChanged, map, observeOn } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,9 @@ export class LoadingService {
   
   // Only show if count > 0
   loading$ = this._loadingCount.pipe(
-    map(count => count > 0)
+    map(count => count > 0),
+    distinctUntilChanged(),
+    observeOn(asapScheduler)
   );
 
   show() {

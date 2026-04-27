@@ -145,7 +145,6 @@ async getMenuList(): Promise<MenuItem[]> {
     return this.menuListCache;
   }
 
-  console.log('📡 Calling /api/menus/findAll ...');
 
   const res = await this.api.GET<any>(this.MENU_FIND_ALL_URL, {}, 'alt');
   const data = res.data;

@@ -239,24 +239,29 @@ export class Header {
   getEconomicOpportunitiesMenus(): MenuItem[] {
     return [
       {
-        label: 'Economic Opportunities Dashboard',
+        label: 'Dashboard',
         icon: 'fas fa-chart-bar',
         routerLink: ['/economic-opportunities/dashboard'],
       },
       {
-        label: 'Template Importing',
+        label: 'Excel Template Download',
         icon: 'fas fa-file-import',
         routerLink: ['/economic-opportunities/template-importing'],
       },
       {
-        label: 'Household Group View',
-        icon: 'fas fa-users',
-        routerLink: ['/economic-opportunities/household-group-view'],
+        label: 'Excel template Upload',
+        icon: 'fas fa-file-upload',
+        routerLink: ['/economic-opportunities/template-upload'],
       },
       {
-        label: 'Audit Record Download',
+        label: 'Household And GroupId Mapping',
+        icon: 'fas fa-object-group',
+        routerLink: ['/economic-opportunities/household-group-mapping'],
+      },
+      {
+        label: 'Audit Log',
         icon: 'fas fa-file-download',
-        routerLink: ['/economic-opportunities/audit-record-download'],
+        routerLink: ['/economic-opportunities/audit-log'],
       },
     ];
   }
@@ -291,7 +296,16 @@ export class Header {
     const permittedMenus = state?.menus || [];
 
     // Get the current route path without query parameters
-    const currentPath = this.router.url.split('?')[0];  // Strip out query parameters
+    const currentPath = this.router.url.split('?')[0]; // Strip out query parameters
+    const isHelpDeskPage = currentPath.startsWith('/help-desk/');
+    const hasHelpDeskAccess = permittedMenus
+      .map((m: any) => m.name)
+      .includes('Help Desk');
+
+    if (isHelpDeskPage) {
+      this.menuList = hasHelpDeskAccess ? this.getHelpDeskMenuItems() : [];
+      return;
+    }
 
     // Filter backend menus only for master portal ones
     const masterMenus = permittedMenus.filter(
@@ -326,7 +340,7 @@ export class Header {
     return item.label ?? index.toString(); // fallback to index if label is undefined
   }
 
-  getHelpDeskMenuItems(): any[] {
+  getHelpDeskMenuItems(): MenuItem[] {
     return [
       { label: 'Help Desk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
       { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
