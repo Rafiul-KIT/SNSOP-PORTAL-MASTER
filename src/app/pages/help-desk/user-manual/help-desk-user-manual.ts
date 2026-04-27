@@ -59,8 +59,6 @@ interface ManualPayload {
   styleUrls: ['./help-desk-user-manual.scss']
 })
 export class HelpDeskUserManual implements OnInit {
-  private readonly minLoadingDurationMs = 7000;
-
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
   breadcrumbItems = [{ label: 'Help Desk' }, { label: 'User Manual' }];
 
@@ -258,7 +256,6 @@ export class HelpDeskUserManual implements OnInit {
   private async loadManualContent(): Promise<void> {
     this.isLoading = true;
     this.loadError = '';
-    const loadStartedAt = Date.now();
 
     try {
       const payload = await firstValueFrom(this.http.get<ManualPayload>('/help-desk/manual-content.json'));
@@ -272,20 +269,10 @@ export class HelpDeskUserManual implements OnInit {
       this.expandedSectionIds = new Set<string>();
       console.error(error);
     } finally {
-      const elapsedMs = Date.now() - loadStartedAt;
-      const remainingDelayMs = this.minLoadingDurationMs - elapsedMs;
-      if (remainingDelayMs > 0) {
-        await this.sleep(remainingDelayMs);
-      }
       this.isLoading = false;
+      
     }
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => {
-      window.setTimeout(resolve, ms);
-    });
-  }
+ }
 
   private normalizeRoles(payloadRoles: ManualPayloadRole[]): ManualRole[] {
     return payloadRoles.map((role) => {
