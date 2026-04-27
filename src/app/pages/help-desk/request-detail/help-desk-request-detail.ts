@@ -164,6 +164,7 @@ export class HelpDeskRequestDetail implements OnInit {
 
   canEditRequest(request?: ITRequest | null): boolean {
     if (!request) return false;
+    
     return this.isRequestCreator(request) && String(request.status || '').toUpperCase() === 'NEW';
   }
 
@@ -217,7 +218,33 @@ export class HelpDeskRequestDetail implements OnInit {
       return [];
     }
   }
+async deleteAttachment(attachment: ITAttachment): Promise<void> {
+  if (!this.detailRequest) return;
 
+  const result = await Swal.fire({
+    icon: 'warning',
+    title: 'Delete Attachment',
+    text: 'Are you sure you want to delete this attachment?',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Delete',
+  });
+
+  if (!result.isConfirmed) return;
+
+  // Remove from array (frontend only)
+  const index = this.detailAttachments.findIndex(att => att.id === attachment.id);
+  if (index > -1) {
+    this.detailAttachments.splice(index, 1);
+    this.cdr.detectChanges();
+  }
+}
+
+canDeleteAttachment(request?: ITRequest | null): boolean {
+  if (!request) return false;
+  return this.isMisFirmUser() || this.isRequestCreator(request);
+}
   getTimelineTitle(action?: string): string {
     switch (String(action || '').toUpperCase()) {
       case 'CREATED':

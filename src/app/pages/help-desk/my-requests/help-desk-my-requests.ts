@@ -132,7 +132,7 @@ export class HelpDeskMyRequests implements OnInit {
   }
 
   onView(request: ITRequest): void {
-    this.router.navigate(['/help-desk/request-details', request.id]);
+    this.router.navigate(['/help-desk/request-detail', request.id]);
   }
 
   getStatusActionLabel(request: ITRequest): string {

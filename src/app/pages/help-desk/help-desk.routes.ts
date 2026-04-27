@@ -8,6 +8,7 @@ import { HelpDeskReports } from './reports/help-desk-reports';
 import { HelpDeskUserManual } from './user-manual/help-desk-user-manual';
 import { HelpDeskRequestDetails } from './request-details/help-desk-request-details';
 import { routeGuard } from '../../route.guard';
+import { HelpDeskRequestDetail } from './request-detail/help-desk-request-detail';
 
 export const HELP_DESK_ROUTES: Routes = [
   { path: 'dashboard', component: HelpDeskDashboard, canActivate: [routeGuard] },
@@ -18,5 +19,6 @@ export const HELP_DESK_ROUTES: Routes = [
   { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
   { path: 'user-manual', component: HelpDeskUserManual, canActivate: [routeGuard] },
   { path: 'request-details/:id', component: HelpDeskRequestDetails, canActivate: [routeGuard] },
+  { path: 'request-detail/:id', component: HelpDeskRequestDetail, canActivate: [routeGuard] },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ];
