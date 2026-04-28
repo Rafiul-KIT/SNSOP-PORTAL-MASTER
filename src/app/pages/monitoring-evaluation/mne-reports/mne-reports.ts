@@ -48,10 +48,11 @@ export class MneReports implements OnInit {
 
   // Options
   fileTypes = [
-    { label: 'Progress Report', value: 'PROGRESS_REPORT' },
-    { label: 'Annual Report', value: 'ANNUAL_REPORT' },
-    { label: 'Evaluation Report', value: 'EVALUATION_REPORT' },
-    { label: 'Other', value: 'OTHER' },
+    { label: 'Partner Monitoring', value: 'PARTNER_MONITORING' },
+    { label: 'SPCU Monitoring', value: 'SPCU_MONITORING' },
+    { label: 'Third Party Monitoring', value: 'THIRD_PARTY_MONITORING' },
+    { label: 'Final Periodic', value: 'FINAL_PERIODIC' },
+    { label: 'Evaluation', value: 'EVALUATION' },
   ];
 
   // Upload Form
@@ -61,7 +62,11 @@ export class MneReports implements OnInit {
   };
 
   // Search Filters
-  filters = {
+  filters: {
+    fromDate: Date | null,
+    toDate: Date | null,
+    fileType: string | null
+  } = {
     fromDate: null,
     toDate: null,
     fileType: null
@@ -108,9 +113,11 @@ export class MneReports implements OnInit {
 
       const formData = new FormData();
       formData.append('file', this.uploadData.file);
-      formData.append('fileType', this.uploadData.fileType);
 
-      await this.api.POST('/api/monitoring/mne-reports/upload', formData);
+      // reportType is sent as a query parameter
+      await this.api.POST('/api/monitoring/mne-reports/upload', formData, 'global', {
+        params: { reportType: this.uploadData.fileType }
+      });
 
       this.msg.add({
         severity: 'success',
@@ -155,19 +162,20 @@ export class MneReports implements OnInit {
 
       const params: any = {
         page: this.currentPage,
-        pageSize: this.pageSize,
-        isDeleted: this.showingDeleted
+        size: this.pageSize,
+        status: this.showingDeleted ? 'INACTIVE' : 'ACTIVE'
       };
 
-      if (this.filters.fromDate) params.fromDate = this.filters.fromDate;
-      if (this.filters.toDate) params.toDate = this.filters.toDate;
-      if (this.filters.fileType) params.fileType = this.filters.fileType;
+      if (this.filters.fromDate) params.fromDate = this.filters.fromDate.toISOString();
+      if (this.filters.toDate) params.toDate = this.filters.toDate.toISOString();
+      if (this.filters.fileType) params.reportType = this.filters.fileType;
 
       const res = await this.api.GET('/api/monitoring/mne-reports', params);
-      const data = res?.data ?? {};
-
-      this.reports = Array.isArray(data.data) ? data.data : [];
-      this.totalRecords = data.totalRecords ?? 0;
+      
+      // Map based on the provided DynamicPagedResponse structure
+      const responseBody: any = res.data ?? {};
+      this.reports = Array.isArray(responseBody.data) ? responseBody.data : [];
+      this.totalRecords = responseBody.pagination?.totalElements ?? 0;
     } catch (err) {
       console.error('Failed to load reports', err);
       this.msg.add({

@@ -28,6 +28,7 @@ import { EconomicOpportunitiesAuditRecordDownload } from './pages/economic-oppor
 import { EconomicOpportunitiesBeneficiaryRandomizationEnrollment } from './pages/economic-opportunities/beneficiary-randomization-enrollment/economic-opportunities-beneficiary-randomization-enrollment';
 import { EconomicOpportunitiesHouseholdGroupView } from './pages/economic-opportunities/household-group-view/economic-opportunities-household-group-view';
 import { Metabase } from './pages/metabase/metabase';
+import { MneReports } from './pages/monitoring-evaluation/mne-reports/mne-reports';
 
 
 
@@ -97,6 +98,7 @@ export const routes: Routes = [
       { path: 'beneficiary-enrolment-summary', component: BeneficiaryEnrolmentSummary, canActivate: [routeGuard], },
       { path: 'cash-transfer-summary', component: CashTransferSummary, canActivate: [routeGuard], },
       { path: 'result-framework', component: ResultFramework, canActivate: [routeGuard], },
+      { path: 'reports', component: MneReports, canActivate: [routeGuard], },
       { path: '', redirectTo: 'beneficiary-enrolment-summary', pathMatch: 'full' }
     ]
   },
