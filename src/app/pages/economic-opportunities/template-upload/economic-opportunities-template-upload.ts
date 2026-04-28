@@ -44,9 +44,9 @@ export class EconomicOpportunitiesTemplateUpload {
     { label: 'Course Details Template', value: 'Course Details Template' },
     { label: 'Training Attendance Tracking Template', value: 'Training Attendance Tracking Template' },
     { label: 'Business Plan Development Template', value: 'Business Plan Development Template' },
-    { label: 'Coaching Entity Template', value: 'Coaching Entity Template' },
-    { label: 'Coaching Details Template', value: 'Coaching Details Template' },
-    { label: 'Coaching Session tracking Template', value: 'Coaching Session tracking Template' },
+    // { label: 'Coaching Entity Template', value: 'Coaching Entity Template' },
+    // { label: 'Coaching Details Template', value: 'Coaching Details Template' },
+    // { label: 'Coaching Session tracking Template', value: 'Coaching Session tracking Template' },
     { label: 'Livelihood Grant Disbursement Template', value: 'Livelihood Grant Disbursement Template' },
     { label: 'Financial Service Linkage Tracking Template', value: 'Financial Service Linkage Tracking Template' },
   ];

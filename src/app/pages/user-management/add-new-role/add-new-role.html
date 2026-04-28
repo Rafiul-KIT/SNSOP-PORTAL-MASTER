@@ -55,34 +55,10 @@
                 } @else {
                   <div class="menu-access-scroll-area">
                     @if (menuTree.length > 0) {
-                      @for (parentMenu of menuTree; track parentMenu.id) {
-                      <div class="parent-menu mb-2">
-                        <div class="d-flex align-items-center gap-1 mb-1">
-                          <p-checkbox [binary]="true" [(ngModel)]="parentMenu.checked"
-                            [inputId]="'menu_' + parentMenu.id" [ngModelOptions]="{ standalone: true }"
-                            (onChange)="onParentChange(parentMenu)">
-                          </p-checkbox>
-                          <label [for]="'menu_' + parentMenu.id" class="fw-bold">{{ parentMenu.label }}</label>
-                        </div>
-
-                        @if (parentMenu.children && parentMenu.children.length > 0) {
-                          <div class="child-menus ps-3">
-                            @for (childMenu of parentMenu.children; track childMenu.id) {
-                              <div class="d-flex align-items-center gap-1 mb-1">
-                                <p-checkbox [binary]="true" [(ngModel)]="childMenu.checked"
-                                  [inputId]="'menu_' + childMenu.id" [ngModelOptions]="{ standalone: true }"
-                                  (onChange)="onChildChange(parentMenu)">
-                                </p-checkbox>
-                                <label [for]="'menu_' + childMenu.id">{{ childMenu.label }}</label>
-                              </div>
-                            }
-                          </div>
-                        }
-                      </div>
+                      <ng-container *ngTemplateOutlet="menuListTemplate; context: { $implicit: menuTree }"></ng-container>
+                    } @else {
+                      <p class="text-muted">No menus found.</p>
                     }
-                  } @else {
-                    <p class="text-muted">No menus found.</p>
-                  }
                   </div>
                 }
               </div>
@@ -118,3 +94,21 @@
     }
   </div>
 </div>
+
+<ng-template #menuListTemplate let-nodes>
+  @for (menu of nodes; track menu.id) {
+    <div class="menu-item-container mb-2" [ngClass]="{'ps-3': menu.parentNode}">
+      <div class="d-flex align-items-center gap-1 mb-1">
+        <p-checkbox [binary]="true" [(ngModel)]="menu.checked"
+          [inputId]="'menu_' + menu.id" [ngModelOptions]="{ standalone: true }"
+          (onChange)="onMenuChange(menu)">
+        </p-checkbox>
+        <label [for]="'menu_' + menu.id" [ngClass]="{'fw-bold': !menu.parentNode}">{{ menu.label }}</label>
+      </div>
+
+      @if (menu.children && menu.children.length > 0) {
+        <ng-container *ngTemplateOutlet="menuListTemplate; context: { $implicit: menu.children }"></ng-container>
+      }
+    </div>
+  }
+</ng-template>

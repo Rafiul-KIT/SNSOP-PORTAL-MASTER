@@ -17,7 +17,7 @@ export class Metabase implements OnInit {
   currentDashboardId: number = 6; // Default dashboard
   dashboards = [
     { id: 6, name: 'Latest Beneficiaries' },
-    { id: 46, name: 'Overview' },
+    { id: 7, name: 'GRM Group By Gender' },
     { id: 5, name: 'Payment Report' },
     { id: 4, name: 'Reconciliation Summary Report' }
   ];

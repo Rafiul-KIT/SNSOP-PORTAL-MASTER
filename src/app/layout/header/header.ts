@@ -1,4 +1,4 @@
-import { Component, effect, inject, computed, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { PopoverModule } from 'primeng/popover';
@@ -16,35 +16,81 @@ import { ApiService } from '../../../services/api.service';
   styleUrl: './header.scss',
 })
 export class Header {
+  private azureService = inject(AzureAdAuthService);
+  private router = inject(Router);
+  private apiService = inject(ApiService);
+  private authService = inject(AzureAdAuthService);
+
   showPortalOptions = false;
   showUsermenu = false;
-  menuList: MenuItem[] = [];
-  userInfo: any = null;
-  isPortalsPage = false;
-  isLandingPage = false;
-  isSurveyCtoPage = false;
-  isMonitoringPage = false;
-  isEconomicOpportunitiesPage = false;
+  portalList: any[] = [];
   isLoading = false;
-  showHelpDeskDropdown: boolean = false;
+  showHelpDeskDropdown = false;
 
-  // Computed signals for reactive UI
-  canAccessHelpDesk = computed(() => {
-    const state = this.azureService.loginState();
-    if (!state.user) return false;
-    const permittedMenus = state.menus || [];
-    return permittedMenus.map((m: any) => String(m.name || '')).includes('Help Desk');
-  });
+  // Signal for current URL to track page state
+  currentUrl = signal<string>(this.router.url);
 
+  // Computed properties from login state
+  loginState = this.azureService.loginState;
+  userInfo = computed(() => this.loginState()?.user);
+  permittedMenus = computed(() => this.loginState()?.menus || []);
+  allPermittedNames = computed(() => this.permittedMenus().map((m: any) => m.name));
+
+  canAccessHelpDesk = computed(() => this.allPermittedNames().includes('Help Desk'));
   helpDeskChildren = computed(() => {
-    const state = this.azureService.loginState();
-    const permittedMenus = state.menus || [];
-    return this.getFilteredHelpDeskItems(permittedMenus);
+    const names = this.allPermittedNames();
+    return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
   });
 
-  portalList = computed(() => {
-    const hasHelpAccess = this.canAccessHelpDesk();
-    const list = [
+  // Page detection signals
+  isLandingPage = computed(() => this.currentUrl() === '/landing' || this.currentUrl() === '/#/landing');
+  isPortalsPage = computed(() => !this.isLandingPage());
+  isSurveyCtoPage = computed(() => this.currentUrl().startsWith('/survey-cto') || this.currentUrl().startsWith('/cto-dashboard'));
+  isMonitoringPage = computed(() => this.currentUrl().startsWith('/monitoring-evaluation'));
+  isEconomicOpportunitiesPage = computed(() => this.currentUrl().startsWith('/economic-opportunities'));
+  isHelpDeskPage = computed(() => this.currentUrl().startsWith('/help-desk/'));
+  isUserManagementPage = computed(() => this.currentUrl().startsWith('/user-management/'));
+
+  // Computed menu list based on current page and permissions
+  menuList = computed(() => {
+    if (this.isLandingPage()) return [];
+
+    const names = this.allPermittedNames();
+
+    if (this.isSurveyCtoPage()) {
+      return this.filterMenusByAccess(this.getSurveyCtoMenus(), names);
+    }
+    if (this.isMonitoringPage()) {
+      return this.filterMenusByAccess(this.getMonitoringMenus(), names);
+    }
+    if (this.isEconomicOpportunitiesPage()) {
+      return this.filterMenusByAccess(this.getEconomicOpportunitiesMenus(), names);
+    }
+    if (this.isHelpDeskPage()) {
+      return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
+    }
+    if (this.isUserManagementPage()) {
+      const masterMenus = this.permittedMenus().filter(
+        (m: any) =>
+          m.name === 'User Management' ||
+          (m.parentMenu && m.parentMenu.name === 'User Management')
+      );
+      const allowedNames = masterMenus.map((m: any) => m.name);
+      return this.filterMenusByAccess(this.getStaticMasterMenus(), allowedNames);
+    }
+    return [];
+  });
+
+  constructor() {
+    // Detect route changes and update signal
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentUrl.set(event.urlAfterRedirects);
+      });
+
+    // Static portal links
+    this.portalList = [
       {
         label: 'Beneficiary',
         link: environment.portals.beneficiary,
@@ -52,7 +98,7 @@ export class Header {
       },
       {
         label: 'Payment',
-        link: environment.portals.payment,
+         link: environment.portals.payment,
         icon: 'fas fa-credit-card',
       },
       {
@@ -85,6 +131,14 @@ export class Header {
         },
       },
       {
+        label: 'Help Desk',
+        icon: 'fas fa-headset',
+        command: () => {
+          this.router.navigate(['/help-desk/dashboard']);
+          this.showPortalOptions = false;
+        },
+      },
+      {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
         command: () => {
@@ -99,99 +153,24 @@ export class Header {
           this.router.navigate(['/economic-opportunities/dashboard']);
           this.showPortalOptions = false;
         },
-      }
+      },
     ];
-
-    if (hasHelpAccess) {
-      list.push({
-        label: 'Help Desk',
-        icon: 'fas fa-headset',
-        command: () => {
-          this.router.navigate(['/help-desk/dashboard']);
-          this.showPortalOptions = false;
-        },
-      } as any);
-    }
-    return list;
-  });
-  private authService = inject(AzureAdAuthService);
-
-  constructor(
-    private router: Router,
-    private azureService: AzureAdAuthService,
-    private apiService: ApiService,
-  ) {
-    // Detect route changes
-    this.router.events
-      .pipe(
-        filter(
-          (event): event is NavigationEnd => event instanceof NavigationEnd
-        )
-      )
-      .subscribe((event: NavigationEnd) => {
-        this.isPortalsPage = event.urlAfterRedirects !== '/landing';
-        this.isLandingPage = event.urlAfterRedirects === '/landing';
-        const isUserManagementPage = event.urlAfterRedirects.startsWith(
-          '/user-management/'
-        );
-        this.isSurveyCtoPage = event.urlAfterRedirects.startsWith('/survey-cto') || event.urlAfterRedirects.startsWith('/cto-dashboard');
-        this.isMonitoringPage = event.urlAfterRedirects.startsWith('/monitoring-evaluation');
-        this.isEconomicOpportunitiesPage = event.urlAfterRedirects.startsWith('/economic-opportunities');
-        this.updateMenuList(
-          isUserManagementPage,
-          this.isSurveyCtoPage,
-          this.isMonitoringPage,
-          this.isEconomicOpportunitiesPage
-        );
-      });
-
-    // Watch login state for side effects
-    effect(() => {
-      const state = this.azureService.loginState();
-      this.userInfo = state?.user;
-      const isUserManagementPage = this.router.url.startsWith(
-        '/user-management/'
-      );
-      this.isSurveyCtoPage = this.router.url.startsWith('/survey-cto') || this.router.url.startsWith('/cto-dashboard');
-      this.isMonitoringPage = this.router.url.startsWith('/monitoring-evaluation');
-      this.isEconomicOpportunitiesPage = this.router.url.startsWith('/economic-opportunities');
-      this.updateMenuList(
-        isUserManagementPage,
-        this.isSurveyCtoPage,
-        this.isMonitoringPage,
-        this.isEconomicOpportunitiesPage
-      );
-    });
-
   }
 
   loginWithAzureAD(): void {
-    this.isLoading = true; // Show the loading spinner when login starts
-    this.authService.login(); // Just call login if it doesn't return a Promise
+    this.isLoading = true;
+    this.authService.login();
   }
 
-  // ✅ 1. Match backend labels exactly
   getStaticMasterMenus(): MenuItem[] {
     return [
       {
-        label: 'User Management', // must match backend name
+        label: 'User Management',
         icon: 'fas fa-users',
         items: [
-          {
-            label: 'User List',
-            icon: 'fas fa-users',
-            routerLink: ['/user-management/users'],
-          },
-          {
-            label: 'Register User',
-            icon: 'fas fa-user-plus',
-            routerLink: ['/user-management/register'],
-          },
-          {
-            label: 'Role List',
-            icon: 'fas fa-users-rays',
-            routerLink: ['/user-management/roles'],
-          },
+          { label: 'User List', icon: 'fas fa-users', routerLink: ['/user-management/users'] },
+          { label: 'Register User', icon: 'fas fa-user-plus', routerLink: ['/user-management/register'] },
+          { label: 'Role List', icon: 'fas fa-users-rays', routerLink: ['/user-management/roles'] },
         ],
       },
     ];
@@ -199,151 +178,67 @@ export class Header {
 
   getSurveyCtoMenus(): MenuItem[] {
     return [
-      {
-        label: 'SurveyCTO Dashboard',
-        icon: 'fas fa-chart-line',
-        routerLink: ['/cto-dashboard'],
-      },
-      {
-        label: 'Template Export',
-        icon: 'fas fa-poll',
-        routerLink: ['/survey-cto-export'],
-      },
-      {
-        label: 'Data Import',
-        icon: 'fas fa-upload',
-        routerLink: ['/survey-cto-import'],
-      },
-      {
-        label: 'Survey Data View',
-        icon: 'fas fa-file-alt',
-        routerLink: ['/survey-cto-report'],
-      }
+      { label: 'SurveyCTO Dashboard', icon: 'fas fa-chart-line', routerLink: ['/cto-dashboard'] },
+      { label: 'Template Export', icon: 'fas fa-poll', routerLink: ['/survey-cto-export'] },
+      { label: 'Data Import', icon: 'fas fa-upload', routerLink: ['/survey-cto-import'] },
+      { label: 'Survey Data View', icon: 'fas fa-file-alt', routerLink: ['/survey-cto-report'] }
     ];
   }
 
   getMonitoringMenus(): MenuItem[] {
     return [
-      {
-        label: 'Beneficiary Enrolment Summary',
-        icon: 'fas fa-clipboard-list',
-        routerLink: ['/monitoring-evaluation/beneficiary-enrolment-summary'],
-      },
-      {
-        label: 'Cash Transfer Summary',
-        icon: 'fas fa-money-bill-wave',
-        routerLink: ['/monitoring-evaluation/cash-transfer-summary'],
-      },
-      {
-        label: 'Result Framework',
-        icon: 'fas fa-bullseye',
-        routerLink: ['/monitoring-evaluation/result-framework'],
-      },
+      { label: 'Beneficiary Enrolment Summary', icon: 'fas fa-clipboard-list', routerLink: ['/monitoring-evaluation/beneficiary-enrolment-summary'] },
+      { label: 'Cash Transfer Summary', icon: 'fas fa-money-bill-wave', routerLink: ['/monitoring-evaluation/cash-transfer-summary'] },
+      { label: 'Result Framework', icon: 'fas fa-bullseye', routerLink: ['/monitoring-evaluation/result-framework'] },
     ];
   }
 
   getEconomicOpportunitiesMenus(): MenuItem[] {
     return [
+      { label: 'E/O Dashboard', icon: 'fas fa-chart-bar', routerLink: ['/economic-opportunities/dashboard'] },
+      { label: 'Excel Template Download', icon: 'fas fa-file-import', routerLink: ['/economic-opportunities/template-importing'] },
+      { label: 'Excel Template Upload', icon: 'fas fa-file-upload', routerLink: ['/economic-opportunities/template-upload'] },
+      { label: 'Household And Group Mapping', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/household-group-mapping'] },
       {
-        label: 'Dashboard',
-        icon: 'fas fa-chart-bar',
-        routerLink: ['/economic-opportunities/dashboard'],
+        label: 'Beneficiary Enrollment',
+        icon: 'fas fa-user-check',
+        items: [
+          { label: 'Beneficiary Randomization Enrollment', icon: 'fas fa-random', routerLink: ['/economic-opportunities/beneficiary-enrollment/beneficiary-randomization-enrollment'] },
+          { label: 'Household Group View', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/beneficiary-enrollment/household-group-view'] },
+        ],
       },
       {
-        label: 'Excel Template Download',
-        icon: 'fas fa-file-import',
-        routerLink: ['/economic-opportunities/template-importing'],
+        label: 'Course and Training Management',
+        icon: 'fas fa-book-reader',
+        items: [
+          { label: 'Course Entity', icon: 'fas fa-graduation-cap', routerLink: ['/economic-opportunities/course-training/course-entity'] },
+          { label: 'Course Details', icon: 'fas fa-info-circle', routerLink: ['/economic-opportunities/course-training/course-details'] },
+          { label: 'Training Attendance Tracking', icon: 'fas fa-user-check', routerLink: ['/economic-opportunities/course-training/training-attendance-tracking'] },
+        ],
       },
       {
-        label: 'Excel template Upload',
-        icon: 'fas fa-file-upload',
-        routerLink: ['/economic-opportunities/template-upload'],
-      },
-      {
-        label: 'Household And GroupId Mapping',
-        icon: 'fas fa-object-group',
-        routerLink: ['/economic-opportunities/household-group-mapping'],
-      },
-      {
-        label: 'Audit Log',
-        icon: 'fas fa-file-download',
-        routerLink: ['/economic-opportunities/audit-log'],
+        label: 'Others',
+        icon: 'fas fa-ellipsis-h',
+        items: [
+          { label: 'Business Plan Development', icon: 'fas fa-file-invoice-dollar', routerLink: ['/economic-opportunities/others/business-plan-development'] },
+          { label: 'Livelihood Grant Disbursement', icon: 'fas fa-hand-holding-usd', routerLink: ['/economic-opportunities/others/livelihood-grant-disbursement'] },
+          { label: 'Financial Service Linkage Tracking', icon: 'fas fa-link', routerLink: ['/economic-opportunities/others/financial-service-linkage-tracking'] },
+        ],
       },
     ];
   }
 
-  updateMenuList(
-    isUserManagementPage: boolean,
-    isSurveyCtoPage: boolean,
-    isMonitoringPage: boolean = false,
-    isEconomicOpportunitiesPage: boolean = false
-  ) {
-    if (this.isLandingPage) {
-      this.menuList = [];
-      return;
-    }
-
-    if (isSurveyCtoPage) {
-      this.menuList = this.getSurveyCtoMenus();
-      return;
-    }
-
-    if (isMonitoringPage) {
-      this.menuList = this.getMonitoringMenus();
-      return;
-    }
-
-    if (isEconomicOpportunitiesPage) {
-      this.menuList = this.getEconomicOpportunitiesMenus();
-      return;
-    }
-
-    const state = this.azureService.loginState();
-    const permittedMenus = state?.menus || [];
-
-    // Get the current route path without query parameters
-    const currentPath = this.router.url.split('?')[0]; // Strip out query parameters
-    const isHelpDeskPage = currentPath.startsWith('/help-desk/');
-    const hasHelpDeskAccess = permittedMenus
-      .map((m: any) => m.name)
-      .includes('Help Desk');
-
-    if (isHelpDeskPage) {
-      this.menuList = hasHelpDeskAccess ? this.getFilteredHelpDeskItems(permittedMenus) : [];
-      return;
-    }
-
-    // Filter backend menus only for master portal ones
-    const masterMenus = permittedMenus.filter(
-      (m: any) =>
-        m.name === 'User Management' ||
-        (m.parentMenu && m.parentMenu.name === 'User Management')
-    );
-
-    const allowedNames = masterMenus.map((m: any) => m.name);
-    const staticMenus = this.getStaticMasterMenus();
-    const filteredMenus = this.filterMenusByAccess(staticMenus, allowedNames);
-
-    // Only apply menus when in user-management pages (using currentPath)
-    this.menuList = currentPath.startsWith('/user-management/') ? filteredMenus : [];
-  }
-
-
-
-  // ✅ Recursive filter: keep only allowed menus
   filterMenusByAccess(menus: MenuItem[], allowedNames: string[]): MenuItem[] {
     return menus
-      .filter((menu) => menu.label && allowedNames.includes(menu.label)) // ensure label is not undefined
+      .filter((menu) => (menu.label && allowedNames.includes(menu.label)) || menu.separator)
       .map((menu) => ({
         ...menu,
-        items: menu.items
-          ? this.filterMenusByAccess(menu.items, allowedNames)
-          : undefined,
+        items: menu.items ? this.filterMenusByAccess(menu.items, allowedNames) : undefined,
       }));
   }
 
   trackByFn(index: number, item: MenuItem): string {
-    return item.label ?? index.toString(); // fallback to index if label is undefined
+    return item.label ?? index.toString();
   }
 
   getHelpDeskMenuItems(): MenuItem[] {
@@ -358,28 +253,6 @@ export class Header {
     ];
   }
 
-  /**
-   * Returns only the Help Desk child items that the user has permission to access,
-   * based on the permitted menus loaded from menus_<roleId> in session storage.
-   */
-  getFilteredHelpDeskItems(permittedMenus: any[]): MenuItem[] {
-    // Extract permitted URLs that are Help Desk children
-    const permittedUrls = new Set(
-      permittedMenus
-        .filter((m: any) => m.parentMenu?.name === 'Help Desk' && m.status !== false)
-        .map((m: any) => String(m.url || '').replace(/^\/?/, '')) // normalize: remove leading slash
-    );
-
-    const allItems = this.getHelpDeskMenuItems();
-
-    return allItems.filter(item => {
-      if (!item.routerLink) return false;
-      // Normalize routerLink to match URL format (strip leading /)
-      const itemUrl = String(item.routerLink).replace(/^\//, '');
-      return permittedUrls.has(itemUrl);
-    });
-  }
-
   toggleHelpDeskDropdown = () => {
     this.showHelpDeskDropdown = !this.showHelpDeskDropdown;
   };
@@ -391,6 +264,7 @@ export class Header {
   goToProfile = () => {
     this.router.navigateByUrl('/home/profile');
   };
+
   logout() {
     this.apiService.logout();
     window.location.href = `${environment.portals.master}/#/landing`;
