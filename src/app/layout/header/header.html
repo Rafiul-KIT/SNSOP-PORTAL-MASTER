@@ -1,6 +1,5 @@
-
 <div class="header">
-  @if(isLandingPage){
+  @if(isLandingPage()){
       <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0C5358; width: 100%; height:140px;">
 
       <div class="container d-flex justify-content-between align-items-center mt-2 ">
@@ -34,7 +33,7 @@
   </nav>
 
   } @else {
-  @if (isPortalsPage) {
+  @if (isPortalsPage()) {
   <div class="portals" (click)="showPortalOptions = !showPortalOptions">
     &nbsp;<i class="fas fa-braille hand"></i>
     <div>
@@ -62,28 +61,15 @@
       }
     </div>
   </div>
-   <!--@if(menuList && menuList.length > 0){
-  <div class="menues">
-    @for(menu of menuList; track menu){
-    <p-button
-      label="{{ menu.label }}"
-      variant="text"
-      [icon]="menu.icon"
-      severity="secondary"
-      [routerLink]="menu.routerLink"
-    />
-    }
-  </div>
-  }-->
 
   <div class="menues">
-    <p-menubar [model]="menuList"></p-menubar>
+    <p-menubar [model]="menuList()"></p-menubar>
   </div>
 
   <!-- Logged In User -->
-  @if(userInfo){
+  @if(userInfo()){
   <div class="help-desk-desktop pe-1">
-    @if(canAccessHelpDesk){
+    @if(canAccessHelpDesk()){
       <div class="help-desk-menu-container">
         <button class="helpdesk-trigger" (click)="toggleHelpDeskDropdown()">
           <i class="fas fa-headset"></i>
@@ -92,14 +78,15 @@
         </button>
 
         <div class="help-desk-menu {{ showHelpDeskDropdown ? 'show' : '' }}" (mouseleave)="hideHelpDeskDropdown()">
-          @for (item of helpDeskChildren; track item.label) {
+          @for (item of helpDeskChildren(); track item.label) {
             @if (item.separator) {
               <div class="menu-divider"></div>
+            } @else {
+              <a class="item {{ item.separator ? 'item-highlight' : '' }}" [routerLink]="item.routerLink" (click)="hideHelpDeskDropdown()">
+                <i class="{{ item.icon }} me-2"></i>
+                {{ item.label }}
+              </a>
             }
-            <a class="item {{ item.separator ? 'item-highlight' : '' }}" [routerLink]="item.routerLink" (click)="hideHelpDeskDropdown()">
-              <i class="{{ item.icon }} me-2"></i>
-              {{ item.label }}
-            </a>
           }
         </div>
       </div>
@@ -124,16 +111,18 @@
       Logout
     </div>
     <!-- Mobile Help Desk items -->
-    @if(canAccessHelpDesk && helpDeskChildren.length > 0){
+    @if(canAccessHelpDesk() && helpDeskChildren().length > 0){
       <div class="item help-desk-mobile-header">
         <hr class="my-1">
         <span class="fw-bold text-muted px-2">Help</span>
       </div>
-      @for (item of helpDeskChildren; track item.label) {
-        <a class="item help-desk-mobile-item" [routerLink]="item.routerLink" (click)="showUsermenu = false">
-          <i class="{{ item.icon }} me-2"></i>
-          {{ item.label }}
-        </a>
+      @for (item of helpDeskChildren(); track item.label) {
+        @if (!item.separator) {
+          <a class="item help-desk-mobile-item" [routerLink]="item.routerLink" (click)="showUsermenu = false">
+            <i class="{{ item.icon }} me-2"></i>
+            {{ item.label }}
+          </a>
+        }
       }
     }
   </div>
