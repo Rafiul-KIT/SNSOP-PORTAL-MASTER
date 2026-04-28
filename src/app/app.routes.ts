@@ -110,14 +110,35 @@ export const routes: Routes = [
       { path: 'household-group-mapping', component: EconomicOpportunitiesHouseholdGroupMapping, canActivate: [routeGuard], },
       { path: 'audit-log', component: EconomicOpportunitiesAuditRecordDownload, canActivate: [routeGuard], },
       { path: 'audit-record-download', redirectTo: 'audit-log', pathMatch: 'full' },
-      { path: 'household-group-view', component: EconomicOpportunitiesHouseholdGroupView, canActivate: [routeGuard], },
-      { path: 'beneficiary-randomization-enrollment', component: EconomicOpportunitiesBeneficiaryRandomizationEnrollment, canActivate: [routeGuard], },
-      { path: 'course-entity', component: UnderConstruction, canActivate: [routeGuard], },
-      { path: 'course-details', component: UnderConstruction, canActivate: [routeGuard], },
-      { path: 'training-attendance-tracking', component: UnderConstruction, canActivate: [routeGuard], },
-      { path: 'business-plan-development', component: UnderConstruction, canActivate: [routeGuard], },
-      { path: 'livelihood-grant-disbursement', component: UnderConstruction, canActivate: [routeGuard], },
-      { path: 'financial-service-linkage-tracking', component: UnderConstruction, canActivate: [routeGuard], },
+      {
+        path: 'beneficiary-enrollment',
+        canActivate: [routeGuard],
+        children: [
+          { path: 'beneficiary-randomization-enrollment', component: EconomicOpportunitiesBeneficiaryRandomizationEnrollment, canActivate: [routeGuard] },
+          { path: 'household-group-view', component: EconomicOpportunitiesHouseholdGroupView, canActivate: [routeGuard] },
+          { path: '', component: UnderConstruction, pathMatch: 'full' }
+        ]
+      },
+      {
+        path: 'course-training',
+        canActivate: [routeGuard],
+        children: [
+          { path: 'course-entity', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: 'course-details', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: 'training-attendance-tracking', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: '', component: UnderConstruction, pathMatch: 'full' }
+        ]
+      },
+      {
+        path: 'others',
+        canActivate: [routeGuard],
+        children: [
+          { path: 'business-plan-development', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: 'livelihood-grant-disbursement', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: 'financial-service-linkage-tracking', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: '', component: UnderConstruction, pathMatch: 'full' }
+        ]
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

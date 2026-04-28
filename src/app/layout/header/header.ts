@@ -197,32 +197,32 @@ export class Header {
     return [
       { label: 'E/O Dashboard', icon: 'fas fa-chart-bar', routerLink: ['/economic-opportunities/dashboard'] },
       { label: 'Excel Template Download', icon: 'fas fa-file-import', routerLink: ['/economic-opportunities/template-importing'] },
-      { label: 'Excel template Upload', icon: 'fas fa-file-upload', routerLink: ['/economic-opportunities/template-upload'] },
-      { label: 'Household And GroupId Mapping', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/household-group-mapping'] },
+      { label: 'Excel Template Upload', icon: 'fas fa-file-upload', routerLink: ['/economic-opportunities/template-upload'] },
+      { label: 'Household And Group Mapping', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/household-group-mapping'] },
       {
-        label: 'Beneficiary enrollment',
+        label: 'Beneficiary Enrollment',
         icon: 'fas fa-user-check',
         items: [
-          { label: 'Household Group view', icon: 'fas fa-users', routerLink: ['/economic-opportunities/household-group-view'] },
-          { label: 'Beneficiary Randomization Enrollment', icon: 'fas fa-random', routerLink: ['/economic-opportunities/beneficiary-randomization-enrollment'] },
+          { label: 'Beneficiary Randomization Enrollment', icon: 'fas fa-random', routerLink: ['/economic-opportunities/beneficiary-enrollment/beneficiary-randomization-enrollment'] },
+          { label: 'Household Group View', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/beneficiary-enrollment/household-group-view'] },
         ],
       },
       {
-        label: 'Course and traning management',
+        label: 'Course and Training Management',
         icon: 'fas fa-book-reader',
         items: [
-          { label: 'Course Entity', icon: 'fas fa-graduation-cap', routerLink: ['/economic-opportunities/course-entity'] },
-          { label: 'Course Details', icon: 'fas fa-info-circle', routerLink: ['/economic-opportunities/course-details'] },
-          { label: 'Training Attendance Tracking', icon: 'fas fa-user-check', routerLink: ['/economic-opportunities/training-attendance-tracking'] },
+          { label: 'Course Entity', icon: 'fas fa-graduation-cap', routerLink: ['/economic-opportunities/course-training/course-entity'] },
+          { label: 'Course Details', icon: 'fas fa-info-circle', routerLink: ['/economic-opportunities/course-training/course-details'] },
+          { label: 'Training Attendance Tracking', icon: 'fas fa-user-check', routerLink: ['/economic-opportunities/course-training/training-attendance-tracking'] },
         ],
       },
       {
-        label: 'Other',
+        label: 'Others',
         icon: 'fas fa-ellipsis-h',
         items: [
-          { label: 'Business Plan Development', icon: 'fas fa-file-invoice-dollar', routerLink: ['/economic-opportunities/business-plan-development'] },
-          { label: 'Livelihood Grant Disbursement', icon: 'fas fa-hand-holding-usd', routerLink: ['/economic-opportunities/livelihood-grant-disbursement'] },
-          { label: 'Financial Service Linkage Tracking', icon: 'fas fa-link', routerLink: ['/economic-opportunities/financial-service-linkage-tracking'] },
+          { label: 'Business Plan Development', icon: 'fas fa-file-invoice-dollar', routerLink: ['/economic-opportunities/others/business-plan-development'] },
+          { label: 'Livelihood Grant Disbursement', icon: 'fas fa-hand-holding-usd', routerLink: ['/economic-opportunities/others/livelihood-grant-disbursement'] },
+          { label: 'Financial Service Linkage Tracking', icon: 'fas fa-link', routerLink: ['/economic-opportunities/others/financial-service-linkage-tracking'] },
         ],
       },
     ];
