@@ -54,6 +54,14 @@ export class ResultFramework implements OnInit {
 
   indicatorOptions: any[] = [];
 
+  get selectedIndicatorLabel(): string {
+    if (!this.filters.indicatorId) {
+      return '--';
+    }
+
+    return this.lookupService.getIndicatorLabelByValue(this.filters.indicatorId);
+  }
+
   // Conditional filter visibility based on selected indicator
   showSex = false;
   showAgeRange = false;

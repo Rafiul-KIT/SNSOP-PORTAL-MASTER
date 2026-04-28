@@ -1,5 +1,4 @@
 
-
 <div class="header">
   @if(isLandingPage){
       <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0C5358; width: 100%; height:140px;">
@@ -20,7 +19,7 @@
 </div>
       </a>
       <div class="w-100 d-flex justify-content-end">
-  <button 
+  <button
     class="btn btn-primary fw-bold mt-lg-4 ms-auto px-3 px-lg-4 py-1 py-lg-2"
     [disabled]="isLoading"
     (click)="loginWithAzureAD()">
@@ -48,7 +47,7 @@
   }
   <div class="portals-option-wrapper {{ showPortalOptions ? 'show' : '' }}" (mouseleave)="showPortalOptions = false">
     <div class="portal-items">
-      @for (portal of portalList(); track portal) {
+      @for (portal of portalList; track portal) {
         @if (portal.command) {
           <a class="item" (click)="portal.command(); $event.preventDefault()" href="#">
             <i class="{{ portal.icon }} w-50"></i>
@@ -84,7 +83,7 @@
   <!-- Logged In User -->
   @if(userInfo){
   <div class="help-desk-desktop pe-1">
-    @if(canAccessHelpDesk()){
+    @if(canAccessHelpDesk){
       <div class="help-desk-menu-container">
         <button class="helpdesk-trigger" (click)="toggleHelpDeskDropdown()">
           <i class="fas fa-headset"></i>
@@ -93,7 +92,7 @@
         </button>
 
         <div class="help-desk-menu {{ showHelpDeskDropdown ? 'show' : '' }}" (mouseleave)="hideHelpDeskDropdown()">
-          @for (item of helpDeskChildren(); track item.label) {
+          @for (item of helpDeskChildren; track item.label) {
             @if (item.separator) {
               <div class="menu-divider"></div>
             }
@@ -125,12 +124,12 @@
       Logout
     </div>
     <!-- Mobile Help Desk items -->
-    @if(canAccessHelpDesk() && helpDeskChildren().length > 0){
+    @if(canAccessHelpDesk && helpDeskChildren.length > 0){
       <div class="item help-desk-mobile-header">
         <hr class="my-1">
         <span class="fw-bold text-muted px-2">Help</span>
       </div>
-      @for (item of helpDeskChildren(); track item.label) {
+      @for (item of helpDeskChildren; track item.label) {
         <a class="item help-desk-mobile-item" [routerLink]="item.routerLink" (click)="showUsermenu = false">
           <i class="{{ item.icon }} me-2"></i>
           {{ item.label }}
@@ -141,4 +140,3 @@
   }
 }
 </div>
- 

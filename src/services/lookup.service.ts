@@ -290,6 +290,19 @@ async getMenuList(): Promise<MenuItem[]> {
     return this.indicatorsByType[type] || [];
   }
 
+  getIndicatorLabelByValue(value: number | string): string {
+    const indicatorValue = Number(value);
+
+    for (const indicators of Object.values(this.indicatorsByType)) {
+      const match = indicators.find((indicator) => indicator.value === indicatorValue);
+      if (match) {
+        return match.label;
+      }
+    }
+
+    return String(value ?? '--');
+  }
+
 /** Get label by menu URL */
 getMenuLabelByValue(value: string): string {
   // Optional chaining safely handles null cache
