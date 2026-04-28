@@ -25,6 +25,8 @@ import { EconomicOpportunitiesTemplateImporting } from './pages/economic-opportu
 import { EconomicOpportunitiesTemplateUpload } from './pages/economic-opportunities/template-upload/economic-opportunities-template-upload';
 import { EconomicOpportunitiesHouseholdGroupMapping } from './pages/economic-opportunities/household-group-mapping/economic-opportunities-household-group-mapping';
 import { EconomicOpportunitiesAuditRecordDownload } from './pages/economic-opportunities/audit-record-download/economic-opportunities-audit-record-download';
+import { EconomicOpportunitiesBeneficiaryRandomizationEnrollment } from './pages/economic-opportunities/beneficiary-randomization-enrollment/economic-opportunities-beneficiary-randomization-enrollment';
+import { EconomicOpportunitiesHouseholdGroupView } from './pages/economic-opportunities/household-group-view/economic-opportunities-household-group-view';
 import { Metabase } from './pages/metabase/metabase';
 
 
@@ -108,7 +110,14 @@ export const routes: Routes = [
       { path: 'household-group-mapping', component: EconomicOpportunitiesHouseholdGroupMapping, canActivate: [routeGuard], },
       { path: 'audit-log', component: EconomicOpportunitiesAuditRecordDownload, canActivate: [routeGuard], },
       { path: 'audit-record-download', redirectTo: 'audit-log', pathMatch: 'full' },
-      { path: 'household-group-view', redirectTo: 'household-group-mapping', pathMatch: 'full' },
+      { path: 'household-group-view', component: EconomicOpportunitiesHouseholdGroupView, canActivate: [routeGuard], },
+      { path: 'beneficiary-randomization-enrollment', component: EconomicOpportunitiesBeneficiaryRandomizationEnrollment, canActivate: [routeGuard], },
+      { path: 'course-entity', component: UnderConstruction, canActivate: [routeGuard], },
+      { path: 'course-details', component: UnderConstruction, canActivate: [routeGuard], },
+      { path: 'training-attendance-tracking', component: UnderConstruction, canActivate: [routeGuard], },
+      { path: 'business-plan-development', component: UnderConstruction, canActivate: [routeGuard], },
+      { path: 'livelihood-grant-disbursement', component: UnderConstruction, canActivate: [routeGuard], },
+      { path: 'financial-service-linkage-tracking', component: UnderConstruction, canActivate: [routeGuard], },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

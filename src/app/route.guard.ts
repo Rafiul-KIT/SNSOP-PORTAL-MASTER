@@ -57,41 +57,6 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
     );
   };
 
-  const menuHasModuleAccess = (menus: any[], moduleUrl: string, moduleNames: string[]): boolean => {
-    const baseUrl = normalizeUrl(moduleUrl);
-    const normalizeName = (name: string): string =>
-      name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
-    const compactName = (name: string): string => normalizeName(name).replace(/\s+/g, '');
-    const normalizedModuleNames = moduleNames.map(name => normalizeName(name));
-    const compactModuleNames = moduleNames.map(name => compactName(name));
-    const matchesModuleName = (name: string): boolean => {
-      const normalizedName = normalizeName(name);
-      const compactedName = compactName(name);
-
-      return normalizedModuleNames.some(moduleName =>
-        normalizedName === moduleName ||
-        normalizedName.startsWith(`${moduleName} `) ||
-        normalizedName.includes(moduleName)
-      ) || compactModuleNames.some(moduleName => compactedName.includes(moduleName));
-    };
-
-    return menus.some((menu) => {
-      const menuUrl = typeof menu.url === 'string' ? normalizeUrl(menu.url) : '';
-      const menuName = typeof menu.name === 'string' ? menu.name : '';
-      const parentName = typeof menu.parentMenu?.name === 'string' ? menu.parentMenu.name : '';
-      const parentUrl = typeof menu.parentMenu?.url === 'string' ? normalizeUrl(menu.parentMenu.url) : '';
-
-      return (
-        matchesModuleName(menuName) ||
-        matchesModuleName(parentName) ||
-        menuUrl === baseUrl ||
-        menuUrl.startsWith(`${baseUrl}/`) ||
-        parentUrl === baseUrl ||
-        parentUrl.startsWith(`${baseUrl}/`)
-      );
-    });
-  };
-
   const hasAccess = (menus: any[], url: string): boolean => {
     const cleanUrl = normalizeUrl(url);
 
@@ -101,72 +66,6 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
       // Check for exact match or parameterized match.
       if (routeMatches(menu.url, cleanUrl)) {
         return true;
-      }
-    }
-
-    const moduleAccessRules = [
-      {
-        urls: ['/cto-dashboard', '/survey-cto-export', '/survey-cto-import', '/survey-cto-report'],
-        names: ['Survey CTO', 'SurveyCTO'],
-      },
-      {
-        urls: ['/help-desk'],
-        names: ['Help Desk'],
-      },
-      {
-        urls: ['/monitoring-evaluation'],
-        names: ['Monitoring & Evaluation', 'Monitoring and Evaluation'],
-      },
-      {
-        urls: ['/economic-opportunities'],
-        names: ['Economic Opportunities'],
-      },
-    ];
-
-    for (const rule of moduleAccessRules) {
-      for (const ruleUrl of rule.urls) {
-        const moduleUrl = normalizeUrl(ruleUrl);
-        if (
-          (cleanUrl === moduleUrl || cleanUrl.startsWith(`${moduleUrl}/`)) &&
-          menuHasModuleAccess(menus, moduleUrl, rule.names)
-        ) {
-          return true;
-        }
-      }
-    }
-
-    const authenticatedPortalRoutes = [
-      '/cto-dashboard',
-      '/survey-cto-export',
-      '/survey-cto-import',
-      '/survey-cto-report',
-      '/help-desk',
-      '/monitoring-evaluation',
-      '/economic-opportunities',
-    ];
-
-    for (const portalRoute of authenticatedPortalRoutes) {
-      const moduleUrl = normalizeUrl(portalRoute);
-      if (cleanUrl === moduleUrl || cleanUrl.startsWith(`${moduleUrl}/`)) {
-        return true;
-      }
-    }
-
-    // If the route is not found in the menu, allow access to known dynamic paths like:
-    //  - /beneficiary/details/:id
-    //  - /beneficiary/edit/:applicationId
-    //  - Any other parameterized route you want to allow
-    const dynamicRoutePrefixes = [
-    
-      '/help-desk/',
-      '/help-desk/support-management',
-      '/help-desk/support-management/',
-    ];
-
-    // Check if the route starts with any of the dynamic prefixes
-    for (const prefix of dynamicRoutePrefixes) {
-      if (cleanUrl.startsWith(prefix)) {
-        return true; // Allow access to dynamic routes
       }
     }
 
