@@ -82,7 +82,7 @@
             @if (item.separator) {
               <div class="menu-divider"></div>
             } @else {
-              <a class="item {{ item.separator ? 'item-highlight' : '' }}" [routerLink]="item.routerLink" (click)="hideHelpDeskDropdown()">
+              <a class="item" [class.item-highlight]="item.label === 'User Manual'" [routerLink]="item.routerLink" (click)="hideHelpDeskDropdown()">
                 <i class="{{ item.icon }} me-2"></i>
                 {{ item.label }}
               </a>
@@ -118,7 +118,7 @@
       </div>
       @for (item of helpDeskChildren(); track item.label) {
         @if (!item.separator) {
-          <a class="item help-desk-mobile-item" [routerLink]="item.routerLink" (click)="showUsermenu = false">
+          <a class="item help-desk-mobile-item" [class.item-highlight]="item.label === 'User Manual'" [routerLink]="item.routerLink" (click)="showUsermenu = false">
             <i class="{{ item.icon }} me-2"></i>
             {{ item.label }}
           </a>
