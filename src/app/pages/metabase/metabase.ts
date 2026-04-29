@@ -2,9 +2,17 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { SignJWT } from 'jose';
+import { ApiService } from '../../../services/api.service';
 
 const METABASE_SITE_URL = "https://analytics.southsudansafetynet.info";
-const METABASE_SECRET_KEY = "900a8210d5a03e1982ed4621f9bc5192d26de8422bdf2617f5baa83e5aa4efad";
+const METABASE_SECRET_KEY = "9ac3605622effc33ebca721a877b0de842724a15ca8826c1869498ef283a1399";
+
+interface MetabaseDashboard {
+  id: number;
+  name: string;
+  description?: string;
+  creatorId?: number;
+}
 
 @Component({
   selector: 'app-metabase',
@@ -14,14 +22,8 @@ const METABASE_SECRET_KEY = "900a8210d5a03e1982ed4621f9bc5192d26de8422bdf2617f5b
   styleUrl: './metabase.scss'
 })
 export class Metabase implements OnInit {
-  currentDashboardId: number = 6; // Default dashboard
-  dashboards = [
-    { id: 6, name: 'Latest Beneficiaries' },
-    { id: 7, name: 'GRM Group By Gender' },
-    { id: 5, name: 'Payment Report' },
-    { id: 4, name: 'Reconciliation Summary Report' }
-  ];
-
+  currentDashboardId: number | null = null;
+  dashboards: MetabaseDashboard[] = [];
   token: string = "";
   iframeUrl: SafeResourceUrl | null = null;
   error: string = "";
@@ -29,11 +31,45 @@ export class Metabase implements OnInit {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private apiService: ApiService
   ) {}
 
   async ngOnInit() {
-    await this.loadDashboard(this.currentDashboardId);
+    await this.fetchDashboards();
+  }
+
+  get currentDashboardName(): string {
+    return this.dashboards.find(dashboard => dashboard.id === this.currentDashboardId)?.name || 'Dashboard';
+  }
+
+  async fetchDashboards() {
+    this.isLoading = true;
+    this.error = "";
+    this.iframeUrl = null;
+
+    try {
+      const response = await this.apiService.GET<MetabaseDashboard[] | { data: MetabaseDashboard[] }>('/client/get-dashboards');
+      const responseBody = response.data;
+      const data = Array.isArray(responseBody) ? responseBody : responseBody?.data;
+
+      this.dashboards = (data || []).filter(dashboard => Number.isFinite(dashboard?.id) && !!dashboard?.name);
+
+      if (!this.dashboards.length) {
+        this.currentDashboardId = null;
+        this.error = 'No dashboards found.';
+        return;
+      }
+
+      await this.loadDashboard(this.dashboards[0].id);
+    } catch (err: any) {
+      console.error("Dashboard list fetch failed:", err);
+      this.currentDashboardId = null;
+      this.error = err?.response?.data?.message || err.message || "Unable to fetch dashboards.";
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
   }
 
   async loadDashboard(id: number) {
