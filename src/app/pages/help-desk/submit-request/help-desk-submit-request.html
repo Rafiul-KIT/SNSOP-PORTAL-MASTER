@@ -41,6 +41,15 @@
                   <small class="error-text">Category is required.</small>
                 }
               </div>
+              @if (isOtherCategorySelected()) {
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Other Category <span class="required-asterisk">*</span></label>
+                  <input type="text" pInputText class="w-100" formControlName="otherCategory" placeholder="Enter other category" />
+                  @if (requestForm.get('otherCategory')?.invalid && (requestForm.get('otherCategory')?.dirty || requestForm.get('otherCategory')?.touched)) {
+                    <small class="error-text">Other category is required.</small>
+                  }
+                </div>
+              }
               <div class="col-12 col-md-6">
                 <label class="form-label">Priority <span class="required-asterisk">*</span></label>
                 <p-select [options]="priorities" formControlName="priority" optionLabel="label" optionValue="value" placeholder="Select priority" class="w-100" />

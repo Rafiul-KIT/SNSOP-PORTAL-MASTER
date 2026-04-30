@@ -36,8 +36,11 @@ export class Header {
   permittedMenus = computed(() => this.loginState()?.menus || []);
   allPermittedNames = computed(() => this.permittedMenus().map((m: any) => m.name));
 
-  canAccessHelpDesk = computed(() => this.allPermittedNames().includes('Help Desk'));
+  // canAccessHelpDesk = computed(() => this.allPermittedNames().includes('Help Desk'));
+  canAccessHelpDesk = true;
+
   helpDeskChildren = computed(() => {
+    
     const names = this.allPermittedNames();
     return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
   });

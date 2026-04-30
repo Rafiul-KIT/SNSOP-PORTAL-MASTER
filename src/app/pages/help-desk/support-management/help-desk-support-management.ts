@@ -151,6 +151,13 @@ export class HelpDeskSupportManagement implements OnInit {
     return status.replace(/_/g, ' ');
   }
 
+  getCategoryDisplay(request?: ITRequest | null): string {
+    if (!request) return '--';
+    const categoryName = request.categoryName || '--';
+    const otherCategory = String(request.otherCategory || '').trim();
+    return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
+  }
+
   private getCurrentUser(): any {
     return this.apiService.loginState()?.user || {};
   }

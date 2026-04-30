@@ -19,7 +19,7 @@
 
       <div class="stats-grid mt-3">
         <div class="stat-box"><span>Priority</span><strong>{{ detailRequest.priority || '--' }}</strong></div>
-        <div class="stat-box"><span>Category</span><strong>{{ detailRequest.categoryName || '--' }}</strong></div>
+        <div class="stat-box"><span>Category</span><strong>{{ getCategoryDisplay(detailRequest) }}</strong></div>
         <div class="stat-box"><span>Module</span><strong>{{ detailRequest.moduleName || '--' }}</strong></div>
         <div class="stat-box"><span>Created</span><strong>{{ formatDate(detailRequest.createdAt) }}</strong></div>
       </div>

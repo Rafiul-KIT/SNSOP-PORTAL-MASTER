@@ -42,6 +42,7 @@ export interface ITRequest {
   description: string;
   categoryId: number;
   categoryName: string;
+  otherCategory?: string | null;
   moduleId: number;
   moduleName: string;
   priority: string;
@@ -291,6 +292,7 @@ export class ItSupportService {
     title: string;
     description: string;
     categoryId: number;
+    otherCategory?: string | null;
     moduleId: number;
     priority: string;
     files?: File[];
@@ -302,6 +304,7 @@ export class ItSupportService {
         title: payload.title,
         description: payload.description,
         categoryId: payload.categoryId,
+        otherCategory: payload.otherCategory ?? null,
         moduleId: payload.moduleId,
         priority: payload.priority,
       };
@@ -328,7 +331,7 @@ export class ItSupportService {
 
   async updateRequest(
     id: number,
-    payload: { description: string; categoryId: number; moduleId: number; priority: string }
+    payload: { description: string; categoryId: number; otherCategory?: string | null; moduleId: number; priority: string }
   ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
     try {
       const res = await this.api.PUT<any>(`${this.baseEndpoint}/requests/${id}`, payload);

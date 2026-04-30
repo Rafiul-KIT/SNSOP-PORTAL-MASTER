@@ -99,7 +99,7 @@
                 <td>
                   <p-tag [value]="ticket.priority || '--'" [severity]="getPrioritySeverity(ticket.priority)" />
                 </td>
-                <td>{{ ticket.categoryName || '--' }}</td>
+                <td>{{ getCategoryDisplay(ticket) }}</td>
                 <td>{{ ticket.moduleName || '--' }}</td>
                 <td>
                   <div class="d-flex flex-wrap gap-1">

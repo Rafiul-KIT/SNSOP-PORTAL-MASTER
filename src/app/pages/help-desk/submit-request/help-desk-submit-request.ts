@@ -64,6 +64,7 @@ export class HelpDeskSubmitRequest implements OnInit {
     this.requestForm = this.fb.group({
       issueTitle: ['', Validators.required],
       category: [null, Validators.required],
+      otherCategory: [null],
       priority: [null, Validators.required],
       // issueType: [null, Validators.required],
       description: ['', Validators.required],
@@ -75,6 +76,7 @@ export class HelpDeskSubmitRequest implements OnInit {
 
   ngOnInit(): void {
     this.loadDropdowns();
+    this.requestForm.get('category')?.valueChanges.subscribe(() => this.syncOtherCategoryValidator());
   }
 
   private detectChanges(): void {
@@ -102,6 +104,7 @@ export class HelpDeskSubmitRequest implements OnInit {
           }));
 
           this.isLoading = false;
+          this.syncOtherCategoryValidator();
           this.detectChanges();
         });
       } catch (error) {
@@ -112,6 +115,29 @@ export class HelpDeskSubmitRequest implements OnInit {
         });
       }
     });
+  }
+
+  private isOtherCategoryName(name?: string | null): boolean {
+    return String(name || '').trim().toLowerCase() === 'other';
+  }
+
+  isOtherCategorySelected(): boolean {
+    const selectedCategoryId = Number(this.requestForm.get('category')?.value);
+    return this.categories.some((cat) => Number(cat.value) === selectedCategoryId && this.isOtherCategoryName(cat.label));
+  }
+
+  private syncOtherCategoryValidator(): void {
+    const otherCategoryControl = this.requestForm.get('otherCategory');
+    if (!otherCategoryControl) return;
+
+    if (this.isOtherCategorySelected()) {
+      otherCategoryControl.setValidators([Validators.required, Validators.pattern(/\S/)]);
+    } else {
+      otherCategoryControl.clearValidators();
+      otherCategoryControl.setValue(null, { emitEvent: false });
+    }
+
+    otherCategoryControl.updateValueAndValidity({ emitEvent: false });
   }
 
   onFileSelect(event: Event): void {
@@ -196,12 +222,16 @@ export class HelpDeskSubmitRequest implements OnInit {
       this.detectChanges();
       
       const formValue = this.requestForm.value;
+      const otherCategory = this.isOtherCategorySelected()
+        ? String(formValue.otherCategory || '').trim()
+        : null;
 
       try {
         const result = await this.itSupportService.createRequest({
           title: formValue.issueTitle,
           description: formValue.description,
           categoryId: formValue.category,
+          otherCategory,
           moduleId: formValue.module,
           priority: formValue.priority,
           files: this.selectedFiles

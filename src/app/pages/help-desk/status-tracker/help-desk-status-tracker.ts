@@ -119,6 +119,13 @@ export class HelpDeskStatusTracker {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
+  getCategoryDisplay(request?: ITRequest | null): string {
+    if (!request) return '--';
+    const categoryName = request.categoryName || '--';
+    const otherCategory = String(request.otherCategory || '').trim();
+    return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
+  }
+
   private prettifyFieldName(field?: string): string {
     if (!field) return 'Field';
     return field
