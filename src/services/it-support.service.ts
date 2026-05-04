@@ -13,6 +13,13 @@ export interface ITModule {
   description: string;
 }
 
+export interface ITSubmodule {
+  id: number;
+  parentModuleId: number;
+  name: string;
+  description: string;
+}
+
 export interface ITAttachment {
   id: number;
   requestId: number;
@@ -126,6 +133,10 @@ export interface ITLookupPayload {
   description: string;
 }
 
+export interface ITSubmodulePayload extends ITLookupPayload {
+  parentModuleId: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -173,6 +184,16 @@ export class ItSupportService {
     try {
       const res = await this.api.GET<any>(`${this.baseEndpoint}/modules`);
       const response = this.parseApiResponse<ITModule[]>(res);
+      return response?.success && Array.isArray(response.data) ? response.data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  async getSubmodules(): Promise<ITSubmodule[]> {
+    try {
+      const res = await this.api.GET<any>(`${this.baseEndpoint}/submodules`);
+      const response = this.parseApiResponse<ITSubmodule[]>(res);
       return response?.success && Array.isArray(response.data) ? response.data : [];
     } catch {
       return [];
@@ -257,6 +278,50 @@ export class ItSupportService {
       return {
         success: false,
         message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update module',
+      };
+    }
+  }
+
+  async createSubmodule(payload: ITSubmodulePayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.POST<any>(`${this.baseEndpoint}/submodules`, {
+        id: 0,
+        parentModuleId: payload.parentModuleId,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to create submodule',
+      };
+    }
+  }
+
+  async updateSubmodule(id: number, payload: ITSubmodulePayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.PUT<any>(`${this.baseEndpoint}/submodules/${id}`, {
+        id,
+        parentModuleId: payload.parentModuleId,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update submodule',
       };
     }
   }

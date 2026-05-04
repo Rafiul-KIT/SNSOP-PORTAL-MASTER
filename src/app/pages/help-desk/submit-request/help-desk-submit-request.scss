@@ -90,15 +90,15 @@
   position: relative;
   overflow: hidden;
   background: #ffffff;
-  border-color: #86efac;
-  box-shadow: 0 8px 22px rgba(22, 163, 74, 0.13);
+  border-color: #0f5132;
+  box-shadow: 0 8px 22px rgba(6, 78, 59, 0.18);
 
   &::before {
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
     width: 5px;
-    background: #16a34a;
+    background: #064e3b;
   }
 
   p {
@@ -114,8 +114,8 @@
   margin-bottom: 0.7rem;
   padding: 0.18rem 0.55rem;
   border-radius: 999px;
-  background: #dcfce7;
-  color: #15803d;
+  background: #d1fae5;
+  color: #064e3b;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -136,14 +136,14 @@
   flex: 0 0 auto;
   border-radius: 8px;
   color: #ffffff;
-  background: #16a34a;
-  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.25);
+  background: #064e3b;
+  box-shadow: 0 6px 14px rgba(6, 78, 59, 0.28);
 }
 
 :host ::ng-deep .setup-shortcut .p-button {
   justify-content: center;
-  border-color: #15803d;
-  background: #16a34a;
+  border-color: #064e3b;
+  background: #064e3b;
   font-weight: 700;
 }
 

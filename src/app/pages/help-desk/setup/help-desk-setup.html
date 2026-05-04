@@ -8,7 +8,7 @@
   <div class="helpdesk-container">
     <div class="page-header">
       <div>
-        <h2 class="page-title">Categories & Modules</h2>
+        <h2 class="page-title">Categories, Modules & Submodules</h2>
         <p class="page-subtitle">Maintain the lookup values used when users submit and update help desk requests.</p>
       </div>
       <div class="header-actions">
@@ -37,6 +37,13 @@
           <strong>{{ modules.length }}</strong>
         </div>
         <span class="summary-icon"><i class="fas fa-cubes"></i></span>
+      </div>
+      <div class="summary-tile tile-submodule">
+        <div>
+          <span class="summary-label">Submodules</span>
+          <strong>{{ submodules.length }}</strong>
+        </div>
+        <span class="summary-icon"><i class="fas fa-sitemap"></i></span>
       </div>
     </div>
 
@@ -100,6 +107,7 @@
                       severity="secondary"
                       size="small"
                       [outlined]="true"
+                      [disabled]="isOtherCategory(item)"
                       (onClick)="openEditDialog('category', item)"
                     ></p-button>
                   </td>
@@ -157,7 +165,7 @@
                 <tr>
                   <td>
                     <div class="item-name">{{ item.name }}</div>
-                    <div class="item-id">ID {{ item.id }}</div>
+                    <!-- <div class="item-id">ID {{ item.id }}</div> -->
                   </td>
                   <td>
                     <div class="description-cell">{{ item.description || '--' }}</div>
@@ -170,6 +178,78 @@
                       size="small"
                       [outlined]="true"
                       (onClick)="openEditDialog('module', item)"
+                    ></p-button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        }
+      </section>
+
+      <section class="lookup-card lookup-card-wide">
+        <div class="lookup-card-head">
+          <div>
+            <h5 class="card-section-title">Submodules</h5>
+            <p-tag [value]="submoduleCountLabel" severity="success"></p-tag>
+          </div>
+          <p-button
+            label="Add Submodule"
+            icon="fas fa-plus"
+            severity="success"
+            size="small"
+            (onClick)="openAddDialog('submodule')"
+          ></p-button>
+        </div>
+
+        <div class="lookup-toolbar">
+          <span class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="submoduleSearch"
+              placeholder="Search submodules or parent modules"
+              aria-label="Search submodules"
+            />
+          </span>
+        </div>
+
+        @if (filteredItems('submodule').length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-sitemap"></i>
+            <span>No submodules found.</span>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <p-table [value]="filteredItems('submodule')" [tableStyle]="{ 'min-width': '760px' }" size="small" [stripedRows]="true">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Name</th>
+                  <th>Parent Module</th>
+                  <th>Description</th>
+                  <th class="action-column">Action</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>
+                    <div class="item-name">{{ item.name }}</div>
+                  </td>
+                  <td>
+                    <span class="parent-pill">{{ getParentModuleName(item.parentModuleId) }}</span>
+                  </td>
+                  <td>
+                    <div class="description-cell">{{ item.description || '--' }}</div>
+                  </td>
+                  <td class="action-column">
+                    <p-button
+                      label="Edit"
+                      icon="fas fa-pen"
+                      severity="secondary"
+                      size="small"
+                      [outlined]="true"
+                      (onClick)="openEditDialog('submodule', item)"
                     ></p-button>
                   </td>
                 </tr>
@@ -192,6 +272,24 @@
     (onHide)="closeDialog()"
   >
     <form [formGroup]="lookupForm" class="lookup-form" (ngSubmit)="saveLookup()">
+      @if (activeKind === 'submodule') {
+        <div class="form-field">
+          <label for="lookup-parent-module">Parent Module <span>*</span></label>
+          <p-select
+            inputId="lookup-parent-module"
+            [options]="moduleOptions"
+            formControlName="parentModuleId"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select parent module"
+            class="w-100"
+          ></p-select>
+          @if (lookupForm.get('parentModuleId')?.invalid && (lookupForm.get('parentModuleId')?.dirty || lookupForm.get('parentModuleId')?.touched)) {
+            <small>Parent module is required.</small>
+          }
+        </div>
+      }
+
       <div class="form-field">
         <label for="lookup-name">Name <span>*</span></label>
         <input
@@ -199,7 +297,7 @@
           pInputText
           type="text"
           formControlName="name"
-          [placeholder]="activeKind === 'category' ? 'Enter category name' : 'Enter module name'"
+          [placeholder]="activeKind === 'category' ? 'Enter category name' : activeKind === 'module' ? 'Enter module name' : 'Enter submodule name'"
         />
         @if (lookupForm.get('name')?.invalid && (lookupForm.get('name')?.dirty || lookupForm.get('name')?.touched)) {
           <small>Name is required and must be 100 characters or less.</small>

@@ -37,7 +37,7 @@
 
 .setup-summary {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
@@ -89,6 +89,11 @@
   background: #ecfdf5;
 }
 
+.tile-submodule .summary-icon {
+  color: #14532d;
+  background: #dcfce7;
+}
+
 .setup-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -102,6 +107,10 @@
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
   overflow: hidden;
+}
+
+.lookup-card-wide {
+  grid-column: 1 / -1;
 }
 
 .lookup-card-head {
@@ -166,6 +175,20 @@
   color: #475569;
   line-height: 1.35;
   white-space: normal;
+}
+
+.parent-pill {
+  display: inline-flex;
+  max-width: 260px;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #14532d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .action-column {
