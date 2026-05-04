@@ -27,6 +27,9 @@ import { EconomicOpportunitiesHouseholdGroupMapping } from './pages/economic-opp
 import { EconomicOpportunitiesAuditRecordDownload } from './pages/economic-opportunities/audit-record-download/economic-opportunities-audit-record-download';
 import { EconomicOpportunitiesBeneficiaryRandomizationEnrollment } from './pages/economic-opportunities/beneficiary-randomization-enrollment/economic-opportunities-beneficiary-randomization-enrollment';
 import { EconomicOpportunitiesHouseholdGroupView } from './pages/economic-opportunities/household-group-view/economic-opportunities-household-group-view';
+import { EconomicOpportunitiesCourseEntity } from './pages/economic-opportunities/course-training/course-entity/economic-opportunities-course-entity';
+import { EconomicOpportunitiesCourseDetails } from './pages/economic-opportunities/course-training/course-details/economic-opportunities-course-details';
+import { EconomicOpportunitiesTrainingAttendanceTracking } from './pages/economic-opportunities/course-training/training-attendance-tracking/economic-opportunities-training-attendance-tracking';
 import { Metabase } from './pages/metabase/metabase';
 import { MneReports } from './pages/monitoring-evaluation/mne-reports/mne-reports';
 
@@ -125,9 +128,9 @@ export const routes: Routes = [
         path: 'course-training',
         canActivate: [routeGuard],
         children: [
-          { path: 'course-entity', component: UnderConstruction, canActivate: [routeGuard] },
-          { path: 'course-details', component: UnderConstruction, canActivate: [routeGuard] },
-          { path: 'training-attendance-tracking', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: 'course-entity', component: EconomicOpportunitiesCourseEntity, canActivate: [routeGuard] },
+          { path: 'course-details', component: EconomicOpportunitiesCourseDetails, canActivate: [routeGuard] },
+          { path: 'training-attendance-tracking', component: EconomicOpportunitiesTrainingAttendanceTracking, canActivate: [routeGuard] },
           { path: '', component: UnderConstruction, pathMatch: 'full' }
         ]
       },

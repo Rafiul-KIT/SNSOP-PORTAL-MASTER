@@ -1,30 +1,290 @@
-<div class="card p-3 shadow-sm mt-3">
+@if (!isEmbeddedMode) {
+<div class="breadcrumb-wrapper mb-2">
+  <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
+</div>
+}
+
+@if (isLoading && !isEmbeddedMode) {
+<app-loader></app-loader>
+} @else {
+
+@if (!isEmbeddedMode) {
+<div class="card p-3 mb-3 shadow-sm">
+  <form class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="groups"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="filters.groupId"
+          name="groupId"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          [loading]="isLoadingGroups"
+          class="w-100"
+        ></p-select>
+        <label>Group ID *</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="states"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="filters.stateId"
+          name="stateId"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          (onChange)="onStateChange()"
+          class="w-100"
+        ></p-select>
+        <label>State</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-2">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="counties"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="filters.countyId"
+          name="countyId"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          [disabled]="!filters.stateId"
+          (onChange)="onCountyChange()"
+          class="w-100"
+        ></p-select>
+        <label>County</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-2">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="payams"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="filters.payamId"
+          name="payamId"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          [disabled]="!filters.countyId"
+          (onChange)="onPayamChange()"
+          class="w-100"
+        ></p-select>
+        <label>Payam</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-2">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="bomas"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="filters.bomaId"
+          name="bomaId"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+          [disabled]="!filters.payamId"
+          class="w-100"
+        ></p-select>
+        <label>Boma</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-12">
+      <div class="d-flex justify-content-end gap-2">
+        <p-button
+          label="Reset"
+          icon="fas fa-refresh"
+          severity="danger"
+          size="small"
+          outlined="true"
+          (onClick)="resetFilters()"
+        ></p-button>
+        <p-button
+          label="Search"
+          icon="fas fa-search"
+          severity="primary"
+          size="small"
+          [loading]="isSearching"
+          (onClick)="search()"
+        ></p-button>
+      </div>
+    </div>
+  </form>
+</div>
+}
+
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-semibold">
+      <i class="fas fa-random me-2"></i> Beneficiary Randomization Enrollment
+    </h5>
+    @if (!isEmbeddedMode) {
+    <p class="fw-bold mb-0">
+      Showing <kbd>{{ rows.length }}</kbd> of <kbd>{{ totalRecords }}</kbd> records
+    </p>
+    }
+  </div>
+
   <p-table
-    [value]="data"
-    [columns]="cols"
-    [paginator]="true"
-    [rows]="10"
+    [value]="rows"
     [responsiveLayout]="'scroll'"
+    [scrollHeight]="isEmbeddedMode ? 'auto' : '60vh'"
+    [tableStyle]="{ 'min-width': '1700px', 'margin-bottom': '5px' }"
+    dataKey="id"
+    size="small"
     styleClass="p-datatable-sm p-datatable-gridlines"
   >
-    <ng-template pTemplate="header" let-columns>
+    <ng-template pTemplate="header">
       <tr>
-        <th *ngFor="let col of columns">
-          {{ col.header }}
-        </th>
+        <th>Serial</th>
+        <th>Application ID</th>
+        <th>Respondent Name</th>
+        <th>Age</th>
+        <th>Interested In Participating</th>
+        <th>Survives Targeting</th>
+        <th>Treatment Arm</th>
+        <th>Household Enrollment Status</th>
+        <th>Reason For Why Not Enrolled</th>
+        <th>Group ID</th>
+        <th>Group Name</th>
+        <th>Nominee Index</th>
+        <th class="update-col">Update</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-rowData let-columns="columns">
+
+    <ng-template pTemplate="body" let-row let-i="rowIndex">
       <tr>
-        <td *ngFor="let col of columns">
-          {{ rowData[col.field] }}
+        <td>{{ isEmbeddedMode ? i + 1 : (currentPage * pageSize) + i + 1 }}</td>
+        <td>{{ row.applicationId || '--' }}</td>
+        <td>{{ row.respondentFullName || '--' }}</td>
+        <td>{{ row.respondentAge ?? '--' }}</td>
+        <td>
+          <p-select
+            [options]="booleanOptions"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="row.interestedInParticipating"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            class="w-100 table-select"
+          ></p-select>
+        </td>
+        <td>
+          <p-select
+            [options]="booleanOptions"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="row.survivesTargeting"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            class="w-100 table-select"
+          ></p-select>
+        </td>
+        <td>
+          <p-select
+            [options]="booleanOptions"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="row.treatmentArm"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            class="w-100 table-select"
+          ></p-select>
+        </td>
+        <td>
+          <p-select
+            [options]="booleanOptions"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="row.householdEnrollmentStatus"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            class="w-100 table-select"
+          ></p-select>
+        </td>
+        <td>
+          <textarea
+            pTextarea
+            [(ngModel)]="row.reasonForWhyNotEnrolled"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            rows="2"
+            class="form-control table-textarea"
+          ></textarea>
+        </td>
+        <td>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="row.groupId"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            class="form-control table-number"
+          />
+        </td>
+        <td>{{ row.groupName || '--' }}</td>
+        <td>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="row.nomineeIndex"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onRowValueChange(row)"
+            class="form-control table-number"
+          />
+        </td>
+        <td class="update-col">
+          <p-button
+            label="Update"
+            icon="fas fa-save"
+            severity="success"
+            size="small"
+            [loading]="row.isSaving"
+            [disabled]="!row.isDirty || row.isSaving"
+            (onClick)="saveRow(row)"
+          ></p-button>
         </td>
       </tr>
     </ng-template>
+
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td [attr.colspan]="cols.length" class="text-center">No records found.</td>
+        <td colspan="13" class="text-center text-danger">
+          <b>No records found!</b>
+        </td>
       </tr>
     </ng-template>
   </p-table>
+
+  @if (!isEmbeddedMode) {
+  <div class="border-top">
+    <p-paginator
+      class="paginator-sticky"
+      [rows]="pageSize"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [first]="currentPage * pageSize"
+      (onPageChange)="onPageChange($event)"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    ></p-paginator>
+  </div>
+  }
 </div>
+
+}
+
+<p-toast position="bottom-right"></p-toast>

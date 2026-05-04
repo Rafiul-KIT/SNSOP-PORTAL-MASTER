@@ -1,3 +1,22 @@
 :host {
   display: block;
 }
+
+.update-col {
+  min-width: 9rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table-select {
+  min-width: 12rem;
+}
+
+.table-textarea {
+  min-width: 16rem;
+  resize: vertical;
+}
+
+.table-number {
+  min-width: 8rem;
+}
