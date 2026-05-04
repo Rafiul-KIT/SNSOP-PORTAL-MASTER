@@ -130,7 +130,12 @@
               <p-button icon="fas fa-download" severity="info" size="small" [rounded]="true" [text]="true"
                 pTooltip="Download" (onClick)="downloadReport(row)"></p-button>
               <p-button *ngIf="row.status === 'ACTIVE'" icon="fas fa-trash" severity="danger" size="small" [rounded]="true" [text]="true"
-                pTooltip="Delete" (onClick)="deleteReport(row)"></p-button>            </div>
+                pTooltip="Delete" (onClick)="deleteReport(row)"></p-button>
+              <p-button *ngIf="row.status === 'INACTIVE' || showingDeleted" icon="fas fa-undo" severity="success" size="small" [rounded]="true" [text]="true"
+                pTooltip="Restore" (onClick)="restoreReport(row)"></p-button>
+              <p-button *ngIf="row.status === 'INACTIVE' || showingDeleted" icon="fas fa-times-circle" severity="danger" size="small" [rounded]="true" [text]="true"
+                pTooltip="Delete Permanently" (onClick)="permanentDeleteReport(row)"></p-button>
+            </div>
           </td>
         </tr>
       </ng-template>

@@ -114,7 +114,7 @@
     [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" dataKey="beneficiaryId" size="small">
     <ng-template pTemplate="header">
       <tr>
-        <th colspan="10" class="text-end">
+        <th colspan="11" class="text-end">
           <p class="fw-bold mb-2">
             Showing <kbd>{{ beneficiaries.length }}</kbd> of
             <kbd>{{ totalRecords }}</kbd> records
@@ -130,6 +130,7 @@
         <th>County</th>
         <th>Payam</th>
         <th>Boma</th>
+        <th>Family Size</th>
         <th>Selection Criteria</th>
         <th>Enrollment Date</th>
       </tr>
@@ -145,14 +146,15 @@
         <td>{{ row.countyName }}</td>
         <td>{{ row.payamName }}</td>
         <td>{{ row.bomaName }}</td>
+        <td>{{ row.householdSize }}</td>
         <td>{{ row.selectionCriteria }}</td>
-        <td>{{ row.enrollmentDate }}</td>
+        <td>{{ row.formattedEnrollmentDate }}</td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="10" class="text-center text-danger">
+        <td colspan="11" class="text-center text-danger">
           <b>No records found!</b>
         </td>
       </tr>

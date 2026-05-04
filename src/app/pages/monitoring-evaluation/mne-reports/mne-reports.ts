@@ -202,7 +202,7 @@ export class MneReports implements OnInit {
       this.isLoading = true;
       this.cdr.detectChanges();
 
-      const res = await this.api.GET(`/api/monitoring/mne-reports/download/${report.id}`, {}, 'global', { responseType: 'blob' });
+      const res = await this.api.GET(`/api/monitoring/mne-reports/${report.id}/download`, {}, 'global', { responseType: 'blob' });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -249,6 +249,64 @@ export class MneReports implements OnInit {
         severity: 'error',
         summary: 'Error',
         detail: 'Unable to delete report.',
+      });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async permanentDeleteReport(report: any): Promise<void> {
+    if (!confirm('Are you sure you want to permanently delete this report? This action cannot be undone.')) return;
+
+    try {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+
+      await this.api.DELETE(`/api/monitoring/mne-reports/${report.id}/permanent`);
+
+      this.msg.add({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: 'Report permanently deleted successfully.',
+      });
+
+      this.loadReports();
+    } catch (err) {
+      console.error('Failed to permanently delete report', err);
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to permanently delete report.',
+      });
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async restoreReport(report: any): Promise<void> {
+    if (!confirm('Are you sure you want to restore this report?')) return;
+
+    try {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+
+      await this.api.PUT(`/api/monitoring/mne-reports/${report.id}/restore`);
+
+      this.msg.add({
+        severity: 'success',
+        summary: 'Restored',
+        detail: 'Report restored successfully.',
+      });
+
+      this.loadReports();
+    } catch (err) {
+      console.error('Failed to restore report', err);
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to restore report.',
       });
     } finally {
       this.isLoading = false;
