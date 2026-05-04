@@ -69,6 +69,11 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
     if (/^\/help-desk\/request-details\/[^/]+$/.test(cleanUrl)) {
       equivalents.add('/help-desk/support-management');
       equivalents.add('/help-desk/status-tracker');
+      
+    }
+
+    if (cleanUrl === '/help-desk/setup') {
+      equivalents.add('/help-desk/support-management');
     }
 
     return [...equivalents];

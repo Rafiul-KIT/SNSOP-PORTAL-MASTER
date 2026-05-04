@@ -1,0 +1,245 @@
+@if (isLoading) {
+  <app-loader />
+} @else {
+  <div class="breadcrumb-wrapper">
+    <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
+  </div>
+
+  <div class="helpdesk-container">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Categories & Modules</h2>
+        <p class="page-subtitle">Maintain the lookup values used when users submit and update help desk requests.</p>
+      </div>
+      <div class="header-actions">
+        <p-button
+          label="Refresh"
+          icon="fas fa-rotate"
+          severity="secondary"
+          size="small"
+          [outlined]="true"
+          (onClick)="loadLookups()"
+        ></p-button>
+      </div>
+    </div>
+
+    <div class="setup-summary">
+      <div class="summary-tile tile-category">
+        <div>
+          <span class="summary-label">Categories</span>
+          <strong>{{ categories.length }}</strong>
+        </div>
+        <span class="summary-icon"><i class="fas fa-folder-tree"></i></span>
+      </div>
+      <div class="summary-tile tile-module">
+        <div>
+          <span class="summary-label">Modules</span>
+          <strong>{{ modules.length }}</strong>
+        </div>
+        <span class="summary-icon"><i class="fas fa-cubes"></i></span>
+      </div>
+    </div>
+
+    <div class="setup-grid">
+      <section class="lookup-card">
+        <div class="lookup-card-head">
+          <div>
+            <h5 class="card-section-title">Categories</h5>
+            <p-tag [value]="categoryCountLabel" severity="info"></p-tag>
+          </div>
+          <p-button
+            label="Add Category"
+            icon="fas fa-plus"
+            severity="primary"
+            size="small"
+            (onClick)="openAddDialog('category')"
+          ></p-button>
+        </div>
+
+        <div class="lookup-toolbar">
+          <span class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="categorySearch"
+              placeholder="Search categories"
+              aria-label="Search categories"
+            />
+          </span>
+        </div>
+
+        @if (filteredItems('category').length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <span>No categories found.</span>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <p-table [value]="filteredItems('category')" [tableStyle]="{ 'min-width': '520px' }" size="small" [stripedRows]="true">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th class="action-column">Action</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>
+                    <div class="item-name">{{ item.name }}</div>
+                    <!-- <div class="item-id">ID {{ item.id }}</div> -->
+                  </td>
+                  <td>
+                    <div class="description-cell">{{ item.description || '--' }}</div>
+                  </td>
+                  <td class="action-column">
+                    <p-button
+                      label="Edit"
+                      icon="fas fa-pen"
+                      severity="secondary"
+                      size="small"
+                      [outlined]="true"
+                      (onClick)="openEditDialog('category', item)"
+                    ></p-button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        }
+      </section>
+
+      <section class="lookup-card">
+        <div class="lookup-card-head">
+          <div>
+            <h5 class="card-section-title">Modules</h5>
+            <p-tag [value]="moduleCountLabel" severity="success"></p-tag>
+          </div>
+          <p-button
+            label="Add Module"
+            icon="fas fa-plus"
+            severity="success"
+            size="small"
+            (onClick)="openAddDialog('module')"
+          ></p-button>
+        </div>
+
+        <div class="lookup-toolbar">
+          <span class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="moduleSearch"
+              placeholder="Search modules"
+              aria-label="Search modules"
+            />
+          </span>
+        </div>
+
+        @if (filteredItems('module').length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <span>No modules found.</span>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <p-table [value]="filteredItems('module')" [tableStyle]="{ 'min-width': '520px' }" size="small" [stripedRows]="true">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th class="action-column">Action</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-item>
+                <tr>
+                  <td>
+                    <div class="item-name">{{ item.name }}</div>
+                    <div class="item-id">ID {{ item.id }}</div>
+                  </td>
+                  <td>
+                    <div class="description-cell">{{ item.description || '--' }}</div>
+                  </td>
+                  <td class="action-column">
+                    <p-button
+                      label="Edit"
+                      icon="fas fa-pen"
+                      severity="secondary"
+                      size="small"
+                      [outlined]="true"
+                      (onClick)="openEditDialog('module', item)"
+                    ></p-button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+
+  <p-dialog
+    [(visible)]="dialogVisible"
+    [header]="dialogTitle"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="lookup-dialog"
+    [style]="{ width: '520px', maxWidth: 'calc(100vw - 2rem)' }"
+    (onHide)="closeDialog()"
+  >
+    <form [formGroup]="lookupForm" class="lookup-form" (ngSubmit)="saveLookup()">
+      <div class="form-field">
+        <label for="lookup-name">Name <span>*</span></label>
+        <input
+          id="lookup-name"
+          pInputText
+          type="text"
+          formControlName="name"
+          [placeholder]="activeKind === 'category' ? 'Enter category name' : 'Enter module name'"
+        />
+        @if (lookupForm.get('name')?.invalid && (lookupForm.get('name')?.dirty || lookupForm.get('name')?.touched)) {
+          <small>Name is required and must be 100 characters or less.</small>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="lookup-description">Description <span>*</span></label>
+        <textarea
+          id="lookup-description"
+          pTextarea
+          rows="5"
+          formControlName="description"
+          placeholder="Write a short description"
+        ></textarea>
+        @if (lookupForm.get('description')?.invalid && (lookupForm.get('description')?.dirty || lookupForm.get('description')?.touched)) {
+          <small>Description is required and must be 500 characters or less.</small>
+        }
+      </div>
+
+      <button type="submit" class="hidden-submit" aria-hidden="true"></button>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        icon="fas fa-xmark"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="isSaving"
+        (onClick)="closeDialog()"
+      ></p-button>
+      <p-button
+        [label]="isSaving ? 'Saving' : 'Save'"
+        icon="fas fa-check"
+        severity="primary"
+        [loading]="isSaving"
+        [disabled]="isSaving"
+        (onClick)="saveLookup()"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
+}

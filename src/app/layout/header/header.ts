@@ -250,6 +250,7 @@ export class Header {
       { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
       { label: 'My Requests', routerLink: '/help-desk/my-requests', icon: 'fas fa-clipboard-list' },
       { label: 'Support Management', routerLink: '/help-desk/support-management', icon: 'fas fa-users-cog' },
+      { label: 'Categories & Modules', routerLink: '/help-desk/setup', icon: 'fas fa-sliders' },
       { label: 'Status Tracker', routerLink: '/help-desk/status-tracker', icon: 'fas fa-search' },
       { label: 'Reports', routerLink: '/help-desk/reports', icon: 'fas fa-chart-bar' },
       { separator: true },

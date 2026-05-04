@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -59,7 +60,8 @@ export class HelpDeskSubmitRequest implements OnInit {
     private fb: FormBuilder,
     private itSupportService: ItSupportService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private router: Router
   ) {
     this.requestForm = this.fb.group({
       issueTitle: ['', Validators.required],
@@ -81,6 +83,10 @@ export class HelpDeskSubmitRequest implements OnInit {
 
   private detectChanges(): void {
     this.cdr.detectChanges();
+  }
+
+  async navigateToSetup(): Promise<void> {
+    await this.router.navigate(['/help-desk/setup']);
   }
 
   async loadDropdowns(): Promise<void> {

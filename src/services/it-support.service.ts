@@ -121,6 +121,11 @@ export interface ITReportSummaryRow {
   trend: number;
 }
 
+export interface ITLookupPayload {
+  name: string;
+  description: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -135,6 +140,13 @@ export class ItSupportService {
       return response as ITApiResponse<T>;
     }
     return null;
+  }
+
+  private isSuccessfulResponse(res: any, response?: ITApiResponse<unknown> | null): boolean {
+    if (response) return response.success;
+
+    const status = Number(res?.status);
+    return Number.isFinite(status) && status >= 200 && status < 300;
   }
 
   private appendFiles(formData: FormData, files?: File[]): void {
@@ -164,6 +176,88 @@ export class ItSupportService {
       return response?.success && Array.isArray(response.data) ? response.data : [];
     } catch {
       return [];
+    }
+  }
+
+  async createCategory(payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.POST<any>(`${this.baseEndpoint}/categories`, {
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to create category',
+      };
+    }
+  }
+
+  async updateCategory(categoryId: number, payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.PUT<any>(`${this.baseEndpoint}/categories/${categoryId}`, {
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update category',
+      };
+    }
+  }
+
+  async createModule(payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.POST<any>(`${this.baseEndpoint}/modules`, {
+        id: 0,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to create module',
+      };
+    }
+  }
+
+  async updateModule(id: number, payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.PUT<any>(`${this.baseEndpoint}/modules/${id}`, {
+        id,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update module',
+      };
     }
   }
 

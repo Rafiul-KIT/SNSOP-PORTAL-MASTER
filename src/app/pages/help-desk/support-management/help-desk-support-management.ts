@@ -269,6 +269,10 @@ export class HelpDeskSupportManagement implements OnInit {
    
   }
 
+  async navigateToSetup(): Promise<void> {
+    await this.router.navigate(['/help-desk/setup']);
+  }
+
   async onAction(request: ITRequest): Promise<void> {
     const actions = this.getAvailableActions(request);
 
