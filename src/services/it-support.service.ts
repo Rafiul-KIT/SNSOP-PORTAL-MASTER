@@ -47,11 +47,14 @@ export interface ITRequest {
   trackingNumber: string;
   title: string;
   description: string;
+  issueType?: 'TECHNICAL' | 'OPERATIONAL' | 'OTHER' | string;
   categoryId: number;
   categoryName: string;
   otherCategory?: string | null;
   moduleId: number;
   moduleName: string;
+  submoduleId?: number;
+  submoduleName?: string;
   priority: string;
   status: string;
   comment: string;
@@ -59,6 +62,14 @@ export interface ITRequest {
   createdAt: string;
   updatedBy: number;
   updatedAt: string;
+  assignedUserId?: number;
+  assignedTo?: number;
+  assigneeId?: number;
+  assignedUserName?: string;
+  assignedToName?: string;
+  assigneeName?: string;
+  assignedUserEmail?: string;
+  assignedUserRole?: string;
   attachmentCount?: number;
   attachments?: ITAttachment[];
   history?: ITHistory[];
@@ -450,9 +461,11 @@ export class ItSupportService {
   async createRequest(payload: {
     title: string;
     description: string;
+    issueType: string;
     categoryId: number;
     otherCategory?: string | null;
     moduleId: number;
+    submoduleId: number;
     priority: string;
     files?: File[];
   }): Promise<{ success: boolean; request?: ITRequest; trackingNumber?: string; message?: string }> {
@@ -462,9 +475,11 @@ export class ItSupportService {
       const requestPayload = {
         title: payload.title,
         description: payload.description,
+        issueType: payload.issueType,
         categoryId: payload.categoryId,
         otherCategory: payload.otherCategory ?? null,
         moduleId: payload.moduleId,
+        submoduleId: payload.submoduleId,
         priority: payload.priority,
       };
 
@@ -561,6 +576,27 @@ export class ItSupportService {
       return {
         success: false,
         message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update status',
+      };
+    }
+  }
+
+  async assignRequest(
+    id: number,
+    userId: number
+  ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
+    try {
+      const res = await this.api.PATCH<any>(`${this.baseEndpoint}/request/${id}/assign/${userId}`, {});
+      const response = this.parseApiResponse<ITRequest>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        request: response?.data,
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to assign request',
       };
     }
   }

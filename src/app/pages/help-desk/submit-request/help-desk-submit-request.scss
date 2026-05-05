@@ -63,6 +63,13 @@
   display: block;
 }
 
+.hint-text {
+  color: #6c757d;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
 // PrimeNG validation styling
 :host ::ng-deep {
   .p-inputtext.ng-invalid.ng-dirty,

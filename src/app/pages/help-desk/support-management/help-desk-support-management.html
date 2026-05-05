@@ -32,7 +32,7 @@
         </div>
       } @else {
         <div class="table-wrapper">
-          <p-table [value]="requests" [tableStyle]="{ 'min-width': '900px' }" size="small" [stripedRows]="true">
+          <p-table [value]="requests" [tableStyle]="{ 'min-width': '1080px' }" size="small" [stripedRows]="true">
             <ng-template pTemplate="header">
                   <tr>
                 <th class="fw-bold">  <div class="">
@@ -87,6 +87,7 @@
                 <th class="fw-bold">Priority</th>
                 <th class="fw-bold">Category</th>
                 <th class="fw-bold">Module</th>
+                <th class="fw-bold">Assigned To</th>
                 <th class="fw-bold">Actions</th>
               </tr>
             </ng-template>
@@ -103,6 +104,14 @@
                 <td>{{ getCategoryDisplay(ticket) }}</td>
                 <td>{{ ticket.moduleName || '--' }}</td>
                 <td>
+                  <div class="assigned-cell">
+                    <strong>{{ getAssignedUserDisplay(ticket) }}</strong>
+                    @if (getAssignedMetaDisplay(ticket)) {
+                      <small>{{ getAssignedMetaDisplay(ticket) }}</small>
+                    }
+                  </div>
+                </td>
+                <td>
                   <div class="d-flex flex-wrap gap-1">
                     <p-button
                       label="View"
@@ -111,6 +120,16 @@
                       [outlined]="true"
                       (onClick)="onView(ticket)"
                     ></p-button>
+                    @if (canAssignRequests()) {
+                      <p-button
+                        label="Assign"
+                        icon="fas fa-user-check"
+                        severity="success"
+                        size="small"
+                        [outlined]="true"
+                        (onClick)="openAssignDialog(ticket)"
+                      ></p-button>
+                    }
                     <p-button
                       [label]="getStatusActionLabel(ticket)"
                       severity="info"
@@ -128,4 +147,152 @@
       }
     </div>
   </div>
+
+  <p-dialog
+    header="Assign Support Request"
+    [(visible)]="assignDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '92vw', maxWidth: '1180px' }"
+    styleClass="assign-dialog"
+    (onHide)="closeAssignDialog()"
+  >
+    <div class="assign-modal">
+      <div class="assign-summary">
+        <div>
+          <span class="assign-kicker">Selected request</span>
+          <h5>{{ selectedRequestForAssign?.trackingNumber || '--' }}</h5>
+          <p>{{ selectedRequestForAssign?.title || '--' }}</p>
+        </div>
+        <div class="selected-user-card" [class.empty]="!selectedAssignee">
+          <span class="assign-kicker">Assignee</span>
+          @if (selectedAssignee) {
+            <strong>{{ selectedAssignee.fullName }}</strong>
+            <small>{{ selectedAssignee.email }} | {{ selectedAssignee.role }}</small>
+          } @else {
+            <strong>No user selected</strong>
+            <small>Select one active user from the list.</small>
+          }
+        </div>
+      </div>
+
+      <div class="assign-filters">
+        <div class="filter-field">
+          <label>Email</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="userFilters.email"
+            placeholder="Search email"
+            (keyup.enter)="applyUserFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>Username</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="userFilters.username"
+            placeholder="Search username"
+            (keyup.enter)="applyUserFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>Status</label>
+          <input type="text" pInputText value="ACTIVE" disabled />
+        </div>
+        <div class="filter-field">
+          <label>Role</label>
+          <p-select
+            [options]="roles"
+            [(ngModel)]="userFilters.roleId"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="All roles"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="filter-actions">
+          <p-button label="Reset" icon="fas fa-rotate-left" severity="secondary" size="small" [outlined]="true" (onClick)="resetUserFilters()"></p-button>
+          <p-button label="Search" icon="fas fa-search" severity="primary" size="small" (onClick)="applyUserFilters()"></p-button>
+        </div>
+      </div>
+
+      <div class="assign-table-wrap">
+        <p-table
+          [value]="assignableUsers"
+          [loading]="isUserSearchLoading"
+          [tableStyle]="{ 'min-width': '920px' }"
+          size="small"
+          [stripedRows]="true"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 80px;">Select</th>
+              <th>User Name</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Role</th>
+              <th>Email Receiver</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-user>
+            <tr [class.selected-row]="selectedAssignee?.id === user.id" (click)="selectAssignee(user)">
+              <td>
+                <p-button
+                  [label]="selectedAssignee?.id === user.id ? 'Selected' : 'Select'"
+                  [icon]="selectedAssignee?.id === user.id ? 'fas fa-check' : 'fas fa-user-plus'"
+                  [severity]="selectedAssignee?.id === user.id ? 'success' : 'secondary'"
+                  size="small"
+                  [outlined]="selectedAssignee?.id !== user.id"
+                  (onClick)="selectAssignee(user)"
+                ></p-button>
+              </td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.fullName }}</td>
+              <td>{{ user.email }}</td>
+              <td><p-tag [value]="user.statusText || 'ACTIVE'" severity="success"></p-tag></td>
+              <td>{{ user.role }}</td>
+              <td>{{ user.emailReceiverText }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">No active users found.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <p-paginator
+        [rows]="userPageSize"
+        [totalRecords]="userTotalRecords"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [first]="userCurrentPage * userPageSize"
+        (onPageChange)="onUserPageChange($event)"
+      ></p-paginator>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        icon="fas fa-xmark"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="isAssigning"
+        (onClick)="closeAssignDialog()"
+      ></p-button>
+      <p-button
+        label="Assign User"
+        icon="fas fa-user-check"
+        severity="success"
+        [loading]="isAssigning"
+        [disabled]="!selectedAssignee || isAssigning"
+        (onClick)="assignSelectedUser()"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
 }
