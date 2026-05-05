@@ -246,6 +246,13 @@ export class HelpDeskRequestDetails implements OnInit {
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString('en-GB');
   }
 
+  getCategoryDisplay(request?: ITRequest | null): string {
+    if (!request) return '--';
+    const categoryName = request.categoryName || '--';
+    const otherCategory = String(request.otherCategory || '').trim();
+    return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
+  }
+
   parseHistoryChanges(changes?: string): Array<{ field: string; oldValue: string; newValue: string }> {
     if (!changes) return [];
     try {

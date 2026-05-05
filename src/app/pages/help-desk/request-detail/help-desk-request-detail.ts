@@ -48,6 +48,7 @@ export class HelpDeskRequestDetail implements OnInit {
 
   editDescription = '';
   editCategoryId: number | null = null;
+  editOtherCategory = '';
   editModuleId: number | null = null;
   editPriority = '';
 
@@ -116,6 +117,7 @@ export class HelpDeskRequestDetail implements OnInit {
 
       this.editDescription = detail.description || '';
       this.editCategoryId = detail.categoryId ?? null;
+      this.editOtherCategory = detail.otherCategory || '';
       this.editModuleId = detail.moduleId ?? null;
       this.editPriority = detail.priority || '';
     } catch (error) {
@@ -204,6 +206,28 @@ export class HelpDeskRequestDetail implements OnInit {
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString('en-GB');
   }
 
+  getCategoryDisplay(request?: ITRequest | null): string {
+    if (!request) return '--';
+    const categoryName = request.categoryName || '--';
+    const otherCategory = String(request.otherCategory || '').trim();
+    return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
+  }
+
+  private isOtherCategoryName(name?: string | null): boolean {
+    return String(name || '').trim().toLowerCase() === 'other';
+  }
+
+  isEditOtherCategorySelected(): boolean {
+    const selectedCategoryId = Number(this.editCategoryId);
+    return this.categories.some((cat) => Number(cat.id) === selectedCategoryId && this.isOtherCategoryName(cat.name));
+  }
+
+  onEditCategoryChange(): void {
+    if (!this.isEditOtherCategorySelected()) {
+      this.editOtherCategory = '';
+    }
+  }
+
   parseHistoryChanges(changes?: string): Array<{ field: string; oldValue: string; newValue: string }> {
     if (!changes) return [];
     try {
@@ -287,12 +311,24 @@ canDeleteAttachment(request?: ITRequest | null): boolean {
   async saveDetailUpdate(): Promise<void> {
     if (!this.detailRequest || !this.canEditRequest(this.detailRequest)) return;
 
+    const otherCategory = this.isEditOtherCategorySelected() ? this.editOtherCategory.trim() : null;
+    if (this.isEditOtherCategorySelected() && !otherCategory) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Other Category Required',
+        text: 'Please enter other category before saving.',
+        confirmButtonColor: '#3085d6',
+      });
+      return;
+    }
+
     this.isSavingDetail = true;
     this.cdr.detectChanges();
     try {
       const response = await this.itSupportService.updateRequest(this.detailRequest.id, {
         description: this.editDescription,
         categoryId: Number(this.editCategoryId),
+        otherCategory,
         moduleId: Number(this.editModuleId),
         priority: this.editPriority,
       });

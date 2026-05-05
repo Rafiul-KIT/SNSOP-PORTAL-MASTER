@@ -13,7 +13,7 @@
     @if (isLoading) {
       <div class="loading-message">
         <div class="spinner"></div>
-        <p>Loading {{ dashboards[currentDashboardId].name || 'Dashboard' }}...</p>
+        <p>Loading {{ currentDashboardName }}...</p>
       </div>
     } @else if (iframeUrl) {
       <iframe
@@ -28,7 +28,16 @@
       <div class="error-message">
         <p>Error loading dashboard:</p>
         <code>{{ error }}</code>
-        <button (click)="loadDashboard(currentDashboardId)">Retry</button>
+        @if (currentDashboardId !== null) {
+          <button (click)="loadDashboard(currentDashboardId)">Retry</button>
+        } @else {
+          <button (click)="fetchDashboards()">Retry</button>
+        }
+      </div>
+    } @else if (!dashboards.length) {
+      <div class="error-message">
+        <p>No dashboards found.</p>
+        <button (click)="fetchDashboards()">Retry</button>
       </div>
     }
   </div>

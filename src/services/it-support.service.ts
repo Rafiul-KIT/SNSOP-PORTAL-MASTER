@@ -13,6 +13,13 @@ export interface ITModule {
   description: string;
 }
 
+export interface ITSubmodule {
+  id: number;
+  parentModuleId: number;
+  name: string;
+  description: string;
+}
+
 export interface ITAttachment {
   id: number;
   requestId: number;
@@ -40,10 +47,14 @@ export interface ITRequest {
   trackingNumber: string;
   title: string;
   description: string;
+  issueType?: 'TECHNICAL' | 'OPERATIONAL' | 'OTHER' | string;
   categoryId: number;
   categoryName: string;
+  otherCategory?: string | null;
   moduleId: number;
   moduleName: string;
+  submoduleId?: number;
+  submoduleName?: string;
   priority: string;
   status: string;
   comment: string;
@@ -51,6 +62,14 @@ export interface ITRequest {
   createdAt: string;
   updatedBy: number;
   updatedAt: string;
+  assignedUserId?: number;
+  assignedTo?: number;
+  assigneeId?: number;
+  assignedUserName?: string;
+  assignedToName?: string;
+  assigneeName?: string;
+  assignedUserEmail?: string;
+  assignedUserRole?: string;
   attachmentCount?: number;
   attachments?: ITAttachment[];
   history?: ITHistory[];
@@ -120,6 +139,15 @@ export interface ITReportSummaryRow {
   trend: number;
 }
 
+export interface ITLookupPayload {
+  name: string;
+  description: string;
+}
+
+export interface ITSubmodulePayload extends ITLookupPayload {
+  parentModuleId: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -134,6 +162,13 @@ export class ItSupportService {
       return response as ITApiResponse<T>;
     }
     return null;
+  }
+
+  private isSuccessfulResponse(res: any, response?: ITApiResponse<unknown> | null): boolean {
+    if (response) return response.success;
+
+    const status = Number(res?.status);
+    return Number.isFinite(status) && status >= 200 && status < 300;
   }
 
   private appendFiles(formData: FormData, files?: File[]): void {
@@ -163,6 +198,142 @@ export class ItSupportService {
       return response?.success && Array.isArray(response.data) ? response.data : [];
     } catch {
       return [];
+    }
+  }
+
+  async getSubmodules(): Promise<ITSubmodule[]> {
+    try {
+      const res = await this.api.GET<any>(`${this.baseEndpoint}/submodules`);
+      const response = this.parseApiResponse<ITSubmodule[]>(res);
+      return response?.success && Array.isArray(response.data) ? response.data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  async createCategory(payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.POST<any>(`${this.baseEndpoint}/categories`, {
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to create category',
+      };
+    }
+  }
+
+  async updateCategory(categoryId: number, payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.PUT<any>(`${this.baseEndpoint}/categories/${categoryId}`, {
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update category',
+      };
+    }
+  }
+
+  async createModule(payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.POST<any>(`${this.baseEndpoint}/modules`, {
+        id: 0,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to create module',
+      };
+    }
+  }
+
+  async updateModule(id: number, payload: ITLookupPayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.PUT<any>(`${this.baseEndpoint}/modules/${id}`, {
+        id,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update module',
+      };
+    }
+  }
+
+  async createSubmodule(payload: ITSubmodulePayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.POST<any>(`${this.baseEndpoint}/submodules`, {
+        id: 0,
+        parentModuleId: payload.parentModuleId,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to create submodule',
+      };
+    }
+  }
+
+  async updateSubmodule(id: number, payload: ITSubmodulePayload): Promise<{ success: boolean; message?: string }> {
+    try {
+      const res = await this.api.PUT<any>(`${this.baseEndpoint}/submodules/${id}`, {
+        id,
+        parentModuleId: payload.parentModuleId,
+        name: payload.name,
+        description: payload.description,
+      });
+      const response = this.parseApiResponse<unknown>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update submodule',
+      };
     }
   }
 
@@ -290,8 +461,11 @@ export class ItSupportService {
   async createRequest(payload: {
     title: string;
     description: string;
+    issueType: string;
     categoryId: number;
+    otherCategory?: string | null;
     moduleId: number;
+    submoduleId: number;
     priority: string;
     files?: File[];
   }): Promise<{ success: boolean; request?: ITRequest; trackingNumber?: string; message?: string }> {
@@ -301,8 +475,11 @@ export class ItSupportService {
       const requestPayload = {
         title: payload.title,
         description: payload.description,
+        issueType: payload.issueType,
         categoryId: payload.categoryId,
+        otherCategory: payload.otherCategory ?? null,
         moduleId: payload.moduleId,
+        submoduleId: payload.submoduleId,
         priority: payload.priority,
       };
 
@@ -328,7 +505,7 @@ export class ItSupportService {
 
   async updateRequest(
     id: number,
-    payload: { description: string; categoryId: number; moduleId: number; priority: string }
+    payload: { description: string; categoryId: number; otherCategory?: string | null; moduleId: number; priority: string }
   ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
     try {
       const res = await this.api.PUT<any>(`${this.baseEndpoint}/requests/${id}`, payload);
@@ -399,6 +576,27 @@ export class ItSupportService {
       return {
         success: false,
         message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to update status',
+      };
+    }
+  }
+
+  async assignRequest(
+    id: number,
+    userId: number
+  ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
+    try {
+      const res = await this.api.PATCH<any>(`${this.baseEndpoint}/request/${id}/assign/${userId}`, {});
+      const response = this.parseApiResponse<ITRequest>(res);
+
+      return {
+        success: this.isSuccessfulResponse(res, response),
+        request: response?.data,
+        message: response?.message,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err?.response?.data?.message || err?.response?.data?.detail || 'Failed to assign request',
       };
     }
   }

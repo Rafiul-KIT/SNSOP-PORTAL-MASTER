@@ -57,14 +57,35 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
     );
   };
 
-  const hasAccess = (menus: any[], url: string): boolean => {
+  const getEquivalentUrls = (url: string): string[] => {
     const cleanUrl = normalizeUrl(url);
+
+    const equivalents = new Set<string>([cleanUrl]);
+
+    if (/^\/help-desk\/request-detail\/[^/]+$/.test(cleanUrl)) {
+      equivalents.add('/help-desk/my-requests');
+    }
+
+    if (/^\/help-desk\/request-details\/[^/]+$/.test(cleanUrl)) {
+      equivalents.add('/help-desk/support-management');
+      equivalents.add('/help-desk/status-tracker');
+      
+    }
+
+    if (cleanUrl === '/help-desk/setup') {
+      equivalents.add('/help-desk/support-management');
+    }
+
+    return [...equivalents];
+  };
+
+  const hasAccess = (menus: any[], url: string): boolean => {
+    const candidateUrls = getEquivalentUrls(url);
 
     for (const menu of menus) {
       if (!menu.url) continue;
 
-      // Check for exact match or parameterized match.
-      if (routeMatches(menu.url, cleanUrl)) {
+      if (candidateUrls.some(candidateUrl => routeMatches(menu.url, candidateUrl))) {
         return true;
       }
     }

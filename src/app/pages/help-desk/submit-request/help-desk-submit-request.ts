@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -11,7 +12,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITCategory, ITModule, ItSupportService } from '../../../../services/it-support.service';
+import { ITCategory, ITModule, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 
 @Component({
   selector: 'app-help-desk-submit-request',
@@ -36,6 +37,7 @@ export class HelpDeskSubmitRequest implements OnInit {
 
   categories: { label: string; value: number }[] = [];
   modules: { label: string; value: number }[] = [];
+  submodules: Array<{ label: string; value: number; parentModuleId: number }> = [];
 
   priorities = [
     { label: 'Critical', value: 'CRITICAL' },
@@ -44,10 +46,11 @@ export class HelpDeskSubmitRequest implements OnInit {
     { label: 'Low', value: 'LOW' }
   ];
 
-  // issueTypes = [
-  //   { label: 'Small - 72 Hours', value: 'SMALL' },
-  //   { label: 'Large - 144 Hours', value: 'LARGE' }
-  // ];
+  issueTypes = [
+    { label: 'Technical', value: 'TECHNICAL' },
+    { label: 'Operational', value: 'OPERATIONAL' },
+    { label: 'Other', value: 'OTHER' }
+  ];
 
   notificationPrefs = [
     { label: 'Email', value: 'EMAIL' },
@@ -59,15 +62,18 @@ export class HelpDeskSubmitRequest implements OnInit {
     private fb: FormBuilder,
     private itSupportService: ItSupportService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private router: Router
   ) {
     this.requestForm = this.fb.group({
       issueTitle: ['', Validators.required],
+      issueType: [null, Validators.required],
       category: [null, Validators.required],
+      otherCategory: [null],
       priority: [null, Validators.required],
-      // issueType: [null, Validators.required],
       description: ['', Validators.required],
       module: [null, Validators.required],
+      submodule: [null, Validators.required],
       notification: [null, Validators.required],
       attachments: [null, Validators.required]
     });
@@ -75,10 +81,16 @@ export class HelpDeskSubmitRequest implements OnInit {
 
   ngOnInit(): void {
     this.loadDropdowns();
+    this.requestForm.get('category')?.valueChanges.subscribe(() => this.syncOtherCategoryValidator());
+    this.requestForm.get('module')?.valueChanges.subscribe(() => this.onModuleChange());
   }
 
   private detectChanges(): void {
     this.cdr.detectChanges();
+  }
+
+  async navigateToSetup(): Promise<void> {
+    await this.router.navigate(['/help-desk/setup']);
   }
 
   async loadDropdowns(): Promise<void> {
@@ -87,8 +99,11 @@ export class HelpDeskSubmitRequest implements OnInit {
     
     this.zone.runOutsideAngular(async () => {
       try {
-        const categoryData = await this.itSupportService.getCategories();
-        const moduleData = await this.itSupportService.getModules();
+        const [categoryData, moduleData, submoduleData] = await Promise.all([
+          this.itSupportService.getCategories(),
+          this.itSupportService.getModules(),
+          this.itSupportService.getSubmodules()
+        ]);
 
         this.zone.run(() => {
           this.categories = categoryData.map((cat: ITCategory) => ({
@@ -101,7 +116,15 @@ export class HelpDeskSubmitRequest implements OnInit {
             value: mod.id
           }));
 
+          this.submodules = submoduleData.map((submodule: ITSubmodule) => ({
+            label: submodule.name,
+            value: submodule.id,
+            parentModuleId: submodule.parentModuleId
+          }));
+
           this.isLoading = false;
+          this.syncOtherCategoryValidator();
+          this.onModuleChange(false);
           this.detectChanges();
         });
       } catch (error) {
@@ -112,6 +135,48 @@ export class HelpDeskSubmitRequest implements OnInit {
         });
       }
     });
+  }
+
+  private isOtherCategoryName(name?: string | null): boolean {
+    return String(name || '').trim().toLowerCase() === 'other';
+  }
+
+  isOtherCategorySelected(): boolean {
+    const selectedCategoryId = Number(this.requestForm.get('category')?.value);
+    return this.categories.some((cat) => Number(cat.value) === selectedCategoryId && this.isOtherCategoryName(cat.label));
+  }
+
+  get filteredSubmodules(): Array<{ label: string; value: number; parentModuleId: number }> {
+    const selectedModuleId = Number(this.requestForm.get('module')?.value);
+    if (!selectedModuleId) return [];
+
+    return this.submodules.filter((submodule) => Number(submodule.parentModuleId) === selectedModuleId);
+  }
+
+  private onModuleChange(resetSubmodule: boolean = true): void {
+    const submoduleControl = this.requestForm.get('submodule');
+    if (!submoduleControl) return;
+
+    if (resetSubmodule) {
+      submoduleControl.setValue(null, { emitEvent: false });
+    }
+
+    submoduleControl.updateValueAndValidity({ emitEvent: false });
+    this.detectChanges();
+  }
+
+  private syncOtherCategoryValidator(): void {
+    const otherCategoryControl = this.requestForm.get('otherCategory');
+    if (!otherCategoryControl) return;
+
+    if (this.isOtherCategorySelected()) {
+      otherCategoryControl.setValidators([Validators.required, Validators.pattern(/\S/)]);
+    } else {
+      otherCategoryControl.clearValidators();
+      otherCategoryControl.setValue(null, { emitEvent: false });
+    }
+
+    otherCategoryControl.updateValueAndValidity({ emitEvent: false });
   }
 
   onFileSelect(event: Event): void {
@@ -196,13 +261,19 @@ export class HelpDeskSubmitRequest implements OnInit {
       this.detectChanges();
       
       const formValue = this.requestForm.value;
+      const otherCategory = this.isOtherCategorySelected()
+        ? String(formValue.otherCategory || '').trim()
+        : null;
 
       try {
         const result = await this.itSupportService.createRequest({
           title: formValue.issueTitle,
           description: formValue.description,
+          issueType: formValue.issueType,
           categoryId: formValue.category,
+          otherCategory,
           moduleId: formValue.module,
+          submoduleId: formValue.submodule,
           priority: formValue.priority,
           files: this.selectedFiles
         });

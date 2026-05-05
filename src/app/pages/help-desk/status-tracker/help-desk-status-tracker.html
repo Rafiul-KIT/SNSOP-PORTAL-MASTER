@@ -21,7 +21,7 @@
         <h5 class="card-section-title mb-3">Check Ticket Status</h5>
         <div class="search-row">
           <p-inputgroup class="w-100">
-            <input type="text" pInputText [(ngModel)]="searchTrackingNo" placeholder="Enter tracking number (e.g., SNSOP-SUP-2026-000121)" (keyup.enter)="checkStatus()" />
+            <input type="text" pInputText [(ngModel)]="searchTrackingNo" placeholder="Enter tracking number here" (keyup.enter)="checkStatus()" />
             <p-button label="Check" severity="primary" (onClick)="checkStatus()" [loading]="isLoading" />
           </p-inputgroup>
         </div>
@@ -52,7 +52,7 @@
             <div class="info-row"><strong>Title:</strong> {{ ticketResult.title }}</div>
             <div class="info-row"><strong>Description:</strong> {{ ticketResult.description }}</div>
             <div class="info-row"><strong>Priority:</strong> {{ ticketResult.priority }}</div>
-            <div class="info-row"><strong>Category:</strong> {{ ticketResult.categoryName || '--' }}</div>
+            <div class="info-row"><strong>Category:</strong> {{ getCategoryDisplay(ticketResult) }}</div>
             <div class="info-row"><strong>Module:</strong> {{ ticketResult.moduleName || '--' }}</div>
             <div class="info-row"><strong>Created:</strong> {{ formatDate(ticketResult.createdAt) }}</div>
             @if (ticketResult.comment) {

@@ -8,6 +8,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
+import { PaginatorModule } from 'primeng/paginator';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITRequest, ItSupportService } from '../../../../services/it-support.service';
@@ -23,6 +25,26 @@ type WorkflowAction = {
   actionType: 'status' | 'submit_info';
 };
 
+type SupportRole = {
+  id: number;
+  name: string;
+  description?: string;
+  status?: boolean;
+};
+
+type AssignableUser = {
+  id: number;
+  fullName: string;
+  username: string;
+  email: string;
+  role: string;
+  status: string | boolean;
+  emailReceiver: boolean;
+  isMobile?: boolean;
+  statusText?: string;
+  emailReceiverText?: string;
+};
+
 @Component({
   selector: 'app-help-desk-support-management',
   standalone: true,
@@ -35,6 +57,8 @@ type WorkflowAction = {
     TagModule,
     SelectModule,
     InputTextModule,
+    DialogModule,
+    PaginatorModule,
     Loader,
   ],
   templateUrl: './help-desk-support-management.html',
@@ -50,6 +74,21 @@ export class HelpDeskSupportManagement implements OnInit {
   searchText = '';
   selectedStatus: string | null = null;
   selectedPriority: string | null = null;
+  assignDialogVisible = false;
+  isUserSearchLoading = false;
+  isAssigning = false;
+  selectedRequestForAssign: ITRequest | null = null;
+  selectedAssignee: AssignableUser | null = null;
+  assignableUsers: AssignableUser[] = [];
+  roles: SupportRole[] = [];
+  userTotalRecords = 0;
+  userCurrentPage = 0;
+  userPageSize = 10;
+  userFilters = {
+    email: '',
+    username: '',
+    roleId: null as number | null,
+  };
 
   statuses = [
     { label: 'All', value: null },
@@ -151,6 +190,31 @@ export class HelpDeskSupportManagement implements OnInit {
     return status.replace(/_/g, ' ');
   }
 
+  getCategoryDisplay(request?: ITRequest | null): string {
+    if (!request) return '--';
+    const categoryName = request.categoryName || '--';
+    const otherCategory = String(request.otherCategory || '').trim();
+    return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
+  }
+
+  getAssignedUserDisplay(request?: ITRequest | null): string {
+    if (!request) return 'Unassigned';
+
+    return (
+      request.assignedUserName ||
+      request.assignedToName ||
+      request.assigneeName ||
+      (request.assignedUserId || request.assignedTo || request.assigneeId ? `User #${request.assignedUserId || request.assignedTo || request.assigneeId}` : 'Unassigned')
+    );
+  }
+
+  getAssignedMetaDisplay(request?: ITRequest | null): string {
+    if (!request) return '';
+
+    const parts = [request.assignedUserRole, request.assignedUserEmail].filter(Boolean);
+    return parts.join(' | ');
+  }
+
   private getCurrentUser(): any {
     return this.apiService.loginState()?.user || {};
   }
@@ -172,6 +236,12 @@ export class HelpDeskSupportManagement implements OnInit {
       roleName.includes('MIS_FIRM') ||
       roleName.includes('MIS FIRM')
     );
+  }
+
+  canAssignRequests(): boolean {
+    const user = this.getCurrentUser();
+    return Number(user?.roleId) === 1;
+    // return true;
   }
 
   private isRequestCreator(request?: ITRequest | null): boolean {
@@ -260,6 +330,231 @@ export class HelpDeskSupportManagement implements OnInit {
   async onView(request: ITRequest): Promise<void> {
     await this.router.navigate(['/help-desk/request-details', request.id]);
    
+  }
+
+  async navigateToSetup(): Promise<void> {
+    await this.router.navigate(['/help-desk/setup']);
+  }
+
+  async openAssignDialog(request: ITRequest): Promise<void> {
+    if (!this.canAssignRequests()) return;
+
+    this.selectedRequestForAssign = request;
+    this.selectedAssignee = null;
+    this.assignDialogVisible = true;
+    this.userCurrentPage = 0;
+
+    if (!this.roles.length) {
+      await this.loadRoles();
+    }
+    await this.loadAssignableUsers();
+  }
+
+  closeAssignDialog(): void {
+    if (this.isAssigning) return;
+
+    this.assignDialogVisible = false;
+    this.selectedRequestForAssign = null;
+    this.selectedAssignee = null;
+  }
+
+  async loadRoles(): Promise<void> {
+    try {
+      const res = await this.apiService.GET<any>('/api/users/roles', {}, 'alt');
+      this.roles = Array.isArray(res.data)
+        ? res.data.filter((role: SupportRole) => role.status === true)
+        : [];
+    } catch (error) {
+      console.error('Failed to load roles:', error);
+      this.roles = [];
+    } finally {
+      this.cdr.detectChanges();
+    }
+  }
+
+  private normalizeUsers(raw: any[]): AssignableUser[] {
+    return (raw || []).map((user: any) => {
+      const isActive =
+        typeof user?.status === 'boolean'
+          ? user.status
+          : String(user?.status || '').toLowerCase() === 'active';
+
+      return {
+        ...user,
+        id: Number(user.id),
+        fullName: user.fullName || '--',
+        username: user.username || '--',
+        email: user.email || '--',
+        role: user.role || '--',
+        statusText: isActive ? 'ACTIVE' : 'INACTIVE',
+        emailReceiverText: user.emailReceiver === true ? 'Yes' : user.emailReceiver === false ? 'No' : '--',
+      };
+    });
+  }
+
+  private buildUserSearchCriteria(): any[] {
+    const criteria = [
+      {
+        fieldName: 'STATUS',
+        operator: 'EQUAL',
+        value: '1',
+      },
+    ];
+
+    if (this.userFilters.email.trim()) {
+      criteria.push({
+        fieldName: 'EMAIL',
+        operator: 'LIKE',
+        value: this.userFilters.email.trim(),
+      });
+    }
+
+    if (this.userFilters.username.trim()) {
+      criteria.push({
+        fieldName: 'USER_NAME',
+        operator: 'LIKE',
+        value: this.userFilters.username.trim(),
+      });
+    }
+
+    return criteria;
+  }
+
+  async loadAssignableUsers(): Promise<void> {
+    this.isUserSearchLoading = true;
+    this.cdr.detectChanges();
+
+    const payload: any = {
+      criteria: this.buildUserSearchCriteria(),
+      sortColumn: 'ID',
+      sortOrder: 'DESC',
+      page: this.userCurrentPage,
+      size: this.userPageSize,
+    };
+
+    if (this.userFilters.roleId) {
+      payload.roleId = this.userFilters.roleId;
+    }
+
+    try {
+      const res = await this.apiService.POST<any>('/api/users/search', payload, 'alt');
+      const data = res?.data ?? {};
+      const list =
+        Array.isArray(data.content) ? data.content :
+        Array.isArray(data.users) ? data.users :
+        Array.isArray(data) ? data :
+        [];
+
+      this.assignableUsers = this.normalizeUsers(list);
+      this.userTotalRecords = typeof data.total === 'number' ? data.total : this.assignableUsers.length;
+    } catch (error) {
+      console.error('Failed to load assignable users:', error);
+      this.assignableUsers = [];
+      this.userTotalRecords = 0;
+      await Swal.fire({
+        icon: 'error',
+        title: 'User Search Failed',
+        text: 'Unable to load active users for assignment.',
+        confirmButtonColor: '#d33',
+      });
+    } finally {
+      this.isUserSearchLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  applyUserFilters(): void {
+    this.userCurrentPage = 0;
+    this.loadAssignableUsers();
+  }
+
+  resetUserFilters(): void {
+    this.userFilters = {
+      email: '',
+      username: '',
+      roleId: null,
+    };
+    this.applyUserFilters();
+  }
+
+  onUserPageChange(event: any): void {
+    this.userCurrentPage = event.page;
+    this.userPageSize = event.rows;
+    this.loadAssignableUsers();
+  }
+
+  selectAssignee(user: AssignableUser): void {
+    this.selectedAssignee = user;
+  }
+
+  async assignSelectedUser(): Promise<void> {
+    if (!this.selectedRequestForAssign || !this.selectedAssignee) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Select User',
+        text: 'Please select an active user before assigning the request.',
+        confirmButtonColor: '#3085d6',
+      });
+      return;
+    }
+
+    this.isAssigning = true;
+    this.cdr.detectChanges();
+
+    try {
+      const result = await this.itSupportService.assignRequest(
+        this.selectedRequestForAssign.id,
+        this.selectedAssignee.id
+      );
+
+      if (result.success) {
+        this.updateAssignedRequestLocally(this.selectedRequestForAssign.id, this.selectedAssignee, result.request);
+        this.assignDialogVisible = false;
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Request Assigned',
+          text: result.message || `Assigned to ${this.selectedAssignee.fullName}.`,
+          confirmButtonColor: '#3085d6',
+          timer: 1400,
+          showConfirmButton: false,
+        });
+      } else {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Assign Failed',
+          text: result.message || 'Unable to assign the selected user.',
+          confirmButtonColor: '#d33',
+        });
+      }
+    } catch {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Unexpected Error',
+        text: 'Unable to assign the selected user.',
+        confirmButtonColor: '#d33',
+      });
+    } finally {
+      this.isAssigning = false;
+      this.selectedRequestForAssign = null;
+      this.selectedAssignee = null;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private updateAssignedRequestLocally(requestId: number, user: AssignableUser, updatedRequest?: ITRequest): void {
+    this.requests = this.requests.map((request) => {
+      if (request.id !== requestId) return request;
+
+      return {
+        ...request,
+        ...(updatedRequest || {}),
+        assignedUserId: user.id,
+        assignedUserName: user.fullName,
+        assignedUserEmail: user.email,
+        assignedUserRole: user.role,
+      };
+    });
   }
 
   async onAction(request: ITRequest): Promise<void> {
