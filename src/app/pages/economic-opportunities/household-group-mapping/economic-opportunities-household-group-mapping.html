@@ -97,6 +97,7 @@
           icon="fas fa-search"
           severity="primary"
           size="small"
+          [disabled]="!canSearch()"
           (onClick)="onSearch()"
         ></p-button>
       </div>
@@ -110,10 +111,14 @@
     <div class="d-flex gap-2 align-items-center">
       <p-select
         [options]="groups"
-        optionLabel="label"
-        optionValue="value"
+        optionLabel="groupName"
+        optionValue="id"
         [(ngModel)]="selectedGroup"
         placeholder="Select Group"
+        [filter]="true"
+        filterBy="groupName"
+        [loading]="isLoadingGroups"
+        [showClear]="true"
         class="w-15rem"
       ></p-select>
       <p-button
@@ -164,3 +169,5 @@
     </ng-template>
   </p-table>
 </div>
+
+<p-toast position="bottom-right"></p-toast>
