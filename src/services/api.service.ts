@@ -53,7 +53,10 @@ export class ApiService {
           config.headers = config.headers ?? {};
           config.headers['Authorization'] = `Bearer ${fresh}`;
         }
-        if (!config.headers?.['Content-Type']) {
+        const isFormDataPayload =
+          typeof FormData !== 'undefined' && config.data instanceof FormData;
+
+        if (!isFormDataPayload && !config.headers?.['Content-Type']) {
           config.headers = config.headers ?? {};
           config.headers['Content-Type'] = 'application/json';
         }
@@ -103,13 +106,13 @@ export class ApiService {
     this.client(base).get<T>(endpoint, { ...this.apiHeader, params, ...(config ?? {}) });
 
   POST = <T = any>(endpoint: string, payload: any, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
-    this.client(base).post<T>(endpoint, payload, { ...this.apiHeader, ...(config ?? {}) });
+    this.client(base).post<T>(endpoint, payload, this.buildRequestConfig(payload, config));
 
   PUT  = <T = any>(endpoint: string, payload?: any, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
-    this.client(base).put<T>(endpoint, payload ?? {}, { ...this.apiHeader, ...(config ?? {}) });
+    this.client(base).put<T>(endpoint, payload ?? {}, this.buildRequestConfig(payload, config));
 
   PATCH= <T = any>(endpoint: string, payload: any, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
-    this.client(base).patch<T>(endpoint, payload, { ...this.apiHeader, ...(config ?? {}) });
+    this.client(base).patch<T>(endpoint, payload, this.buildRequestConfig(payload, config));
 
   DELETE= <T = any>(endpoint: string, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
     this.client(base).delete<T>(endpoint, { ...this.apiHeader, ...(config ?? {}) });
@@ -128,6 +131,17 @@ export class ApiService {
     const data = await response.json();
     return { data } as T;
   };
+
+  private buildRequestConfig(payload?: any, config?: AxiosRequestConfig): AxiosRequestConfig {
+    const isFormDataPayload =
+      typeof FormData !== 'undefined' && payload instanceof FormData;
+
+    if (isFormDataPayload) {
+      return { ...(config ?? {}) };
+    }
+
+    return { ...this.apiHeader, ...(config ?? {}) };
+  }
 }
 
 // safe decode

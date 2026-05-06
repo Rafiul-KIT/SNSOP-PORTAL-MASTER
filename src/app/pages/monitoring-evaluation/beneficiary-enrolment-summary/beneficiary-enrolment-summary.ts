@@ -176,7 +176,12 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
       const res = await this.api.GET('/api/monitoring/beneficiariry/enrollment', params);
       const data = res?.data ?? {};
 
-      this.beneficiaries = Array.isArray(data.data) ? data.data : [];
+      this.beneficiaries = Array.isArray(data.data)
+        ? data.data.map((item: any) => ({
+            ...item,
+            formattedEnrollmentDate: this.formatEnrollmentDate(item.enrollmentDate),
+          }))
+        : [];
       this.totalRecords = data.totalRecords ?? 0;
     } catch (err) {
       console.error('Failed to load beneficiaries', err);
@@ -268,5 +273,23 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
     this.beneficiaries = [];
     this.totalRecords = 0;
     this.currentPage = 0;
+  }
+
+  private formatEnrollmentDate(value: string | Date | null | undefined): string {
+    if (!value) return '';
+
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours24 = date.getHours();
+    const hours12 = hours24 % 12 || 12;
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const meridiem = hours24 >= 12 ? 'PM' : 'AM';
+
+    return `${month}/${day}/${year} ${hours12}:${minutes}:${seconds} ${meridiem}`;
   }
 }

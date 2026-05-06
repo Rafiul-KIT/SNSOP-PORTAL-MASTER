@@ -85,6 +85,16 @@
       </p-floatlabel>
     </div>
 
+    <!-- Selection Criteria -->
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select [options]="selectionCriteriaOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.selectionCriteria" name="selectionCriteria" [showClear]="true"
+          class="w-100"></p-select>
+        <label>Selection Criteria</label>
+      </p-floatlabel>
+    </div>
+
     <!-- Buttons -->
     <div class="col-md-3">
       <div class="d-flex justify-content-end gap-2">
@@ -112,11 +122,34 @@
     </div>
   </div>
 
+  <div class="px-3 pt-3">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="border rounded px-3 py-2 bg-light h-100">
+          <div class="text-muted small">Total Paid Beneficiary</div>
+          <div class="fw-bold">{{ totalPaidBeneficiary }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="border rounded px-3 py-2 bg-light h-100">
+          <div class="text-muted small">Total Unpaid Beneficiary</div>
+          <div class="fw-bold">{{ totalUnpaidBeneficiary }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="border rounded px-3 py-2 bg-light h-100">
+          <div class="text-muted small">Total Paid Amount (USD)</div>
+          <div class="fw-bold">{{ totalPaidAmountUSD | number:'1.2-2' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <p-table [value]="transfers" [scrollHeight]="'60vh'"
     [tableStyle]="{ 'min-width': '100%', 'margin-bottom': '5px' }" dataKey="reqNo" size="small">
     <ng-template pTemplate="header">
       <tr>
-        <th colspan="8" class="text-end">
+        <th colspan="9" class="text-end">
           <p class="fw-bold mb-2">
             Showing <kbd>{{ transfers.length }}</kbd> of
             <kbd>{{ totalRecords }}</kbd> records
@@ -128,6 +161,7 @@
         <th>Req No</th>
         <th>Beneficiary Name</th>
         <th>Household Number</th>
+        <th>Selection Criteria</th>
         <th>Payment Cycle</th>
         <th>Payment Status</th>
         <th>Amount (USD)</th>
@@ -141,6 +175,7 @@
         <td>{{ row.reqNo }}</td>
         <td>{{ row.beneficiaryName }}</td>
         <td>{{ row.householdNumber }}</td>
+        <td>{{ row.selectionCriteria }}</td>
         <td>Payment Cycle {{ row.paymentCycle }}</td>
         <td>
           <span class="badge" [ngClass]="{
@@ -158,7 +193,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="8" class="text-center text-danger">
+        <td colspan="9" class="text-center text-danger">
           <b>No records found!</b>
         </td>
       </tr>

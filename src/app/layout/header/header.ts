@@ -193,6 +193,7 @@ export class Header {
       { label: 'Beneficiary Enrolment Summary', icon: 'fas fa-clipboard-list', routerLink: ['/monitoring-evaluation/beneficiary-enrolment-summary'] },
       { label: 'Cash Transfer Summary', icon: 'fas fa-money-bill-wave', routerLink: ['/monitoring-evaluation/cash-transfer-summary'] },
       { label: 'Result Framework', icon: 'fas fa-bullseye', routerLink: ['/monitoring-evaluation/result-framework'] },
+      { label: 'M&E Reports', icon: 'fas fa-report', routerLink: ['/monitoring-evaluation/reports'] },
     ];
   }
 
