@@ -597,7 +597,7 @@ export class ItSupportService {
     userId: number
   ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
     try {
-      const res = await this.api.PATCH<any>(`${this.baseEndpoint}/request/${id}/assign/${userId}`, {});
+      const res = await this.api.PATCH<any>(`${this.baseEndpoint}/requests/${id}/assign/${userId}`, {});
       const response = this.parseApiResponse<ITRequest>(res);
 
       return {
