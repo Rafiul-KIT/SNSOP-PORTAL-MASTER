@@ -42,6 +42,12 @@ export interface ITHistory {
   performedAt: string;
 }
 
+export interface ITAssignedUser {
+  username: string;
+  fullName: string;
+  email: string;
+}
+
 export interface ITRequest {
   id: number;
   trackingNumber: string;
@@ -63,7 +69,7 @@ export interface ITRequest {
   updatedBy: number;
   updatedAt: string;
   assignedUserId?: number;
-  assignedTo?: number;
+  assignedTo?: ITAssignedUser | number | null;
   assigneeId?: number;
   assignedUserName?: string;
   assignedToName?: string;
@@ -98,8 +104,11 @@ export interface ITSearchParams {
   status?: string;
   categoryId?: number;
   moduleId?: number;
+  submoduleId?: number;
+  issueType?: string;
   priority?: string;
   trackingNumber?: string;
+  assignedTo?: number;
   search?: string;
   page?: number;
   size?: number;
@@ -343,8 +352,11 @@ export class ItSupportService {
     if (params.status) queryParams['status'] = params.status;
     if (params.categoryId) queryParams['categoryId'] = params.categoryId;
     if (params.moduleId) queryParams['moduleId'] = params.moduleId;
+    if (params.submoduleId) queryParams['submoduleId'] = params.submoduleId;
+    if (params.issueType) queryParams['issueType'] = params.issueType;
     if (params.priority) queryParams['priority'] = params.priority;
     if (params.trackingNumber) queryParams['trackingNumber'] = params.trackingNumber;
+    if (params.assignedTo) queryParams['assignedTo'] = params.assignedTo;
     if (params.search) queryParams['search'] = params.search;
     if (params.page !== undefined) queryParams['page'] = params.page;
     if (params.size !== undefined) queryParams['size'] = params.size;

@@ -12,7 +12,7 @@ import { Loader } from '../../../components/loader/loader';
 import Swal from 'sweetalert2';
 
 import { TableModule } from 'primeng/table';
-import { ITRequest, ItSupportService } from '../../../../services/it-support.service';
+import { ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 type WorkflowAction = {
@@ -20,6 +20,11 @@ type WorkflowAction = {
   value: string;
   needsComment: boolean;
   actionType: 'status' | 'submit_info';
+};
+
+type LookupOption = {
+  label: string;
+  value: number;
 };
 
 @Component({
@@ -36,6 +41,15 @@ export class HelpDeskMyRequests implements OnInit {
   isLoading = false;
   requests: ITRequest[] = [];
   filteredRequests: ITRequest[] = [];
+  searchText = '';
+  trackingNumber = '';
+  selectedCategoryId: number | null = null;
+  selectedModuleId: number | null = null;
+  selectedSubmoduleId: number | null = null;
+  selectedIssueType: string | null = null;
+  categories: LookupOption[] = [];
+  modules: LookupOption[] = [];
+  submodules: Array<LookupOption & { parentModuleId: number }> = [];
 
   summary = {
     total: 0,
@@ -63,6 +77,13 @@ export class HelpDeskMyRequests implements OnInit {
     { label: 'Low', value: 'LOW' }
   ];
 
+  issueTypeOptions = [
+    { label: 'All Types', value: '' },
+    { label: 'Technical', value: 'TECHNICAL' },
+    { label: 'Operational', value: 'OPERATIONAL' },
+    { label: 'Other', value: 'OTHER' }
+  ];
+
   selectedStatus = '';
   selectedPriority = '';
 
@@ -84,6 +105,7 @@ export class HelpDeskMyRequests implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadFilterLookups();
     this.loadRequests();
   }
 
@@ -94,6 +116,12 @@ export class HelpDeskMyRequests implements OnInit {
     const params: any = { size: 50 };
     if (this.selectedStatus) params.status = this.selectedStatus;
     if (this.selectedPriority) params.priority = this.selectedPriority;
+    if (this.selectedIssueType) params.issueType = this.selectedIssueType;
+    if (this.selectedCategoryId) params.categoryId = this.selectedCategoryId;
+    if (this.selectedModuleId) params.moduleId = this.selectedModuleId;
+    if (this.selectedSubmoduleId) params.submoduleId = this.selectedSubmoduleId;
+    if (this.trackingNumber.trim()) params.trackingNumber = this.trackingNumber.trim();
+    if (this.searchText.trim()) params.search = this.searchText.trim();
 
     this.zone.runOutsideAngular(async () => {
       try {
@@ -118,6 +146,48 @@ export class HelpDeskMyRequests implements OnInit {
 
   filterRequests(): void {
     this.loadRequests();
+  }
+
+  resetFilters(): void {
+    this.searchText = '';
+    this.trackingNumber = '';
+    this.selectedStatus = '';
+    this.selectedPriority = '';
+    this.selectedIssueType = '';
+    this.selectedCategoryId = null;
+    this.selectedModuleId = null;
+    this.selectedSubmoduleId = null;
+    this.loadRequests();
+  }
+
+  onModuleFilterChange(): void {
+    this.selectedSubmoduleId = null;
+  }
+
+  get filteredSubmoduleOptions(): Array<LookupOption & { parentModuleId: number }> {
+    if (!this.selectedModuleId) return this.submodules;
+    return this.submodules.filter((submodule) => Number(submodule.parentModuleId) === Number(this.selectedModuleId));
+  }
+
+  private async loadFilterLookups(): Promise<void> {
+    try {
+      const [categories, modules, submodules] = await Promise.all([
+        this.itSupportService.getCategories(),
+        this.itSupportService.getModules(),
+        this.itSupportService.getSubmodules(),
+      ]);
+
+      this.categories = categories.map((category: ITCategory) => ({ label: category.name, value: category.id }));
+      this.modules = modules.map((module: ITModule) => ({ label: module.name, value: module.id }));
+      this.submodules = submodules.map((submodule: ITSubmodule) => ({
+        label: submodule.name,
+        value: submodule.id,
+        parentModuleId: submodule.parentModuleId,
+      }));
+      this.detectChanges();
+    } catch (error) {
+      console.error('Failed to load my request filters:', error);
+    }
   }
 
   calculateSummary(): void {
@@ -393,6 +463,11 @@ export class HelpDeskMyRequests implements OnInit {
       default:
         return 'secondary';
     }
+  }
+
+  formatIssueType(issueType?: string): string {
+    if (!issueType) return '--';
+    return issueType.replace(/_/g, ' ');
   }
 
   getStars(count: number): number[] {

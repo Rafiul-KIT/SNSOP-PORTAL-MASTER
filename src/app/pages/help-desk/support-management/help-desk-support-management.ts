@@ -12,7 +12,7 @@ import { DialogModule } from 'primeng/dialog';
 import { PaginatorModule } from 'primeng/paginator';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITRequest, ItSupportService } from '../../../../services/it-support.service';
+import { ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 
@@ -45,6 +45,11 @@ type AssignableUser = {
   emailReceiverText?: string;
 };
 
+type LookupOption = {
+  label: string;
+  value: number;
+};
+
 @Component({
   selector: 'app-help-desk-support-management',
   standalone: true,
@@ -72,8 +77,17 @@ export class HelpDeskSupportManagement implements OnInit {
 
   isLoading = false;
   searchText = '';
+  trackingNumber = '';
   selectedStatus: string | null = null;
   selectedPriority: string | null = null;
+  selectedIssueType: string | null = null;
+  selectedCategoryId: number | null = null;
+  selectedModuleId: number | null = null;
+  selectedSubmoduleId: number | null = null;
+  selectedAssignedTo: number | null = null;
+  currentPage = 0;
+  pageSize = 20;
+  totalRecords = 0;
   assignDialogVisible = false;
   isUserSearchLoading = false;
   isAssigning = false;
@@ -81,6 +95,10 @@ export class HelpDeskSupportManagement implements OnInit {
   selectedAssignee: AssignableUser | null = null;
   assignableUsers: AssignableUser[] = [];
   roles: SupportRole[] = [];
+  categories: LookupOption[] = [];
+  modules: LookupOption[] = [];
+  submodules: Array<LookupOption & { parentModuleId: number }> = [];
+  assignedUserOptions: LookupOption[] = [];
   userTotalRecords = 0;
   userCurrentPage = 0;
   userPageSize = 10;
@@ -109,6 +127,13 @@ export class HelpDeskSupportManagement implements OnInit {
     { label: 'Low', value: 'LOW' },
   ];
 
+  issueTypeOptions = [
+    { label: 'All', value: null },
+    { label: 'Technical', value: 'TECHNICAL' },
+    { label: 'Operational', value: 'OPERATIONAL' },
+    { label: 'Other', value: 'OTHER' },
+  ];
+
   requests: ITRequest[] = [];
 
   constructor(
@@ -119,6 +144,7 @@ export class HelpDeskSupportManagement implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadFilterLookups();
     this.loadRequests();
   }
 
@@ -126,20 +152,28 @@ export class HelpDeskSupportManagement implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    const params: any = { page: 0, size: 50 };
+    const params: any = { page: this.currentPage, size: this.pageSize };
     if (useFilters) {
       if (this.selectedStatus) params.status = this.selectedStatus;
       if (this.selectedPriority) params.priority = this.selectedPriority;
+      if (this.selectedIssueType) params.issueType = this.selectedIssueType;
+      if (this.selectedCategoryId) params.categoryId = this.selectedCategoryId;
+      if (this.selectedModuleId) params.moduleId = this.selectedModuleId;
+      if (this.selectedSubmoduleId) params.submoduleId = this.selectedSubmoduleId;
+      if (this.selectedAssignedTo) params.assignedTo = this.selectedAssignedTo;
+      if (this.trackingNumber.trim()) params.trackingNumber = this.trackingNumber.trim();
       if (this.searchText.trim()) params.search = this.searchText.trim();
     }
 
     try {
       const result = await this.itSupportService.getRequests(params);
       this.requests = result.items;
+      this.totalRecords = result.total;
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Error loading support requests:', error);
       this.requests = [];
+      this.totalRecords = 0;
       this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
@@ -148,7 +182,59 @@ export class HelpDeskSupportManagement implements OnInit {
   }
 
   applyFilters(): void {
+    this.currentPage = 0;
     this.loadRequests();
+  }
+
+  resetFilters(): void {
+    this.searchText = '';
+    this.trackingNumber = '';
+    this.selectedStatus = null;
+    this.selectedPriority = null;
+    this.selectedIssueType = null;
+    this.selectedCategoryId = null;
+    this.selectedModuleId = null;
+    this.selectedSubmoduleId = null;
+    this.selectedAssignedTo = null;
+    this.applyFilters();
+  }
+
+  onRequestPageChange(event: any): void {
+    this.currentPage = event.page;
+    this.pageSize = event.rows;
+    this.loadRequests();
+  }
+
+  onModuleFilterChange(): void {
+    this.selectedSubmoduleId = null;
+  }
+
+  get filteredSubmoduleOptions(): Array<LookupOption & { parentModuleId: number }> {
+    if (!this.selectedModuleId) return this.submodules;
+    return this.submodules.filter((submodule) => Number(submodule.parentModuleId) === Number(this.selectedModuleId));
+  }
+
+  private async loadFilterLookups(): Promise<void> {
+    try {
+      const [categories, modules, submodules] = await Promise.all([
+        this.itSupportService.getCategories(),
+        this.itSupportService.getModules(),
+        this.itSupportService.getSubmodules(),
+      ]);
+
+      this.categories = categories.map((category: ITCategory) => ({ label: category.name, value: category.id }));
+      this.modules = modules.map((module: ITModule) => ({ label: module.name, value: module.id }));
+      this.submodules = submodules.map((submodule: ITSubmodule) => ({
+        label: submodule.name,
+        value: submodule.id,
+        parentModuleId: submodule.parentModuleId,
+      }));
+      await this.loadAssignedUserOptions();
+    } catch (error) {
+      console.error('Failed to load support request filters:', error);
+    } finally {
+      this.cdr.detectChanges();
+    }
   }
 
   getStatusSeverity(status: string | undefined): Severity {
@@ -197,19 +283,51 @@ export class HelpDeskSupportManagement implements OnInit {
     return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
   }
 
+  formatIssueType(issueType?: string): string {
+    if (!issueType) return '--';
+    return issueType.replace(/_/g, ' ');
+  }
+
+  hasAssignedUser(request?: ITRequest | null): boolean {
+    const assigned = request?.assignedTo;
+    return !!(
+      (assigned && typeof assigned === 'object') ||
+      request?.assignedUserName ||
+      request?.assignedToName ||
+      request?.assigneeName ||
+      request?.assignedUserId ||
+      (typeof assigned === 'number' && assigned > 0) ||
+      request?.assigneeId
+    );
+  }
+
+  getAssignButtonLabel(request?: ITRequest | null): string {
+    return this.hasAssignedUser(request) ? 'Reassign' : 'Assign';
+  }
+
   getAssignedUserDisplay(request?: ITRequest | null): string {
     if (!request) return 'Unassigned';
+    const assignedTo = request.assignedTo;
+
+    if (assignedTo && typeof assignedTo === 'object') {
+      return assignedTo.fullName || assignedTo.username || 'Assigned';
+    }
 
     return (
       request.assignedUserName ||
       request.assignedToName ||
       request.assigneeName ||
-      (request.assignedUserId || request.assignedTo || request.assigneeId ? `User #${request.assignedUserId || request.assignedTo || request.assigneeId}` : 'Unassigned')
+      (request.assignedUserId || assignedTo || request.assigneeId ? `User #${request.assignedUserId || assignedTo || request.assigneeId}` : 'Unassigned')
     );
   }
 
   getAssignedMetaDisplay(request?: ITRequest | null): string {
     if (!request) return '';
+    const assignedTo = request.assignedTo;
+
+    if (assignedTo && typeof assignedTo === 'object') {
+      return assignedTo.email || '';
+    }
 
     const parts = [request.assignedUserRole, request.assignedUserEmail].filter(Boolean);
     return parts.join(' | ');
@@ -241,7 +359,6 @@ export class HelpDeskSupportManagement implements OnInit {
   canAssignRequests(): boolean {
     const user = this.getCurrentUser();
     return Number(user?.roleId) === 1;
-    // return true;
   }
 
   private isRequestCreator(request?: ITRequest | null): boolean {
@@ -390,6 +507,40 @@ export class HelpDeskSupportManagement implements OnInit {
         emailReceiverText: user.emailReceiver === true ? 'Yes' : user.emailReceiver === false ? 'No' : '--',
       };
     });
+  }
+
+  private async loadAssignedUserOptions(): Promise<void> {
+    const payload = {
+      criteria: [
+        {
+          fieldName: 'STATUS',
+          operator: 'EQUAL',
+          value: '1',
+        },
+      ],
+      sortColumn: 'ID',
+      sortOrder: 'DESC',
+      page: 0,
+      size: 100,
+    };
+
+    try {
+      const res = await this.apiService.POST<any>('/api/users/search', payload, 'alt');
+      const data = res?.data ?? {};
+      const list =
+        Array.isArray(data.content) ? data.content :
+        Array.isArray(data.users) ? data.users :
+        Array.isArray(data) ? data :
+        [];
+
+      this.assignedUserOptions = this.normalizeUsers(list).map((user) => ({
+        label: `${user.fullName} (${user.email})`,
+        value: user.id,
+      }));
+    } catch (error) {
+      console.error('Failed to load assigned user filter options:', error);
+      this.assignedUserOptions = [];
+    }
   }
 
   private buildUserSearchCriteria(): any[] {
@@ -553,6 +704,11 @@ export class HelpDeskSupportManagement implements OnInit {
         assignedUserName: user.fullName,
         assignedUserEmail: user.email,
         assignedUserRole: user.role,
+        assignedTo: {
+          username: user.username,
+          fullName: user.fullName,
+          email: user.email,
+        },
       };
     });
   }

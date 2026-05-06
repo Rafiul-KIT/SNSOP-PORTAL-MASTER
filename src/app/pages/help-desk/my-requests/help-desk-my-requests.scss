@@ -44,6 +44,41 @@
   color: #2c3e50;
 }
 
+.my-request-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+.filter-field {
+  display: grid;
+  gap: 0.35rem;
+
+  label {
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: flex-end;
+  grid-column: 1 / -1;
+}
+
 // Table Styles
 :host ::ng-deep {
   .p-datatable {
@@ -203,5 +238,15 @@
     .summary-value {
       font-size: 1rem;
     }
+  }
+
+  .my-request-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }

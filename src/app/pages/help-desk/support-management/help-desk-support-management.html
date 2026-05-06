@@ -20,10 +20,119 @@
     <div class="card p-3">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="card-section-title mb-0">Support Request Queue</h5>
-        <!-- <span class="text-muted small d-none d-sm-inline">{{ getWorkflowContextText() }}</span> -->
+        <span class="text-muted small d-none d-md-inline">
+          Showing {{ requests.length }} of {{ totalRecords }} requests
+        </span>
       </div>
 
-  
+      <div class="queue-filters">
+        <div class="filter-field">
+          <label>Search</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchText"
+            placeholder="Title or description"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>Tracking No.</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="trackingNumber"
+            placeholder="Tracking number"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>Status</label>
+          <p-select
+            [options]="statuses"
+            [(ngModel)]="selectedStatus"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All statuses"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Issue Type</label>
+          <p-select
+            [options]="issueTypeOptions"
+            [(ngModel)]="selectedIssueType"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All types"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Priority</label>
+          <p-select
+            [options]="priorityOptions"
+            [(ngModel)]="selectedPriority"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All priorities"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Category</label>
+          <p-select
+            [options]="categories"
+            [(ngModel)]="selectedCategoryId"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All categories"
+            [showClear]="true"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Module</label>
+          <p-select
+            [options]="modules"
+            [(ngModel)]="selectedModuleId"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All modules"
+            [showClear]="true"
+            class="w-100"
+            (onChange)="onModuleFilterChange()"
+          ></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Submodule</label>
+          <p-select
+            [options]="filteredSubmoduleOptions"
+            [(ngModel)]="selectedSubmoduleId"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All submodules"
+            [showClear]="true"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Assigned To</label>
+          <p-select
+            [options]="assignedUserOptions"
+            [(ngModel)]="selectedAssignedTo"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Anyone"
+            [showClear]="true"
+            class="w-100"
+          ></p-select>
+        </div>
+        <div class="queue-filter-actions">
+          <p-button label="Reset" icon="fas fa-rotate-left" severity="secondary" size="small" [outlined]="true" (onClick)="resetFilters()"></p-button>
+          <p-button label="Search" icon="fas fa-search" severity="primary" size="small" (onClick)="applyFilters()"></p-button>
+        </div>
+      </div>
 
       @if (requests.length === 0) {
         <div class="text-center text-muted py-4">
@@ -32,61 +141,17 @@
         </div>
       } @else {
         <div class="table-wrapper">
-          <p-table [value]="requests" [tableStyle]="{ 'min-width': '1080px' }" size="small" [stripedRows]="true">
+          <p-table [value]="requests" [tableStyle]="{ 'min-width': '1320px' }" size="small" [stripedRows]="true">
             <ng-template pTemplate="header">
-                  <tr>
-                <th class="fw-bold">  <div class="">
-          <label class="small fw-semibold mb-1 d-block">Search</label>
-          <input
-            type="text"
-            pInputText
-            class="w-100"
-            [(ngModel)]="searchText"
-            placeholder="Search by title or tracking number"
-            (keyup.enter)="applyFilters()"
-          />
-        </div></th>
-                <th class="fw-bold"></th>
-                <th class="fw-bold">  <div class="">
-          <label class="small fw-semibold mb-1 d-block">Status</label>
-          <p-select
-            [options]="statuses"
-            [(ngModel)]="selectedStatus"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Status"
-            class="w-100"
-          />
-        </div></th>
-                <th class="fw-bold"> <div class="">
-          <label class="small fw-semibold mb-1 d-block">Priority</label>
-          <p-select
-            [options]="priorityOptions"
-            [(ngModel)]="selectedPriority"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Priority"
-            class="w-100"
-          />
-        </div></th>
-                <th class="fw-bold"></th>
-                <th class="fw-bold"></th>
-                <th class="fw-bold">   <div class="">
-      <p-button 
-  label="Search" 
-  severity="primary" 
-  [style]="{ width: '50%' }"
-  (onClick)="applyFilters()">
-</p-button>
-        </div></th>
-              </tr>
               <tr>
                 <th class="fw-bold">Tracking No.</th>
                 <th class="fw-bold">Title</th>
+                <th class="fw-bold">Issue Type</th>
                 <th class="fw-bold">Status</th>
                 <th class="fw-bold">Priority</th>
                 <th class="fw-bold">Category</th>
                 <th class="fw-bold">Module</th>
+                <th class="fw-bold">Submodule</th>
                 <th class="fw-bold">Assigned To</th>
                 <th class="fw-bold">Actions</th>
               </tr>
@@ -95,6 +160,7 @@
               <tr>
                 <td>{{ ticket.trackingNumber }}</td>
                 <td>{{ ticket.title }}</td>
+                <td>{{ formatIssueType(ticket.issueType) }}</td>
                 <td>
                   <p-tag [value]="formatStatus(ticket.status)" [severity]="getStatusSeverity(ticket.status)" />
                 </td>
@@ -103,6 +169,7 @@
                 </td>
                 <td>{{ getCategoryDisplay(ticket) }}</td>
                 <td>{{ ticket.moduleName || '--' }}</td>
+                <td>{{ ticket.submoduleName || '--' }}</td>
                 <td>
                   <div class="assigned-cell">
                     <strong>{{ getAssignedUserDisplay(ticket) }}</strong>
@@ -122,7 +189,7 @@
                     ></p-button>
                     @if (canAssignRequests()) {
                       <p-button
-                        label="Assign"
+                        [label]="getAssignButtonLabel(ticket)"
                         icon="fas fa-user-check"
                         severity="success"
                         size="small"
@@ -144,6 +211,14 @@
             </ng-template>
           </p-table>
         </div>
+        <p-paginator
+          class="request-paginator"
+          [rows]="pageSize"
+          [totalRecords]="totalRecords"
+          [rowsPerPageOptions]="[10, 20, 50]"
+          [first]="currentPage * pageSize"
+          (onPageChange)="onRequestPageChange($event)"
+        ></p-paginator>
       }
     </div>
   </div>
