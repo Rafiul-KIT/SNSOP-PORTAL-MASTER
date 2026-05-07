@@ -55,6 +55,7 @@ export class CashTransferSummary implements OnInit {
   get paidStatusOptions() { return this.lookupService.paidStatusOptions; }
   get paymentCycleOptions() { return this.lookupService.paymentCycleOptions; }
   selectionCriteriaOptions = [
+    { label: 'ALL', value: 'ALL' },
     { label: 'LIPW', value: 'LIPW' },
     { label: 'DIS', value: 'DIS' },
   ];
@@ -74,7 +75,7 @@ export class CashTransferSummary implements OnInit {
     paymentCycle: null,
     status: null,
     paidStatus: null,
-    selectionCriteria: null,
+    selectionCriteria: 'ALL',
   };
 
   // Breadcrumb
@@ -176,16 +177,19 @@ export class CashTransferSummary implements OnInit {
       if (this.filters.paymentCycle) params.paymentCycle = this.filters.paymentCycle;
       if (this.filters.status != null) params.status = this.filters.status;
       if (this.filters.paidStatus) params.paidStatus = this.filters.paidStatus;
-      if (this.filters.selectionCriteria) params.selectionCriteria = this.filters.selectionCriteria;
+      if (this.filters.selectionCriteria && this.filters.selectionCriteria !== 'ALL') {
+        params.selectionCriteria = this.filters.selectionCriteria;
+      }
 
       const res = await this.api.GET('/api/monitoring/cashTransfer', params);
       const data = res?.data ?? {};
+      const summary = data.summary ?? {};
 
-      this.transfers = Array.isArray(data.data) ? data.data : [];
-      this.totalRecords = data.count ?? 0;
-      this.totalPaidBeneficiary = data.totalPaidBeneficiary ?? 0;
-      this.totalUnpaidBeneficiary = data.totalUnpaidBeneficiary ?? 0;
-      this.totalPaidAmountUSD = data.totalPaidAmountUSD ?? 0;
+      this.transfers = Array.isArray(data.content) ? data.content : [];
+      this.totalRecords = data.totalElements ?? 0;
+      this.totalPaidBeneficiary = summary.totalPaidBeneficiaries ?? 0;
+      this.totalUnpaidBeneficiary = summary.totalUnpaidBeneficiaries ?? 0;
+      this.totalPaidAmountUSD = summary.totalPaidAmountUSD ?? 0;
     } catch (err) {
       console.error('Failed to load cash transfers', err);
       this.msg.add({
@@ -220,7 +224,9 @@ export class CashTransferSummary implements OnInit {
       if (this.filters.paymentCycle) payload.paymentCycle = this.filters.paymentCycle;
       if (this.filters.status != null) payload.status = this.filters.status;
       if (this.filters.paidStatus) payload.paidStatus = this.filters.paidStatus;
-      if (this.filters.selectionCriteria) payload.selectionCriteria = this.filters.selectionCriteria;
+      if (this.filters.selectionCriteria && this.filters.selectionCriteria !== 'ALL') {
+        payload.selectionCriteria = this.filters.selectionCriteria;
+      }
 
       const res = await this.api.POST(
         '/api/monitoring/cashTransfer/download',
@@ -267,7 +273,7 @@ export class CashTransferSummary implements OnInit {
       paymentCycle: null,
       status: null,
       paidStatus: null,
-      selectionCriteria: null,
+      selectionCriteria: 'ALL',
     };
     this.counties = [];
     this.payams = [];
