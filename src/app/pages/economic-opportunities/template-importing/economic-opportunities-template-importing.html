@@ -114,8 +114,13 @@
           icon="fas fa-download"
           severity="primary"
           size="small"
+          [loading]="isDownloading"
+          [disabled]="!selectedTemplate || isDownloading"
+          (onClick)="downloadTemplate()"
         ></p-button>
       </div>
     </div>
   </form>
 </div>
+
+<p-toast position="bottom-right"></p-toast>

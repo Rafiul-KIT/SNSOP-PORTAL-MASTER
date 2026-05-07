@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -8,8 +8,27 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 import { IdName, LookupService } from '../../../../services/lookup.service';
+import { ApiService } from '../../../../services/api.service';
+
+interface GroupRecord {
+  id: number;
+  groupName: string;
+  latitude: number;
+  longitude: number;
+  vlsaFormed: boolean;
+}
+
+interface GroupListResponse {
+  code?: number | string | null;
+  message?: string | null;
+  content?: GroupRecord[] | null;
+  pageNumber?: number | null;
+  pageSize?: number | null;
+  totalElements?: number | null;
+}
 
 @Component({
   selector: 'app-economic-opportunities-household-group-mapping',
@@ -24,11 +43,15 @@ import { IdName, LookupService } from '../../../../services/lookup.service';
     Select,
     TableModule,
     CheckboxModule,
+    Toast,
   ],
+  providers: [MessageService],
   templateUrl: './economic-opportunities-household-group-mapping.html',
   styleUrl: './economic-opportunities-household-group-mapping.scss',
 })
 export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
+  private readonly groupEndpoint = '/api/econ-op/group/get';
+
   selectedState: string | number | null = null;
   selectedCounty: string | number | null = null;
   selectedPayam: string | number | null = null;
@@ -42,17 +65,14 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
   isLoadingCounties = false;
   isLoadingPayams = false;
   isLoadingBomas = false;
+  isLoadingGroups = false;
 
   beneficiaries: any[] = [];
   selectedBeneficiaries: any[] = [];
-  selectedGroup: any = null;
+  selectedGroup: number | null = null;
   showTable = false;
 
-  groups = [
-    { label: 'Group A', value: 'group_a' },
-    { label: 'Group B', value: 'group_b' },
-    { label: 'Group C', value: 'group_c' },
-  ];
+  groups: GroupRecord[] = [];
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items: MenuItem[] = [
@@ -60,10 +80,16 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
     { label: 'Household And GroupId Mapping', icon: 'fas fa-users-cog' },
   ];
 
-  constructor(private lookupService: LookupService) {}
+  constructor(
+    private lookupService: LookupService,
+    private api: ApiService,
+    private cdr: ChangeDetectorRef,
+    private msg: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.loadStates();
+    this.loadGroups();
   }
 
   async loadStates(): Promise<void> {
@@ -125,7 +151,53 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
     }
   }
 
+  async loadGroups(): Promise<void> {
+    this.isLoadingGroups = true;
+    this.cdr.detectChanges();
+
+    try {
+      const res = await this.api.GET<GroupListResponse>(this.groupEndpoint, {
+        pageNumber: 0,
+        pageSize: 1000,
+      });
+      const data = res?.data;
+
+      if (!this.isApiSuccess(data, Array.isArray(data?.content))) {
+        throw new Error(data?.message || 'Unable to load groups');
+      }
+
+      const content = Array.isArray(data?.content) ? data.content : [];
+      this.groups = content.map((item) => ({
+        id: Number(item.id) || 0,
+        groupName: item.groupName ?? '',
+        latitude: Number(item.latitude) || 0,
+        longitude: Number(item.longitude) || 0,
+        vlsaFormed: !!item.vlsaFormed,
+      }));
+    } catch (err) {
+      console.error('Failed to load groups', err);
+      this.groups = [];
+      this.msg.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to load household groups.',
+      });
+    } finally {
+      this.isLoadingGroups = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   onSearch(): void {
+    if (!this.canSearch()) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Geo Fields Required',
+        detail: 'Please select State, County, Payam, and Boma before searching.',
+      });
+      return;
+    }
+
     // Mock data for beneficiaries
     this.beneficiaries = [
       { id: 1, name: 'Beneficiary 1', householdNo: 'HH-001', location: 'State A, County B' },
@@ -145,6 +217,7 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
     this.bomas = [];
     this.beneficiaries = [];
     this.selectedBeneficiaries = [];
+    this.selectedGroup = null;
     this.showTable = false;
   }
 
@@ -153,5 +226,16 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
       console.log('Assigning', this.selectedBeneficiaries, 'to', this.selectedGroup);
       // Logic for assignment
     }
+  }
+
+  canSearch(): boolean {
+    return !!this.selectedState && !!this.selectedCounty && !!this.selectedPayam && !!this.selectedBoma;
+  }
+
+  private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {
+    if (!data) return fallback;
+    if (data.code === undefined || data.code === null || data.code === '') return fallback;
+    const code = Number(data.code);
+    return code === 0 || code === 200;
   }
 }
