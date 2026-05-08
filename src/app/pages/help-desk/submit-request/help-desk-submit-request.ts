@@ -72,8 +72,8 @@ export class HelpDeskSubmitRequest implements OnInit {
       otherCategory: [null],
       priority: [null, Validators.required],
       description: ['', Validators.required],
-      module: [null, Validators.required],
-      submodule: [null, Validators.required],
+      module: [null],
+      submodule: [null],
       notification: [null, Validators.required],
       attachments: [null, Validators.required]
     });
@@ -264,6 +264,8 @@ export class HelpDeskSubmitRequest implements OnInit {
       const otherCategory = this.isOtherCategorySelected()
         ? String(formValue.otherCategory || '').trim()
         : null;
+      const moduleId = Number(formValue.module);
+      const submoduleId = Number(formValue.submodule);
 
       try {
         const result = await this.itSupportService.createRequest({
@@ -272,8 +274,8 @@ export class HelpDeskSubmitRequest implements OnInit {
           issueType: formValue.issueType,
           categoryId: formValue.category,
           otherCategory,
-          moduleId: formValue.module,
-          submoduleId: formValue.submodule,
+          moduleId: Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined,
+          submoduleId: Number.isFinite(submoduleId) && submoduleId > 0 ? submoduleId : undefined,
           priority: formValue.priority,
           files: this.selectedFiles
         });

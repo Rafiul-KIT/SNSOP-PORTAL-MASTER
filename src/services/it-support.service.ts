@@ -506,24 +506,34 @@ export class ItSupportService {
     issueType: string;
     categoryId: number;
     otherCategory?: string | null;
-    moduleId: number;
-    submoduleId: number;
+    moduleId?: number | null;
+    submoduleId?: number | null;
     priority: string;
     files?: File[];
   }): Promise<{ success: boolean; request?: ITRequest; trackingNumber?: string; message?: string }> {
     try {
       const formData = new FormData();
 
-      const requestPayload = {
+      const requestPayload: {
+        title: string;
+        description: string;
+        issueType: string;
+        categoryId: number;
+        otherCategory: string | null;
+        priority: string;
+        moduleId?: number;
+        submoduleId?: number;
+      } = {
         title: payload.title,
         description: payload.description,
         issueType: payload.issueType,
         categoryId: payload.categoryId,
         otherCategory: payload.otherCategory ?? null,
-        moduleId: payload.moduleId,
-        submoduleId: payload.submoduleId,
         priority: payload.priority,
       };
+
+      if (payload.moduleId) requestPayload.moduleId = payload.moduleId;
+      if (payload.submoduleId) requestPayload.submoduleId = payload.submoduleId;
 
       formData.append('payload', new Blob([JSON.stringify(requestPayload)], { type: 'application/json' }));
       this.appendFiles(formData, payload.files);
