@@ -36,7 +36,7 @@ export class Dashboard {
       },
       {
         label: 'Report',
-        routerLink: '/under-construction',
+        routerLink: '/home/metabase',
         icon: 'fas fa-chart-line',
       },
       {
@@ -49,6 +49,25 @@ export class Dashboard {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
         routerLink: '/cto-dashboard'
+      },
+         {
+        label: 'Help Desk',
+        icon: 'fas fa-headset',
+        routerLink: '/help-desk/dashboard',
+        tooltipText: 'IT Support Help Desk'
+      },
+      {
+        label: 'Monitoring & Evaluation',
+        icon: 'fas fa-chart-bar',
+        routerLink: '/monitoring-evaluation/beneficiary-enrolment-summary',
+        tooltipText: 'Monitoring & Evaluation'
+      },
+   
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        routerLink: '/economic-opportunities/dashboard',
+        tooltipText: 'Economic Opportunities'
       },
     ];
   }

@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.breadcrumb-wrapper {
+  width: 100%;
+}
+
+:host ::ng-deep .p-datepicker {
+  width: 100%;
+}

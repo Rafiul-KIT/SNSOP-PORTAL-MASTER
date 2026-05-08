@@ -72,6 +72,7 @@ export class AddNewRole implements OnInit {
     menus.forEach(menu => {
       menuMap.set(menu.id, {
         ...menu,
+        label: menu.label || menu.name,
         checked: assignedMenuIds.has(menu.id),
         children: []
       });
@@ -82,20 +83,23 @@ export class AddNewRole implements OnInit {
         const parent = menuMap.get(menu.parentMenu.id);
         if (parent) {
           parent.children.push(menu);
+          menu.parentNode = parent; // Store parent reference for bubbling up
         }
       } else {
         roots.push(menu);
       }
     });
 
-    // Ensure parents are checked if any of their children are checked
-    roots.forEach(parent => {
-      if (parent.children?.length > 0) {
-        if (parent.children.some((child: any) => child.checked)) {
-          parent.checked = true;
+    // Recursively ensure parents are checked if any descendant is checked
+    const syncParentStatus = (node: any) => {
+      if (node.children && node.children.length > 0) {
+        node.children.forEach((child: any) => syncParentStatus(child));
+        if (node.children.some((c: any) => c.checked)) {
+          node.checked = true;
         }
       }
-    });
+    };
+    roots.forEach(root => syncParentStatus(root));
 
     this.menuTree = roots;
   }
@@ -131,14 +135,25 @@ export class AddNewRole implements OnInit {
     }
   }
 
-  onParentChange(parentMenu: any) {
-    parentMenu.children.forEach((c: any) => c.checked = parentMenu.checked);
-    this.cdr.detectChanges();
-  }
+  onMenuChange(menu: any) {
+    // 1. Cascade down: if parent is checked/unchecked, all descendants follow
+    const toggleChildren = (node: any, val: boolean) => {
+      if (node.children) {
+        node.children.forEach((c: any) => {
+          c.checked = val;
+          toggleChildren(c, val);
+        });
+      }
+    };
+    toggleChildren(menu, menu.checked);
 
-  onChildChange(parentMenu: any) {
-    if (parentMenu.children.some((c: any) => c.checked)) {
-      parentMenu.checked = true;
+    // 2. Bubble up: if a child is checked, all ancestors must be checked
+    if (menu.checked) {
+      let current = menu.parentNode;
+      while (current) {
+        current.checked = true;
+        current = current.parentNode;
+      }
     }
     this.cdr.detectChanges();
   }

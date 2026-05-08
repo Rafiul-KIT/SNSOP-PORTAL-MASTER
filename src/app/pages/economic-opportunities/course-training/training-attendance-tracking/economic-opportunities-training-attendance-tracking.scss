@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.course-code-box {
+  min-height: 56px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.5rem;
+  background: var(--surface-card);
+}
+
+.step-badge {
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary-color) 12%, white);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.attendance-radio-group {
+  min-width: 160px;
+}
+
+.table-textarea {
+  min-width: 220px;
+}

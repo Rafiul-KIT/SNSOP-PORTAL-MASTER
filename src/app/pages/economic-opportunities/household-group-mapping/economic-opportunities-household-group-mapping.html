@@ -1,0 +1,173 @@
+<div class="breadcrumb-wrapper mb-2">
+  <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
+</div>
+
+<div class="card p-3 mb-3 shadow-sm">
+  <form class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="states"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="selectedState"
+          name="stateId"
+          [filter]="true"
+          filterBy="name"
+          [loading]="isLoadingStates"
+          [showClear]="true"
+          (onChange)="onStateChange()"
+          class="w-100"
+        ></p-select>
+        <label>State</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="counties"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="selectedCounty"
+          name="countyId"
+          [filter]="true"
+          filterBy="name"
+          [loading]="isLoadingCounties"
+          [showClear]="true"
+          [disabled]="!selectedState"
+          (onChange)="onCountyChange()"
+          class="w-100"
+        ></p-select>
+        <label>County</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="payams"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="selectedPayam"
+          name="payamId"
+          [filter]="true"
+          filterBy="name"
+          [loading]="isLoadingPayams"
+          [showClear]="true"
+          [disabled]="!selectedCounty"
+          (onChange)="onPayamChange()"
+          class="w-100"
+        ></p-select>
+        <label>Payam</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-select
+          [options]="bomas"
+          optionLabel="name"
+          optionValue="id"
+          [(ngModel)]="selectedBoma"
+          name="bomaId"
+          [filter]="true"
+          filterBy="name"
+          [loading]="isLoadingBomas"
+          [showClear]="true"
+          [disabled]="!selectedPayam"
+          class="w-100"
+        ></p-select>
+        <label>Boma</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-12">
+      <div class="d-flex justify-content-end gap-2">
+        <p-button
+          label="Reset"
+          icon="fas fa-refresh"
+          severity="danger"
+          size="small"
+          outlined="true"
+          (onClick)="resetFilters()"
+        ></p-button>
+        <p-button
+          label="Search"
+          icon="fas fa-search"
+          severity="primary"
+          size="small"
+          [disabled]="!canSearch()"
+          (onClick)="onSearch()"
+        ></p-button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div *ngIf="showTable" class="card p-3 shadow-sm">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="m-0">Beneficiaries</h5>
+    <div class="d-flex gap-2 align-items-center">
+      <p-select
+        [options]="groups"
+        optionLabel="groupName"
+        optionValue="id"
+        [(ngModel)]="selectedGroup"
+        placeholder="Select Group"
+        [filter]="true"
+        filterBy="groupName"
+        [loading]="isLoadingGroups"
+        [showClear]="true"
+        class="w-15rem"
+      ></p-select>
+      <p-button
+        label="Assign"
+        icon="fas fa-user-plus"
+        severity="success"
+        size="small"
+        [disabled]="selectedBeneficiaries.length === 0 || !selectedGroup"
+        (onClick)="onAssign()"
+      ></p-button>
+    </div>
+  </div>
+
+  <p-table
+    [value]="beneficiaries"
+    [(selection)]="selectedBeneficiaries"
+    [paginator]="true"
+    [rows]="10"
+    [responsiveLayout]="'scroll'"
+    styleClass="p-datatable-sm p-datatable-gridlines"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Household No</th>
+        <th>Location</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-beneficiary>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="beneficiary"></p-tableCheckbox>
+        </td>
+        <td>{{ beneficiary.id }}</td>
+        <td>{{ beneficiary.name }}</td>
+        <td>{{ beneficiary.householdNo }}</td>
+        <td>{{ beneficiary.location }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">No beneficiaries found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast position="bottom-right"></p-toast>

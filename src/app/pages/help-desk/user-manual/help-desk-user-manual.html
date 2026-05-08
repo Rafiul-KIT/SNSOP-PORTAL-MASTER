@@ -1,0 +1,171 @@
+<div class="breadcrumb-wrapper">
+  <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="w-100"></p-breadcrumb>
+</div>
+
+<div class="helpdesk-container">
+  <div class="page-header">
+ 
+
+  </div>
+
+  @if (loading$ | async) {
+   <app-loader/>
+
+  } @else if (loadError) {
+    <div class="state-card error">
+      <i class="fas fa-triangle-exclamation"></i>
+      <span>{{ loadError }}</span>
+    </div>
+  } @else {
+    <div class="row g-3">
+      <div class="col-xl-3 col-lg-4">
+        <div class="card p-3 role-card">
+          <h5 class="card-section-title mb-2">Role Directory</h5>
+          <p class="card-muted mb-3">Select a role to open its full migrated manual.</p>
+
+          <div class="role-list">
+            @for (role of roles; track role.id) {
+              <button
+                type="button"
+                class="role-item"
+                [class.active]="role.id === selectedRoleId"
+                [style.border-left-color]="role.color"
+                (click)="selectRole(role.id)"
+              >
+                <span class="role-icon" [style.color]="role.color">{{ role.icon }}</span>
+                <span class="role-content">
+                  <span class="role-name">{{ role.name }}</span>
+                  <span class="role-desc">{{ role.shortDescription }}</span>
+                </span>
+              </button>
+            }
+          </div>
+
+          @if (selectedRole; as role) {
+            <div class="summary-panel mt-3">
+              <div class="summary-item">
+                <span class="summary-label">Current Role</span>
+                <span class="summary-value">{{ role.name }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Modules</span>
+                <span class="summary-value">{{ role.sections.length }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Visible Sections</span>
+                <span class="summary-value">{{ filteredSections.length }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Images</span>
+                <span class="summary-value">{{ role.imageCount }}</span>
+              </div>
+            </div>
+
+            <div class="approval-chain mt-3">
+              <h6 class="mini-title">Approval Chain</h6>
+              <div class="chain-list">
+                @for (stage of approvalPath; track stage) {
+                  <span class="chain-pill" [class.current]="stage === role.name">{{ stage }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="col-xl-9 col-lg-8">
+        <div class="card p-3 manual-card" [style.--role-accent]="selectedRole?.color ?? '#1565c0'">
+          @if (selectedRole; as role) {
+            <div class="manual-toolbar">
+              <div class="toolbar-left">
+                <span class="manual-badge" [style.background]="role.color + '1A'" [style.color]="role.color">
+                  <span>{{ role.icon }}</span>
+                  {{ role.name }}
+                </span>
+
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input
+                    type="text"
+                    [value]="searchTerm"
+                    (input)="onSearchInput($event)"
+                    placeholder="Search section title or manual text"
+                    aria-label="Search manual content"
+                  />
+                  @if (hasSearchQuery) {
+                    <button type="button" class="clear-search" (click)="clearSearch()">Clear</button>
+                  }
+                </div>
+              </div>
+
+              <div class="toolbar-actions">
+                <p-button
+                  label="Expand All"
+                  icon="fas fa-expand-alt"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="expandAllSections()"
+                ></p-button>
+                <p-button
+                  label="Collapse All"
+                  icon="fas fa-compress-alt"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="collapseAllSections()"
+                ></p-button>
+              </div>
+            </div>
+
+            <div class="toc-bar">
+              <span class="toc-label">Table of Contents</span>
+              <div class="toc-list">
+                @for (entry of visibleNavEntries; track entry.sectionId) {
+                  <button type="button" class="toc-chip" (click)="scrollToSection(entry.sectionId)">
+                    {{ entry.title }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            @if (filteredSections.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>No section matched your search. Try another keyword.</p>
+              </div>
+            } @else {
+              <div class="section-list">
+                @for (section of filteredSections; track section.id) {
+                  <article class="manual-section" [id]="section.id" [class.expanded]="isSectionExpanded(section.id)">
+                    <button type="button" class="section-header" (click)="toggleSection(section.id)">
+                      <div class="section-heading">
+                        <h6>{{ section.title }}</h6>
+                      </div>
+                      <i
+                        class="fas"
+                        [class.fa-chevron-down]="!isSectionExpanded(section.id)"
+                        [class.fa-chevron-up]="isSectionExpanded(section.id)"
+                      ></i>
+                    </button>
+
+                    @if (isSectionExpanded(section.id)) {
+                      <div class="section-body rich-content" (click)="onSectionBodyClick($event)" [innerHTML]="section.bodyHtml"></div>
+                    }
+                  </article>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (lightboxImageSrc) {
+    <div class="lightbox" (click)="closeLightbox()">
+      <button type="button" class="lightbox-close" (click)="closeLightbox()" aria-label="Close image preview">×</button>
+      <img [src]="lightboxImageSrc" alt="Manual preview" (click)="$event.stopPropagation()" />
+    </div>
+  }
+</div>

@@ -1,0 +1,506 @@
+<div class="breadcrumb-wrapper mb-2">
+  <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
+</div>
+
+@if (isLoading) {
+<app-loader></app-loader>
+} @else {
+
+<div class="card shadow-sm mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-semibold">
+      <i class="fas fa-user-check me-2"></i> Training And Attendance Tracking
+    </h5>
+    <span class="step-badge">Current Step: {{ activeStep === 'filters' ? '1' : activeStep === 'beneficiaries' ? '2' : '3' }}</span>
+  </div>
+
+  <div class="p-3 border-bottom">
+    <div class="section-title mb-3">Step 1: Select Location</div>
+    <form class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="states"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="beneficiaryFilters.stateId"
+            name="stateId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            (onChange)="onStateChange()"
+            class="w-100"
+          ></p-select>
+          <label>State *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="counties"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="beneficiaryFilters.countyId"
+            name="countyId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            [disabled]="!beneficiaryFilters.stateId"
+            (onChange)="onCountyChange()"
+            class="w-100"
+          ></p-select>
+          <label>County *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="payams"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="beneficiaryFilters.payamId"
+            name="payamId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            [disabled]="!beneficiaryFilters.countyId"
+            (onChange)="onPayamChange()"
+            class="w-100"
+          ></p-select>
+          <label>Payam *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="bomas"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="beneficiaryFilters.bomaId"
+            name="bomaId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            [disabled]="!beneficiaryFilters.payamId"
+            class="w-100"
+          ></p-select>
+          <label>Boma *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <p-button
+            label="Reset"
+            icon="fas fa-refresh"
+            severity="danger"
+            size="small"
+            outlined="true"
+            (onClick)="resetBeneficiaryFilters()"
+          ></p-button>
+          <p-button
+            label="Load Beneficiaries"
+            icon="fas fa-search"
+            severity="primary"
+            size="small"
+            [loading]="isLoadingBeneficiaries"
+            (onClick)="searchBeneficiaries()"
+          ></p-button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  @if (activeStep === 'beneficiaries' || activeStep === 'attendance' || activeStep === 'search') {
+  <div class="p-3 border-bottom">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="section-title">Step 2: Select Beneficiaries And Course</div>
+      <p class="fw-bold mb-0">
+        Selected <kbd>{{ selectedBeneficiaries.length }}</kbd> of <kbd>{{ beneficiaryTotalRecords }}</kbd>
+      </p>
+    </div>
+
+    <form class="row g-3 align-items-end mb-3">
+      <div class="col-md-5">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="courses"
+            optionLabel="courseName"
+            optionValue="id"
+            [(ngModel)]="selectedCourseId"
+            name="courseId"
+            [filter]="true"
+            filterBy="courseName"
+            [showClear]="true"
+            [loading]="isLoadingCourses"
+            class="w-100"
+          ></p-select>
+          <label>Course *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-datepicker
+            [(ngModel)]="attendanceDate"
+            name="attendanceDate"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            class="w-100"
+          ></p-datepicker>
+          <label>Attendance Date *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-2">
+        <div class="course-code-box">
+          <span class="small text-muted">Course Code</span>
+          <div class="fw-semibold">{{ selectedCourseCode || '--' }}</div>
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="d-flex justify-content-end">
+          <p-button
+            label="Prepare Attendance"
+            icon="fas fa-list-check"
+            severity="success"
+            size="small"
+            [disabled]="selectedBeneficiaries.length === 0"
+            (onClick)="generateAttendanceRows()"
+          ></p-button>
+        </div>
+      </div>
+    </form>
+
+    <p-table
+      [value]="beneficiaries"
+      [(selection)]="selectedBeneficiaries"
+      dataKey="beneficiaryId"
+      [responsiveLayout]="'scroll'"
+      [tableStyle]="{ 'min-width': '1300px', 'margin-bottom': '5px' }"
+      size="small"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th>Serial</th>
+          <th>Beneficiary ID</th>
+          <th>Household Number</th>
+          <th>Respondent Name</th>
+          <th>Phone Number</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Registration Phase</th>
+          <th>Selection Criteria</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row let-i="rowIndex">
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="row"></p-tableCheckbox>
+          </td>
+          <td>{{ (beneficiaryCurrentPage * beneficiaryPageSize) + i + 1 }}</td>
+          <td>{{ row.beneficiaryId }}</td>
+          <td>{{ row.householdNumber || '--' }}</td>
+          <td>{{ row.respondentFullName || '--' }}</td>
+          <td>{{ row.phoneNumber || '--' }}</td>
+          <td>{{ row.age || '--' }}</td>
+          <td>{{ row.gender || '--' }}</td>
+          <td>{{ row.registrationPhase || '--' }}</td>
+          <td>{{ row.selectionCriteria || '--' }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10" class="text-center text-danger">
+            <b>No beneficiaries found!</b>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="border-top">
+      <p-paginator
+        class="paginator-sticky"
+        [rows]="beneficiaryPageSize"
+        [totalRecords]="beneficiaryTotalRecords"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [first]="beneficiaryCurrentPage * beneficiaryPageSize"
+        (onPageChange)="onBeneficiaryPageChange($event)"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      ></p-paginator>
+    </div>
+  </div>
+  }
+
+  @if (activeStep === 'attendance' || activeStep === 'search') {
+  <div class="p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="section-title">Step 3: Enter Attendance</div>
+      <p class="fw-bold mb-0">
+        Rows <kbd>{{ attendanceRows.length }}</kbd>
+      </p>
+    </div>
+
+    <p-table
+      [value]="attendanceRows"
+      [responsiveLayout]="'scroll'"
+      [tableStyle]="{ 'min-width': '1500px', 'margin-bottom': '5px' }"
+      dataKey="beneficiaryId"
+      size="small"
+      styleClass="p-datatable-sm p-datatable-gridlines"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Serial</th>
+          <th>Beneficiary ID</th>
+          <th>Household Number</th>
+          <th>Respondent Name</th>
+          <th>Course</th>
+          <th>Date</th>
+          <th>Present</th>
+          <th>Absent Reason</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row let-i="rowIndex">
+        <tr>
+          <td>{{ i + 1 }}</td>
+          <td>{{ row.beneficiaryId }}</td>
+          <td>{{ row.householdNumber || '--' }}</td>
+          <td>{{ row.respondentFullName || '--' }}</td>
+          <td>{{ selectedCourseCode || '--' }}</td>
+          <td>{{ row.classAttendanceDate || '--' }}</td>
+          <td>
+            <div class="d-flex align-items-center gap-3 attendance-radio-group">
+              @for (option of presenceOptions; track option.value) {
+              <div class="d-flex align-items-center gap-2">
+                <p-radiobutton
+                  [name]="'presence-' + row.beneficiaryId"
+                  [value]="option.value"
+                  [(ngModel)]="row.presentInClass"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onAttendancePresenceChange(row)"
+                ></p-radiobutton>
+                <label>{{ option.label }}</label>
+              </div>
+              }
+            </div>
+          </td>
+          <td>
+            <textarea
+              pTextarea
+              [(ngModel)]="row.classMissReason"
+              [ngModelOptions]="{ standalone: true }"
+              [disabled]="row.presentInClass !== false"
+              rows="2"
+              class="form-control table-textarea"
+              placeholder="Enter absence reason"
+            ></textarea>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center text-danger">
+            <b>No attendance rows prepared yet!</b>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="pt-3 border-top d-flex justify-content-end">
+      <p-button
+        label="Save Attendance"
+        icon="fas fa-save"
+        severity="success"
+        size="small"
+        [loading]="isSaving"
+        [disabled]="attendanceRows.length === 0"
+        (onClick)="saveAttendance()"
+      ></p-button>
+    </div>
+  </div>
+  }
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-semibold">
+      <i class="fas fa-search me-2"></i> Attendance Search And List
+    </h5>
+    <p class="fw-bold mb-0">
+      Showing <kbd>{{ attendanceSearchResults.length }}</kbd> of <kbd>{{ searchTotalRecords }}</kbd> records
+    </p>
+  </div>
+
+  <div class="p-3 border-bottom">
+    <form class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="searchStates"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="attendanceSearchFilters.stateId"
+            name="searchStateId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            (onChange)="onSearchStateChange()"
+            class="w-100"
+          ></p-select>
+          <label>State *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="searchCounties"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="attendanceSearchFilters.countyId"
+            name="searchCountyId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            [disabled]="!attendanceSearchFilters.stateId"
+            (onChange)="onSearchCountyChange()"
+            class="w-100"
+          ></p-select>
+          <label>County *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="searchPayams"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="attendanceSearchFilters.payamId"
+            name="searchPayamId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            [disabled]="!attendanceSearchFilters.countyId"
+            (onChange)="onSearchPayamChange()"
+            class="w-100"
+          ></p-select>
+          <label>Payam *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-md-3">
+        <p-floatlabel variant="on" class="w-100">
+          <p-select
+            [options]="searchBomas"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="attendanceSearchFilters.bomaId"
+            name="searchBomaId"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            [disabled]="!attendanceSearchFilters.payamId"
+            class="w-100"
+          ></p-select>
+          <label>Boma *</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <p-button
+            label="Reset"
+            icon="fas fa-refresh"
+            severity="danger"
+            size="small"
+            outlined="true"
+            (onClick)="resetSearchFilters()"
+          ></p-button>
+          <p-button
+            label="Search Attendance"
+            icon="fas fa-search"
+            severity="primary"
+            size="small"
+            [loading]="isSearchingAttendance"
+            (onClick)="searchAttendance()"
+          ></p-button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <p-table
+    [value]="attendanceSearchResults"
+    [responsiveLayout]="'scroll'"
+    [tableStyle]="{ 'min-width': '1100px', 'margin-bottom': '5px' }"
+    dataKey="id"
+    size="small"
+    styleClass="p-datatable-sm p-datatable-gridlines"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Serial</th>
+        <th>ID</th>
+        <th>Course ID</th>
+        <th>Beneficiary ID</th>
+        <th>Attendance Date</th>
+        <th>Present</th>
+        <th>Absent Reason</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row let-i="rowIndex">
+      <tr>
+        <td>{{ (searchCurrentPage * searchPageSize) + i + 1 }}</td>
+        <td>{{ row.id || '--' }}</td>
+        <td>{{ row.courseId || '--' }}</td>
+        <td>{{ row.beneficiaryId || '--' }}</td>
+        <td>{{ row.classAttendanceDate || '--' }}</td>
+        <td>
+          <span [class]="row.presentInClass ? 'text-success fw-semibold' : 'text-danger fw-semibold'">
+            {{ row.presentInClass ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td>{{ row.classMissReason || '--' }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center text-danger">
+          <b>No attendance records found!</b>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <div class="border-top">
+    <p-paginator
+      class="paginator-sticky"
+      [rows]="searchPageSize"
+      [totalRecords]="searchTotalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [first]="searchCurrentPage * searchPageSize"
+      (onPageChange)="onAttendanceSearchPageChange($event)"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    ></p-paginator>
+  </div>
+</div>
+
+}
+
+<p-toast position="bottom-right"></p-toast>
