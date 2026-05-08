@@ -2,6 +2,10 @@
   <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
 </div>
 
+@if (isDownloading) {
+<app-loader></app-loader>
+}
+
 <div class="card p-3 mb-3 shadow-sm">
   <form class="row g-3 align-items-end">
     <div class="col-md-4">
@@ -15,12 +19,14 @@
           [filter]="true"
           filterBy="label"
           [showClear]="true"
+          (onChange)="onTemplateChange()"
           class="w-100"
         ></p-select>
         <label>Select Template</label>
       </p-floatlabel>
     </div>
 
+    @if (shouldShowGeoFields) {
     <div class="col-md-2">
       <p-floatlabel variant="on" class="w-100">
         <p-select
@@ -98,6 +104,22 @@
         <label>Boma</label>
       </p-floatlabel>
     </div>
+    }
+
+    @if (shouldShowTrainingDate) {
+    <div class="col-md-3">
+      <p-floatlabel variant="on" class="w-100">
+        <p-datepicker
+          [(ngModel)]="selectedTrainingDate"
+          name="trainingDate"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          class="w-100"
+        ></p-datepicker>
+        <label>Training Date</label>
+      </p-floatlabel>
+    </div>
+    }
 
     <div class="col-12">
       <div class="d-flex justify-content-end gap-2">
@@ -115,7 +137,7 @@
           severity="primary"
           size="small"
           [loading]="isDownloading"
-          [disabled]="!selectedTemplate || isDownloading"
+          [disabled]="!canDownloadTemplate"
           (onClick)="downloadTemplate()"
         ></p-button>
       </div>

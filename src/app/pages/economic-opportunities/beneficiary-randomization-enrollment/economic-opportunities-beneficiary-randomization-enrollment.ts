@@ -24,13 +24,21 @@ interface EnrollmentFilters {
   bomaId: string | number | null;
 }
 
+interface EnrollmentSearchPayload {
+  stateId?: number;
+  countyId?: number;
+  payamId?: number;
+  bomaId?: number;
+  groupId: number;
+}
+
 interface EnrollmentApiResponse {
-  code: number;
-  message: string;
-  content: EnrollmentRecord[];
-  pageNumber: number;
-  pageSize: number;
-  totalElements: number;
+  code?: number | string | null;
+  message?: string | null;
+  content?: EnrollmentRecord[] | null;
+  pageNumber?: number | null;
+  pageSize?: number | null;
+  totalElements?: number | null;
 }
 
 interface GroupApiResponse {
@@ -341,18 +349,12 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
       this.isSearching = true;
       this.cdr.detectChanges();
 
-      const params: Record<string, string | number> = {
-        groupId: this.filters.groupId!,
-        pageNumber: this.currentPage,
-        pageSize: this.pageSize,
-      };
-
-      if (this.filters.stateId) params['stateId'] = this.filters.stateId;
-      if (this.filters.countyId) params['countyId'] = this.filters.countyId;
-      if (this.filters.payamId) params['payamId'] = this.filters.payamId;
-      if (this.filters.bomaId) params['bomaId'] = this.filters.bomaId;
-
-      const res = await this.api.GET<EnrollmentApiResponse>(this.getEndpoint, params);
+      const payload = this.createSearchPayload();
+      const endpoint = `${this.getEndpoint}?page=${this.currentPage}&size=${this.pageSize}`;
+      const res = await this.api.POST<EnrollmentApiResponse>(
+        endpoint,
+        payload
+      );
       const data = res?.data;
 
       const hasEmptySearchPayload =
@@ -368,7 +370,7 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
       this.rows = content.map((item) => this.toRow(item));
       this.totalRecords = Number(data?.totalElements ?? content.length ?? 0);
       this.currentPage = Number(data?.pageNumber ?? this.currentPage ?? 0);
-      this.pageSize = Number(data?.pageSize ?? this.pageSize ?? 10);
+      this.pageSize = Number(data?.pageSize ?? this.pageSize ?? 10) || 10;
       this.snapshotRows(this.rows);
     } catch (err) {
       console.error('Failed to load beneficiary enrollment list', err);
@@ -392,15 +394,33 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
     };
   }
 
+  private createSearchPayload(): EnrollmentSearchPayload {
+    const payload: EnrollmentSearchPayload = {
+      groupId: this.normalizeNumber(this.filters.groupId),
+    };
+
+    if (this.filters.stateId) payload.stateId = this.normalizeNumber(this.filters.stateId);
+    if (this.filters.countyId) payload.countyId = this.normalizeNumber(this.filters.countyId);
+    if (this.filters.payamId) payload.payamId = this.normalizeNumber(this.filters.payamId);
+    if (this.filters.bomaId) payload.bomaId = this.normalizeNumber(this.filters.bomaId);
+
+    return payload;
+  }
+
   private toRow(item: EnrollmentRecord): EnrollmentRow {
     return {
-      ...item,
+      id: this.normalizeNumber(item.id),
+      beneficiaryId: this.normalizeNumber(item.beneficiaryId),
+      applicationId: item.applicationId ?? '',
+      respondentFullName: item.respondentFullName ?? '',
+      respondentAge: this.normalizeNumber(item.respondentAge),
       interestedInParticipating: !!item.interestedInParticipating,
       survivesTargeting: !!item.survivesTargeting,
       treatmentArm: !!item.treatmentArm,
       householdEnrollmentStatus: !!item.householdEnrollmentStatus,
       reasonForWhyNotEnrolled: item.reasonForWhyNotEnrolled ?? '',
       groupId: this.normalizeNumber(item.groupId),
+      groupName: item.groupName ?? '',
       nomineeIndex: this.normalizeNumber(item.nomineeIndex),
       isDirty: false,
       isSaving: false,
@@ -451,7 +471,7 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
     return Number.isFinite(numericValue) ? numericValue : 0;
   }
 
-  private isApiSuccess(data: { code?: number | string } | null | undefined, fallback = false): boolean {
+  private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {
     if (!data) return fallback;
     if (data.code === undefined || data.code === null || data.code === '') return fallback;
     const code = Number(data.code);

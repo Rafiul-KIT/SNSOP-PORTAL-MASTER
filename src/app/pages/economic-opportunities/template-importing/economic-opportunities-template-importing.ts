@@ -7,9 +7,11 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabel } from 'primeng/floatlabel';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Select } from 'primeng/select';
+import { DatePickerModule } from 'primeng/datepicker';
 import { Toast } from 'primeng/toast';
 import { IdName, LookupService } from '../../../../services/lookup.service';
 import { ApiService } from '../../../../services/api.service';
+import { Loader } from '../../../components/loader/loader';
 
 interface TemplateOption {
   label: string;
@@ -27,7 +29,9 @@ interface TemplateOption {
     ButtonModule,
     FloatLabel,
     Select,
+    DatePickerModule,
     Toast,
+    Loader,
   ],
   providers: [MessageService],
   templateUrl: './economic-opportunities-template-importing.html',
@@ -41,6 +45,7 @@ export class EconomicOpportunitiesTemplateImporting implements OnInit {
   selectedCounty: string | number | null = null;
   selectedPayam: string | number | null = null;
   selectedBoma: string | number | null = null;
+  selectedTrainingDate: Date | null = null;
 
   isDownloading = false;
   states: IdName[] = [];
@@ -72,6 +77,12 @@ export class EconomicOpportunitiesTemplateImporting implements OnInit {
     { label: 'Financial Service Linkage Tracking Template', value: 'FINANCIAL_SERVICE_LINKAGE_TRACKING' },
   ];
 
+  private readonly templatesWithoutGeo = new Set([
+    'HOUSEHOLD_GROUP_VIEW',
+    'COURSE_ENTITY',
+    'COURSE_DETAILS',
+  ]);
+
   constructor(
     private lookupService: LookupService,
     private api: ApiService,
@@ -81,6 +92,26 @@ export class EconomicOpportunitiesTemplateImporting implements OnInit {
 
   ngOnInit(): void {
     this.loadStates();
+  }
+
+  get shouldShowGeoFields(): boolean {
+    return !!this.selectedTemplate && !this.templatesWithoutGeo.has(this.selectedTemplate);
+  }
+
+  get shouldShowTrainingDate(): boolean {
+    return this.selectedTemplate === 'TRAINING_ATTENDANCE_TRACKING';
+  }
+
+  get canDownloadTemplate(): boolean {
+    return !!this.selectedTemplate && !this.isDownloading && (!this.shouldShowTrainingDate || !!this.selectedTrainingDate);
+  }
+
+  onTemplateChange(): void {
+    this.resetGeoFilters();
+
+    if (!this.shouldShowTrainingDate) {
+      this.selectedTrainingDate = null;
+    }
   }
 
   async loadStates(): Promise<void> {
@@ -168,14 +199,29 @@ export class EconomicOpportunitiesTemplateImporting implements OnInit {
       return;
     }
 
+    if (this.shouldShowTrainingDate && !this.selectedTrainingDate) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Training Date Required',
+        detail: 'Please select a training date before downloading this template.',
+      });
+      return;
+    }
+
     const payload: Record<string, string | number> = {
       templateType: this.selectedTemplate,
     };
 
-    if (this.selectedState) payload['stateId'] = Number(this.selectedState);
-    if (this.selectedCounty) payload['countyId'] = Number(this.selectedCounty);
-    if (this.selectedPayam) payload['payamId'] = Number(this.selectedPayam);
-    if (this.selectedBoma) payload['bomaId'] = Number(this.selectedBoma);
+    if (this.shouldShowGeoFields) {
+      if (this.selectedState) payload['stateId'] = Number(this.selectedState);
+      if (this.selectedCounty) payload['countyId'] = Number(this.selectedCounty);
+      if (this.selectedPayam) payload['payamId'] = Number(this.selectedPayam);
+      if (this.selectedBoma) payload['bomaId'] = Number(this.selectedBoma);
+    }
+
+    if (this.shouldShowTrainingDate && this.selectedTrainingDate) {
+      payload['trainingDate'] = this.formatDate(this.selectedTrainingDate);
+    }
 
     try {
       this.isDownloading = true;
@@ -216,6 +262,11 @@ export class EconomicOpportunitiesTemplateImporting implements OnInit {
 
   resetFilters(): void {
     this.selectedTemplate = null;
+    this.selectedTrainingDate = null;
+    this.resetGeoFilters();
+  }
+
+  private resetGeoFilters(): void {
     this.selectedState = null;
     this.selectedCounty = null;
     this.selectedPayam = null;
@@ -223,6 +274,13 @@ export class EconomicOpportunitiesTemplateImporting implements OnInit {
     this.counties = [];
     this.payams = [];
     this.bomas = [];
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private getFileNameFromHeaders(contentDisposition: string | undefined): string | null {

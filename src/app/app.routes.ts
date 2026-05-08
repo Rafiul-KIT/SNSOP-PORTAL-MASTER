@@ -30,6 +30,9 @@ import { EconomicOpportunitiesHouseholdGroupView } from './pages/economic-opport
 import { EconomicOpportunitiesCourseEntity } from './pages/economic-opportunities/course-training/course-entity/economic-opportunities-course-entity';
 import { EconomicOpportunitiesCourseDetails } from './pages/economic-opportunities/course-training/course-details/economic-opportunities-course-details';
 import { EconomicOpportunitiesTrainingAttendanceTracking } from './pages/economic-opportunities/course-training/training-attendance-tracking/economic-opportunities-training-attendance-tracking';
+import { EconomicOpportunitiesBusinessPlanDevelopment } from './pages/economic-opportunities/business-plan-development/economic-opportunities-business-plan-development';
+import { EconomicOpportunitiesLivelihoodGrantDisbursement } from './pages/economic-opportunities/livelihood-grant-disbursement/economic-opportunities-livelihood-grant-disbursement';
+import { EconomicOpportunitiesFinancialServiceLinkageTracking } from './pages/economic-opportunities/financial-service-linkage-tracking/economic-opportunities-financial-service-linkage-tracking';
 import { Metabase } from './pages/metabase/metabase';
 import { MneReports } from './pages/monitoring-evaluation/mne-reports/mne-reports';
 
@@ -138,9 +141,9 @@ export const routes: Routes = [
         path: 'others',
         canActivate: [routeGuard],
         children: [
-          { path: 'business-plan-development', component: UnderConstruction, canActivate: [routeGuard] },
-          { path: 'livelihood-grant-disbursement', component: UnderConstruction, canActivate: [routeGuard] },
-          { path: 'financial-service-linkage-tracking', component: UnderConstruction, canActivate: [routeGuard] },
+          { path: 'business-plan-development', component: EconomicOpportunitiesBusinessPlanDevelopment, canActivate: [routeGuard] },
+          { path: 'livelihood-grant-disbursement', component: EconomicOpportunitiesLivelihoodGrantDisbursement, canActivate: [routeGuard] },
+          { path: 'financial-service-linkage-tracking', component: EconomicOpportunitiesFinancialServiceLinkageTracking, canActivate: [routeGuard] },
           { path: '', component: UnderConstruction, pathMatch: 'full' }
         ]
       },
