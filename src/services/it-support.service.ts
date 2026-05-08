@@ -377,6 +377,36 @@ export class ItSupportService {
     }
   }
 
+  async getAssignedRequests(params: ITSearchParams = {}): Promise<{ items: ITRequest[]; total: number; pagination?: ITPagination }> {
+    const queryParams: Record<string, any> = {};
+
+    if (params.status) queryParams['status'] = params.status;
+    if (params.categoryId) queryParams['categoryId'] = params.categoryId;
+    if (params.moduleId) queryParams['moduleId'] = params.moduleId;
+    if (params.submoduleId) queryParams['submoduleId'] = params.submoduleId;
+    if (params.issueType) queryParams['issueType'] = params.issueType;
+    if (params.priority) queryParams['priority'] = params.priority;
+    if (params.trackingNumber) queryParams['trackingNumber'] = params.trackingNumber;
+    if (params.search) queryParams['search'] = params.search;
+    if (params.page !== undefined) queryParams['page'] = params.page;
+    if (params.size !== undefined) queryParams['size'] = params.size;
+
+    try {
+      const res = await this.api.GET<any>(`${this.baseEndpoint}/requests/assigned`, queryParams);
+      const response = this.parseApiResponse<ITRequest[]>(res);
+
+      if (response?.success) {
+        const items = Array.isArray(response.data) ? response.data : [];
+        const total = response.pagination?.totalElements ?? items.length;
+        return { items, total, pagination: response.pagination };
+      }
+
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
   async getRequestById(id: number): Promise<ITRequest | null> {
     try {
       const res = await this.api.GET<any>(`${this.baseEndpoint}/requests/${id}`);
@@ -476,24 +506,34 @@ export class ItSupportService {
     issueType: string;
     categoryId: number;
     otherCategory?: string | null;
-    moduleId: number;
-    submoduleId: number;
+    moduleId?: number | null;
+    submoduleId?: number | null;
     priority: string;
     files?: File[];
   }): Promise<{ success: boolean; request?: ITRequest; trackingNumber?: string; message?: string }> {
     try {
       const formData = new FormData();
 
-      const requestPayload = {
+      const requestPayload: {
+        title: string;
+        description: string;
+        issueType: string;
+        categoryId: number;
+        otherCategory: string | null;
+        priority: string;
+        moduleId?: number;
+        submoduleId?: number;
+      } = {
         title: payload.title,
         description: payload.description,
         issueType: payload.issueType,
         categoryId: payload.categoryId,
         otherCategory: payload.otherCategory ?? null,
-        moduleId: payload.moduleId,
-        submoduleId: payload.submoduleId,
         priority: payload.priority,
       };
+
+      if (payload.moduleId) requestPayload.moduleId = payload.moduleId;
+      if (payload.submoduleId) requestPayload.submoduleId = payload.submoduleId;
 
       formData.append('payload', new Blob([JSON.stringify(requestPayload)], { type: 'application/json' }));
       this.appendFiles(formData, payload.files);
@@ -597,7 +637,7 @@ export class ItSupportService {
     userId: number
   ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
     try {
-      const res = await this.api.PATCH<any>(`${this.baseEndpoint}/request/${id}/assign/${userId}`, {});
+      const res = await this.api.PATCH<any>(`${this.baseEndpoint}/requests/${id}/assign/${userId}`, {});
       const response = this.parseApiResponse<ITRequest>(res);
 
       return {

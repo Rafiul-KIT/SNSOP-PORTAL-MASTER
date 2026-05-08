@@ -72,14 +72,11 @@
                 }
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label">Module <span class="required-asterisk">*</span></label>
+                <label class="form-label">Module</label>
                 <p-select [options]="modules" formControlName="module" optionLabel="label" optionValue="value" placeholder="Select module" class="w-100" />
-                @if (requestForm.get('module')?.invalid && (requestForm.get('module')?.dirty || requestForm.get('module')?.touched)) {
-                  <small class="error-text">Module is required.</small>
-                }
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label">Submodule <span class="required-asterisk">*</span></label>
+                <label class="form-label">Submodule</label>
                 <p-select
                   [options]="filteredSubmodules"
                   formControlName="submodule"

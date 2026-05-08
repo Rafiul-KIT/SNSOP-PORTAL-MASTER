@@ -76,6 +76,10 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
       equivalents.add('/help-desk/support-management');
     }
 
+    if (cleanUrl === '/help-desk/assigned-requests') {
+      equivalents.add('/help-desk/support-management');
+    }
+
     return [...equivalents];
   };
 

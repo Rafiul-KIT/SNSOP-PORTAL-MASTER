@@ -209,6 +209,24 @@
 }
 
 :host ::ng-deep {
+  .setup-cta-button.p-button {
+    border-color: #047857;
+    background: #047857;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(4, 120, 87, 0.22);
+  }
+
+  .setup-cta-button.p-button:not(:disabled):hover {
+    border-color: #065f46;
+    background: #065f46;
+    box-shadow: 0 10px 22px rgba(4, 120, 87, 0.3);
+  }
+
+  .setup-cta-button .p-button-icon {
+    font-size: 0.95rem;
+  }
+
   .assign-dialog .p-dialog-content {
     padding-top: 1rem;
   }
@@ -281,6 +299,11 @@
   .header-actions {
     width: 100%;
     flex-wrap: wrap;
+  }
+
+  :host ::ng-deep .setup-cta-button.p-button {
+    width: 100%;
+    justify-content: center;
   }
 
   .page-title {
