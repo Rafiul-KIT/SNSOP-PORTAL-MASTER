@@ -112,7 +112,7 @@ export class Header {
       {
         label: 'Report',
         command: () => {
-          this.router.navigate(['/home/metabase']);
+          this.router.navigate(['/home/report']);
           this.showPortalOptions = false;
         },
         icon: 'fas fa-chart-line',
@@ -133,14 +133,14 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
-      {
-        label: 'Help Desk',
-        icon: 'fas fa-headset',
-        command: () => {
-          this.router.navigate(['/help-desk/dashboard']);
-          this.showPortalOptions = false;
-        },
-      },
+      // {
+      //   label: 'Help Desk',
+      //   icon: 'fas fa-headset',
+      //   command: () => {
+      //     this.router.navigate(['/help-desk/dashboard']);
+      //     this.showPortalOptions = false;
+      //   },
+      // },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
@@ -149,14 +149,14 @@ export class Header {
           this.showPortalOptions = false;
         },
       },
-      {
-        label: 'Economic Opportunities',
-        icon: 'fas fa-briefcase',
-        command: () => {
-          this.router.navigate(['/economic-opportunities/dashboard']);
-          this.showPortalOptions = false;
-        },
-      },
+      // {
+      //   label: 'Economic Opportunities',
+      //   icon: 'fas fa-briefcase',
+      //   command: () => {
+      //     this.router.navigate(['/economic-opportunities/dashboard']);
+      //     this.showPortalOptions = false;
+      //   },
+      // },
     ];
   }
 

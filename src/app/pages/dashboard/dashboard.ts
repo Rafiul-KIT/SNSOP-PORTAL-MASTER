@@ -34,9 +34,14 @@ export class Dashboard {
         link: environment.portals.grm,
         icon: 'fas fa-sitemap'
       },
-      {
+      // {
+      //   label: 'Report',
+      //   routerLink: '/home/metabase',
+      //   icon: 'fas fa-chart-line',
+      // },
+         {
         label: 'Report',
-        routerLink: '/home/metabase',
+        routerLink: '/home/report',
         icon: 'fas fa-chart-line',
       },
       {
@@ -50,12 +55,12 @@ export class Dashboard {
         icon: 'fas fa-poll',
         routerLink: '/cto-dashboard'
       },
-         {
-        label: 'Help Desk',
-        icon: 'fas fa-headset',
-        routerLink: '/help-desk/dashboard',
-        tooltipText: 'IT Support Help Desk'
-      },
+      //    {
+      //   label: 'Help Desk',
+      //   icon: 'fas fa-headset',
+      //   routerLink: '/help-desk/dashboard',
+      //   tooltipText: 'IT Support Help Desk'
+      // },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
@@ -63,12 +68,12 @@ export class Dashboard {
         tooltipText: 'Monitoring & Evaluation'
       },
    
-      {
-        label: 'Economic Opportunities',
-        icon: 'fas fa-briefcase',
-        routerLink: '/economic-opportunities/dashboard',
-        tooltipText: 'Economic Opportunities'
-      },
+      // {
+      //   label: 'Economic Opportunities',
+      //   icon: 'fas fa-briefcase',
+      //   routerLink: '/economic-opportunities/dashboard',
+      //   tooltipText: 'Economic Opportunities'
+      // },
     ];
   }
 }
