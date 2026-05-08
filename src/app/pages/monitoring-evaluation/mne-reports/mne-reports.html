@@ -28,6 +28,11 @@
       <div class="col-md-6">
         <div class="form-group">
           <input type="file" id="reportFile" class="form-control py-2" (change)="onFileSelect($event)" />
+          <div class="form-text">
+            Maximum file size: {{ maxUploadFileSizeLabel }}.
+            Uploaded: {{ selectedFileSizeLabel }}.
+            Remaining capacity: {{ remainingUploadCapacityLabel }}.
+          </div>
         </div>
       </div>
     </div>

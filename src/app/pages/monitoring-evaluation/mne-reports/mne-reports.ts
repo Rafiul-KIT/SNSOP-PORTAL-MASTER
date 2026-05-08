@@ -38,6 +38,9 @@ import { Tooltip } from 'primeng/tooltip';
   providers: [MessageService],
 })
 export class MneReports implements OnInit {
+  private readonly maxUploadFileSizeBytes = 25 * 1024 * 1024;
+  readonly maxUploadFileSizeLabel = '25 MB';
+
   isLoading = false;
   reports: any[] = [];
 
@@ -91,10 +94,36 @@ export class MneReports implements OnInit {
     this.loadReports();
   }
 
-  onFileSelect(event: any): void {
-    if (event.target.files.length > 0) {
-      this.uploadData.file = event.target.files[0];
+  get selectedFileSizeLabel(): string {
+    return this.uploadData.file ? this.formatFileSize(this.uploadData.file.size) : '0 MB';
+  }
+
+  get remainingUploadCapacityLabel(): string {
+    const usedBytes = this.uploadData.file?.size ?? 0;
+    return this.formatFileSize(Math.max(this.maxUploadFileSizeBytes - usedBytes, 0));
+  }
+
+  onFileSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    if (!file) {
+      this.uploadData.file = null;
+      return;
     }
+
+    if (!this.isAllowedFileSize(file)) {
+      this.uploadData.file = null;
+      input.value = '';
+      this.msg.add({
+        severity: 'warn',
+        summary: 'File Too Large',
+        detail: 'Please select a file that is 25 MB or smaller.',
+      });
+      return;
+    }
+
+    this.uploadData.file = file;
   }
 
   async uploadReport(): Promise<void> {
@@ -103,6 +132,18 @@ export class MneReports implements OnInit {
         severity: 'warn',
         summary: 'Validation',
         detail: 'Please select a file type and a file to upload.',
+      });
+      return;
+    }
+
+    if (!this.isAllowedFileSize(this.uploadData.file)) {
+      this.uploadData.file = null;
+      const fileInput = document.getElementById('reportFile') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+      this.msg.add({
+        severity: 'warn',
+        summary: 'File Too Large',
+        detail: 'Please select a file that is 25 MB or smaller.',
       });
       return;
     }
@@ -321,5 +362,16 @@ export class MneReports implements OnInit {
       fileType: null
     };
     this.search();
+  }
+
+  private isAllowedFileSize(file: File): boolean {
+    return file.size <= this.maxUploadFileSizeBytes;
+  }
+
+  private formatFileSize(bytes: number): string {
+    if (bytes <= 0) return '0 MB';
+
+    const megabytes = bytes / (1024 * 1024);
+    return `${megabytes.toFixed(2)} MB`;
   }
 }

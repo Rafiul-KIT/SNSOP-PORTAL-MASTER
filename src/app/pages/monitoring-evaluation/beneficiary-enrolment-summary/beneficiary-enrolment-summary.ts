@@ -10,10 +10,24 @@ import { MessageService } from 'primeng/api';
 import { Loader } from '../../../components/loader/loader';
 import { ApiService } from '../../../../services/api.service';
 import { LookupService, IdName } from '../../../../services/lookup.service';
-import { Paginator } from 'primeng/paginator';
+import { Paginator, PaginatorState } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
+
+interface BeneficiaryEnrollmentResponse {
+  content?: any[] | null;
+  data?: any[] | null;
+  pagination?: {
+    page?: number | null;
+    size?: number | null;
+    totalElements?: number | null;
+  } | null;
+  pageNumber?: number | null;
+  pageSize?: number | null;
+  totalElements?: number | null;
+  totalRecords?: number | null;
+}
 
 @Component({
   selector: 'app-beneficiary-enrolment-summary',
@@ -162,6 +176,7 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
 
       const params: any = {
         page: this.currentPage,
+        size: this.pageSize,
         pageSize: this.pageSize,
       };
 
@@ -173,16 +188,21 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
       if (this.filters.gender != null) params.gender = this.filters.gender;
       if (this.filters.selectionCriteria != null) params.selectionCriteria = this.filters.selectionCriteria;
 
-      const res = await this.api.GET('/api/monitoring/beneficiariry/enrollment', params);
+      const res = await this.api.GET<BeneficiaryEnrollmentResponse>('/api/monitoring/beneficiariry/enrollment', params);
       const data = res?.data ?? {};
+      const content = Array.isArray(data.content)
+        ? data.content
+        : Array.isArray(data.data)
+          ? data.data
+          : [];
 
-      this.beneficiaries = Array.isArray(data.data)
-        ? data.data.map((item: any) => ({
-            ...item,
-            formattedEnrollmentDate: this.formatEnrollmentDate(item.enrollmentDate),
-          }))
-        : [];
-      this.totalRecords = data.totalRecords ?? 0;
+      this.beneficiaries = content.map((item: any) => ({
+        ...item,
+        formattedEnrollmentDate: this.formatEnrollmentDate(item.enrollmentDate),
+      }));
+      this.totalRecords = Number(data.pagination?.totalElements ?? data.totalElements ?? data.totalRecords ?? content.length ?? 0);
+      this.currentPage = Number(data.pagination?.page ?? data.pageNumber ?? this.currentPage ?? 0);
+      this.pageSize = Number(data.pagination?.size ?? data.pageSize ?? this.pageSize ?? 10);
     } catch (err) {
       console.error('Failed to load beneficiaries', err);
       this.msg.add({
@@ -198,9 +218,9 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
     }
   }
 
-  onPageChange(event: any): void {
-    this.currentPage = event.page;
-    this.pageSize = event.rows;
+  onPageChange(event: PaginatorState): void {
+    this.currentPage = event.page ?? 0;
+    this.pageSize = event.rows ?? this.pageSize;
     this.loadBeneficiaries();
   }
 
