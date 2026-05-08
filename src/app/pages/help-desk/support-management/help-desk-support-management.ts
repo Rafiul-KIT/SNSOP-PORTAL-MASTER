@@ -70,7 +70,7 @@ type LookupOption = {
   styleUrls: ['./help-desk-support-management.scss'],
 })
 export class HelpDeskSupportManagement implements OnInit {
-  private readonly MIS_FIRM_ROLE_IDS = [51];
+  private readonly MIS_FIRM_ROLE_IDS = [1, 51];
 
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
   breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Support Management' }];
@@ -148,9 +148,11 @@ export class HelpDeskSupportManagement implements OnInit {
     this.loadRequests();
   }
 
-  async loadRequests(useFilters: boolean = true): Promise<void> {
-    this.isLoading = true;
-    this.cdr.detectChanges();
+  async loadRequests(useFilters: boolean = true, showLoader: boolean = true): Promise<void> {
+    if (showLoader) {
+      this.isLoading = true;
+      this.cdr.detectChanges();
+    }
 
     const params: any = { page: this.currentPage, size: this.pageSize };
     if (useFilters) {
@@ -176,7 +178,9 @@ export class HelpDeskSupportManagement implements OnInit {
       this.totalRecords = 0;
       this.cdr.detectChanges();
     } finally {
-      this.isLoading = false;
+      if (showLoader) {
+        this.isLoading = false;
+      }
       this.cdr.detectChanges();
     }
   }
@@ -812,8 +816,6 @@ export class HelpDeskSupportManagement implements OnInit {
 
       if (!result.isConfirmed || !result.value) return;
 
-      this.isLoading = true;
-      this.cdr.detectChanges();
       try {
         const submitResponse = await this.itSupportService.submitInfo(
           request.id,
@@ -831,6 +833,7 @@ export class HelpDeskSupportManagement implements OnInit {
             text: submitResponse.message || 'Required information submitted and status moved to PROCESSING.',
             confirmButtonColor: '#3085d6',
           });
+          await this.loadRequests(true, false);
         } else {
           await Swal.fire({
             icon: 'error',
@@ -849,7 +852,6 @@ export class HelpDeskSupportManagement implements OnInit {
       } finally {
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.loadRequests();
       }
       return;
     }

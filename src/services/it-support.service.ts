@@ -377,6 +377,36 @@ export class ItSupportService {
     }
   }
 
+  async getAssignedRequests(params: ITSearchParams = {}): Promise<{ items: ITRequest[]; total: number; pagination?: ITPagination }> {
+    const queryParams: Record<string, any> = {};
+
+    if (params.status) queryParams['status'] = params.status;
+    if (params.categoryId) queryParams['categoryId'] = params.categoryId;
+    if (params.moduleId) queryParams['moduleId'] = params.moduleId;
+    if (params.submoduleId) queryParams['submoduleId'] = params.submoduleId;
+    if (params.issueType) queryParams['issueType'] = params.issueType;
+    if (params.priority) queryParams['priority'] = params.priority;
+    if (params.trackingNumber) queryParams['trackingNumber'] = params.trackingNumber;
+    if (params.search) queryParams['search'] = params.search;
+    if (params.page !== undefined) queryParams['page'] = params.page;
+    if (params.size !== undefined) queryParams['size'] = params.size;
+
+    try {
+      const res = await this.api.GET<any>(`${this.baseEndpoint}/requests/assigned`, queryParams);
+      const response = this.parseApiResponse<ITRequest[]>(res);
+
+      if (response?.success) {
+        const items = Array.isArray(response.data) ? response.data : [];
+        const total = response.pagination?.totalElements ?? items.length;
+        return { items, total, pagination: response.pagination };
+      }
+
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
   async getRequestById(id: number): Promise<ITRequest | null> {
     try {
       const res = await this.api.GET<any>(`${this.baseEndpoint}/requests/${id}`);

@@ -10,12 +10,14 @@ import { HelpDeskRequestDetails } from './request-details/help-desk-request-deta
 import { routeGuard } from '../../route.guard';
 import { HelpDeskRequestDetail } from './request-detail/help-desk-request-detail';
 import { HelpDeskSetup } from './setup/help-desk-setup';
+import { HelpDeskAssignedRequests } from './assigned-requests/help-desk-assigned-requests';
 
 export const HELP_DESK_ROUTES: Routes = [
   { path: 'dashboard', component: HelpDeskDashboard, canActivate: [routeGuard] },
   { path: 'submit-request', component: HelpDeskSubmitRequest, canActivate: [routeGuard] },
   { path: 'my-requests', component: HelpDeskMyRequests, canActivate: [routeGuard] },
   { path: 'support-management', component: HelpDeskSupportManagement, canActivate: [routeGuard] },
+  { path: 'assigned-requests', component: HelpDeskAssignedRequests, canActivate: [routeGuard] },
   { path: 'setup', component: HelpDeskSetup, canActivate: [routeGuard] },
   { path: 'status-tracker', component: HelpDeskStatusTracker, canActivate: [routeGuard] },
   { path: 'reports', component: HelpDeskReports, canActivate: [routeGuard] },
