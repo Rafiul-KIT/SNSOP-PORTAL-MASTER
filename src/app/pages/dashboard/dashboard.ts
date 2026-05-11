@@ -13,7 +13,7 @@ export class Dashboard {
   portalList: any = [];
 
   constructor(private router: Router) {
-    this.portalList = [
+   this.portalList = [
       // {
       //   label: 'Dashboard',
       //   link: environment.portals.master,
@@ -21,18 +21,21 @@ export class Dashboard {
       // },
       {
         label: 'Beneficiary',
-        link: environment.portals.beneficiary,
         icon: 'fas fa-user-friends',
+        link: environment.portals.beneficiary,
+        tooltipText: 'Beneficiary Management Portal'
       },
       {
         label: 'Payment',
-        link: environment.portals.payment,
         icon: 'fas fa-credit-card',
+        link: environment.portals.payment,
+        tooltipText: 'Payment Portal'
       },
       {
         label: 'GRM',
+        icon: 'fas fa-sitemap',
         link: environment.portals.grm,
-        icon: 'fas fa-sitemap'
+        tooltipText: 'Grievance Redress Mechanism'
       },
       // {
       //   label: 'Report',
@@ -41,39 +44,43 @@ export class Dashboard {
       // },
          {
         label: 'Report',
-        routerLink: '/home/report',
         icon: 'fas fa-chart-line',
+        // link: environment.portals.report,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Reports Dashboard'
       },
       {
         label: 'Settings',
         icon: 'fas fa-cog',
-        routerLink: '/user-management/users',
-        tooltipText: 'User & Role Management'
+        link: environment.portals.masterSettings,
+        tooltipText: 'Settings portal - User & Role Management'
       },
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
-        routerLink: '/cto-dashboard'
+        link: environment.portals.surveyCTO,
+        tooltipText: 'Survey CTO Portal'
       },
-      //    {
-      //   label: 'Help Desk',
-      //   icon: 'fas fa-headset',
-      //   routerLink: '/help-desk/dashboard',
-      //   tooltipText: 'IT Support Help Desk'
-      // },
+         {
+        label: 'Help Desk',
+        icon: 'fas fa-headset',
+        // link: environment.portals.helpDesk,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Help Desk Portal - IT Support'
+      },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
-        routerLink: '/monitoring-evaluation/beneficiary-enrolment-summary',
-        tooltipText: 'Monitoring & Evaluation'
+        link: environment.portals.mNe,
+        tooltipText: 'Monitoring & Evaluation Portal'
       },
-   
-      // {
-      //   label: 'Economic Opportunities',
-      //   icon: 'fas fa-briefcase',
-      //   routerLink: '/economic-opportunities/dashboard',
-      //   tooltipText: 'Economic Opportunities'
-      // },
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        // link: environment.portals.economicOpportunities,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Economic Opportunities Portal'
+      },
     ];
   }
 }

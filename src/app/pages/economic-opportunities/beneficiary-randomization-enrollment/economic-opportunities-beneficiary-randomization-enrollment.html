@@ -143,7 +143,7 @@
     [value]="rows"
     [responsiveLayout]="'scroll'"
     [scrollHeight]="isEmbeddedMode ? 'auto' : '60vh'"
-    [tableStyle]="{ 'min-width': '1700px', 'margin-bottom': '5px' }"
+    [tableStyle]="{ 'min-width': '1850px', 'margin-bottom': '5px' }"
     dataKey="id"
     size="small"
     styleClass="p-datatable-sm p-datatable-gridlines"
@@ -159,7 +159,6 @@
         <th>Treatment Arm</th>
         <th>Household Enrollment Status</th>
         <th>Reason For Why Not Enrolled</th>
-        <th>Group ID</th>
         <th>Group Name</th>
         <th>Nominee Index</th>
         <th class="update-col">Update</th>
@@ -226,16 +225,6 @@
             class="form-control table-textarea"
           ></textarea>
         </td>
-        <td>
-          <input
-            pInputText
-            type="number"
-            [(ngModel)]="row.groupId"
-            [ngModelOptions]="{ standalone: true }"
-            (ngModelChange)="onRowValueChange(row)"
-            class="form-control table-number"
-          />
-        </td>
         <td>{{ row.groupName || '--' }}</td>
         <td>
           <input
@@ -263,7 +252,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="13" class="text-center text-danger">
+        <td colspan="15" class="text-center text-danger">
           <b>No records found!</b>
         </td>
       </tr>

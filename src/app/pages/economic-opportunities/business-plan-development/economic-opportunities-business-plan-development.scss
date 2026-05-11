@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.update-col {
+  min-width: 9rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.select-col {
+  width: 3rem;
+  min-width: 3rem;
+  text-align: center;
+}
+
+.table-select {
+  min-width: 9rem;
+}
+
+.table-textarea {
+  min-width: 16rem;
+  resize: vertical;
+}
+
+.table-number {
+  min-width: 8rem;
+}

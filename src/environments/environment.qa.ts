@@ -9,7 +9,13 @@ export const environment = {
     beneficiary: 'https://qa-mis.southsudansafetynet.info/v2/beneficiary',
     payment: 'https://qa-mis.southsudansafetynet.info/v2/payment',
     grm: 'https://qa-mis.southsudansafetynet.info/v2/grm',
-    report: 'https://qa-mis.southsudansafetynet.info/v2/report',
+    masterSettings: 'https://qa-mis.southsudansafetynet.info/v2/#/user-management/users',
+    surveyCTO: 'https://qa-mis.southsudansafetynet.info/v2/#/cto-dashboard',
+    mNe: 'https://qa-mis.southsudansafetynet.info/v2/#/monitoring-evaluation/beneficiary-enrolment-summary',
+    report: 'https://qa-mis.southsudansafetynet.info/v2/#/home/metabase',
+    economicOpportunities: 'https://qa-mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard',
+    UnderConstruction: 'https://qa-mis.southsudansafetynet.info/v2/#/under-construction',
+    helpDesk: 'https://qa-mis.southsudansafetynet.info/v2/#/help-desk/dashboard',
   },
   msalConfig: {
     auth: {
@@ -24,6 +30,6 @@ export const environment = {
     }
   },
   authBackend: 'https://qa-gwapp.southsudansafetynet.info/mis_auth',
-  
+
   cookie_name:'mis_ta'
 };

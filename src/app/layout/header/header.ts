@@ -8,6 +8,7 @@ import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 import { MenuItem } from 'primeng/api';
 import { filter } from 'rxjs';
 import { ApiService } from '../../../services/api.service';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-header',
@@ -40,7 +41,7 @@ export class Header {
   canAccessHelpDesk = true;
 
   helpDeskChildren = computed(() => {
-    
+
     const names = this.allPermittedNames();
     return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
   });
@@ -93,70 +94,69 @@ export class Header {
       });
 
     // Static portal links
-    this.portalList = [
+     this.portalList = [
+      // {
+      //   label: 'Dashboard',
+      //   link: environment.portals.master,
+      //   icon: 'fas fa-dashboard',
+      // },
       {
         label: 'Beneficiary',
-        link: environment.portals.beneficiary,
         icon: 'fas fa-user-friends',
+        link: environment.portals.beneficiary,
+        tooltipText: 'Beneficiary Management Portal'
       },
       {
         label: 'Payment',
-         link: environment.portals.payment,
         icon: 'fas fa-credit-card',
+        link: environment.portals.payment,
+        tooltipText: 'Payment Portal'
       },
       {
         label: 'GRM',
+        icon: 'fas fa-sitemap',
         link: environment.portals.grm,
-        icon: 'fas fa-sitemap'
+        tooltipText: 'Grievance Redress Mechanism'
       },
       {
         label: 'Report',
-        command: () => {
-          this.router.navigate(['/home/report']);
-          this.showPortalOptions = false;
-        },
         icon: 'fas fa-chart-line',
+        // link: environment.portals.report,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Reports Dashboard'
       },
       {
         label: 'Settings',
         icon: 'fas fa-cog',
-        command: () => {
-          this.router.navigate(['/user-management/users']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.masterSettings,
+        tooltipText: 'Settings portal - User & Role Management'
       },
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
-        command: () => {
-          this.router.navigate(['/cto-dashboard']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.surveyCTO,
+        tooltipText: 'Survey CTO Portal'
       },
-      // {
-      //   label: 'Help Desk',
-      //   icon: 'fas fa-headset',
-      //   command: () => {
-      //     this.router.navigate(['/help-desk/dashboard']);
-      //     this.showPortalOptions = false;
-      //   },
-      // },
+         {
+        label: 'Help Desk',
+        icon: 'fas fa-headset',
+        // link: environment.portals.helpDesk,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Help Desk Portal - IT Support'
+      },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
-        command: () => {
-          this.router.navigate(['/monitoring-evaluation/beneficiary-enrolment-summary']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.mNe,
+        tooltipText: 'Monitoring & Evaluation Portal'
       },
-      // {
-      //   label: 'Economic Opportunities',
-      //   icon: 'fas fa-briefcase',
-      //   command: () => {
-      //     this.router.navigate(['/economic-opportunities/dashboard']);
-      //     this.showPortalOptions = false;
-      //   },
-      // },
+      {
+        label: 'Economic Opportunities',
+        icon: 'fas fa-briefcase',
+        // link: environment.portals.economicOpportunities,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Economic Opportunities Portal'
+      },
     ];
   }
 
