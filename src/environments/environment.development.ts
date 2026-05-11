@@ -12,7 +12,7 @@ export const environment = {
     masterSettings: 'https://localhost:4010/#/user-management/users',
     surveyCTO: 'https://localhost:4010/#/cto-dashboard',
     mNe: 'https://localhost:4010/#/monitoring-evaluation/beneficiary-enrolment-summary',
-    report: 'https://localhost:4050/#/home/metabase',
+    report: 'https://localhost:4010/#/home/metabase',
     economicOpportunities: 'https://localhost:4010/#/economic-opportunities/dashboard',
     UnderConstruction: 'https://localhost:4010/#/under-construction',
     helpDesk: 'https://localhost:4010/#/help-desk/dashboard',
