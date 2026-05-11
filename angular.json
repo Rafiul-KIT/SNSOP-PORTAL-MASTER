@@ -61,7 +61,7 @@
               ]
             },
             "staging": {
-              "baseHref": "/v2/",
+              "baseHref": "/trial/master/",
               "outputHashing": "all",
               "fileReplacements": [
                 {
