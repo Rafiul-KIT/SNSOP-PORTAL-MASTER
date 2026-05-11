@@ -150,6 +150,7 @@ export class Header {
         link: environment.portals.mNe,
         tooltipText: 'Monitoring & Evaluation Portal'
       },
+
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
@@ -236,7 +237,6 @@ export class Header {
     return menus
       .filter((menu) =>
         (menu.label && allowedNames.includes(menu.label)) ||
-        (menu.label === 'Assigned Requests' && allowedNames.includes('Support Management')) ||
         menu.separator
       )
       .map((menu) => ({

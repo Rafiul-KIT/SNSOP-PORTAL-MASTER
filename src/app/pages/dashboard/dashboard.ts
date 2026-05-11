@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { TooltipModule } from 'primeng/tooltip';
+import { Tooltip, TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../environments/environment';
 
 @Component({
