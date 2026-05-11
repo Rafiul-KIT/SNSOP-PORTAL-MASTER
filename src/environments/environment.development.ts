@@ -9,7 +9,13 @@ export const environment = {
     beneficiary: 'https://localhost:4020',
     payment: 'https://localhost:4030',
     grm: 'https://localhost:4040',
-    report: 'https://localhost:4050',
+    masterSettings: 'https://localhost:4010/#/user-management/users',
+    surveyCTO: 'https://localhost:4010/#/cto-dashboard',
+    mNe: 'https://localhost:4010/#/monitoring-evaluation/beneficiary-enrolment-summary',
+    report: 'https://localhost:4050/#/home/metabase',
+    economicOpportunities: 'https://localhost:4010/#/economic-opportunities/dashboard',
+    UnderConstruction: 'https://localhost:4010/#/under-construction',
+    helpDesk: 'https://localhost:4010/#/help-desk/dashboard',
   },
   msalConfig: {
     auth: {

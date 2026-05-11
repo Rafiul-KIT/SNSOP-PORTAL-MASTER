@@ -36,13 +36,14 @@ export class Dashboard {
       },
       {
         label: 'Report',
-        routerLink: '/home/metabase',
+        // link: environment.portals.report,
+        link: environment.portals.UnderConstruction,
         icon: 'fas fa-chart-line',
       },
       {
         label: 'Settings',
+        link: environment.portals.masterSettings,
         icon: 'fas fa-cog',
-        routerLink: '/user-management/users',
         tooltipText: 'User & Role Management'
       },
       {
@@ -53,20 +54,22 @@ export class Dashboard {
          {
         label: 'Help Desk',
         icon: 'fas fa-headset',
-        routerLink: '/help-desk/dashboard',
+        // link: environment.portals.helpDesk,
+        link: environment.portals.UnderConstruction,
         tooltipText: 'IT Support Help Desk'
       },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
-        routerLink: '/monitoring-evaluation/beneficiary-enrolment-summary',
+        link: environment.portals.mNe,
         tooltipText: 'Monitoring & Evaluation'
       },
-   
+
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
-        routerLink: '/economic-opportunities/dashboard',
+      //   link: environment.portals.economicOpportunities,',
+        link: environment.portals.UnderConstruction,
         tooltipText: 'Economic Opportunities'
       },
     ];

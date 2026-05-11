@@ -8,6 +8,7 @@ import { AzureAdAuthService } from '../../../services/azure-ad-auth.service';
 import { MenuItem } from 'primeng/api';
 import { filter } from 'rxjs';
 import { ApiService } from '../../../services/api.service';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-header',
@@ -40,7 +41,7 @@ export class Header {
   canAccessHelpDesk = true;
 
   helpDeskChildren = computed(() => {
-    
+
     const names = this.allPermittedNames();
     return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
   });
@@ -111,11 +112,10 @@ export class Header {
       },
       {
         label: 'Report',
-        command: () => {
-          this.router.navigate(['/home/metabase']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.UnderConstruction,
+        // link: environment.portals.report,
         icon: 'fas fa-chart-line',
+        Tooltip: 'Reports Dashboard'
       },
       {
         label: 'Settings',
@@ -128,34 +128,29 @@ export class Header {
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
-        command: () => {
-          this.router.navigate(['/cto-dashboard']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.surveyCTO,
+        Tooltip: 'SurveyCTO Dashboard'
       },
       {
         label: 'Help Desk',
         icon: 'fas fa-headset',
-        command: () => {
-          this.router.navigate(['/help-desk/dashboard']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.UnderConstruction,
+        Tooltip: 'IT Support Help Desk'
+        // link: environment.portals.helpDesk,
+
       },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
-        command: () => {
-          this.router.navigate(['/monitoring-evaluation/beneficiary-enrolment-summary']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.mNe,
+        tooltipText: 'Monitoring & Evaluation'
       },
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
-        command: () => {
-          this.router.navigate(['/economic-opportunities/dashboard']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Economic Opportunities'
+        //link: environment.portals.economicOpportunities,
       },
     ];
   }
