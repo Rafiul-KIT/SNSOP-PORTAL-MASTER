@@ -9,7 +9,13 @@ export const environment = {
     beneficiary: 'https://newmis.southsudansafetynet.info/trial/beneficiary/',
     payment: 'https://newmis.southsudansafetynet.info/trial/payment/',
     grm: 'https://newmis.southsudansafetynet.info/trial/grm/',
-    report: 'https://newmis.southsudansafetynet.info/trial/report/',
+    masterSettings: 'https://newmis.southsudansafetynet.info/trial/master/#/user-management/users',
+    surveyCTO: 'https://newmis.southsudansafetynet.info/trial/master/#/cto-dashboard',
+    mNe: 'https://newmis.southsudansafetynet.info/trial/master/#/monitoring-evaluation/beneficiary-enrolment-summary',
+    report: 'https://newmis.southsudansafetynet.info/trial/master/#/home/metabase',
+    economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard',
+    UnderConstruction: 'https://newmis.southsudansafetynet.info/trial/master/#/under-construction',
+    helpDesk: 'https://newmis.southsudansafetynet.info/trial/master/#/help-desk/dashboard',
   },
   msalConfig: {
     auth: {
