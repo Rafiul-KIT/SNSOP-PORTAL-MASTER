@@ -156,14 +156,25 @@ export class MneReports implements OnInit {
       formData.append('file', this.uploadData.file);
 
       // reportType is sent as a query parameter
-      await this.api.POST('/api/monitoring/mne-reports/upload', formData, 'global', {
+      const res = await this.api.POST('/api/monitoring/mne-reports/upload', formData, 'global', {
         params: { reportType: this.uploadData.fileType }
       });
+
+      const responseData = res?.data ?? {};
+
+      if (responseData.success === false) {
+        this.msg.add({
+          severity: 'error',
+          summary: 'Upload Failed',
+          detail: responseData.message || 'Unable to upload report.',
+        });
+        return;
+      }
 
       this.msg.add({
         severity: 'success',
         summary: 'Success',
-        detail: 'Report uploaded successfully.',
+        detail: responseData.message || 'Report uploaded successfully.',
       });
 
       this.uploadData = { fileType: null, file: null };
@@ -172,12 +183,15 @@ export class MneReports implements OnInit {
       if (fileInput) fileInput.value = '';
 
       this.loadReports();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to upload report', err);
+      
+      const errorMessage = err?.response?.data?.message || 'Unable to upload report.';
+      
       this.msg.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Unable to upload report.',
+        detail: errorMessage,
       });
     } finally {
       this.isLoading = false;
@@ -207,16 +221,31 @@ export class MneReports implements OnInit {
         status: this.showingDeleted ? 'INACTIVE' : 'ACTIVE'
       };
 
-      if (this.filters.fromDate) params.fromDate = this.filters.fromDate.toISOString();
-      if (this.filters.toDate) params.toDate = this.filters.toDate.toISOString();
+      if (this.filters.fromDate) params.fromDate = this.formatDate(this.filters.fromDate);
+      if (this.filters.toDate) params.toDate = this.formatDate(this.filters.toDate);
       if (this.filters.fileType) params.reportType = this.filters.fileType;
 
       const res = await this.api.GET('/api/monitoring/mne-reports', params);
       
-      // Map based on the provided DynamicPagedResponse structure
-      const responseBody: any = res.data ?? {};
-      this.reports = Array.isArray(responseBody.data) ? responseBody.data : [];
-      this.totalRecords = responseBody.pagination?.totalElements ?? 0;
+      const responseBody: any = res?.data ?? res ?? {};
+      
+      // More robust mapping for different possible response structures
+      if (Array.isArray(responseBody.data)) {
+        this.reports = responseBody.data;
+      } else if (Array.isArray(responseBody.content)) {
+        this.reports = responseBody.content;
+      } else if (Array.isArray(responseBody)) {
+        this.reports = responseBody;
+      } else {
+        this.reports = [];
+      }
+
+      // Handle pagination info robustly
+      this.totalRecords = responseBody.pagination?.totalElements ?? 
+                          responseBody.totalElements ?? 
+                          responseBody.count ?? 
+                          this.reports.length;
+
     } catch (err) {
       console.error('Failed to load reports', err);
       this.msg.add({
@@ -362,6 +391,15 @@ export class MneReports implements OnInit {
       fileType: null
     };
     this.search();
+  }
+
+  private formatDate(date: Date | null): string | null {
+    if (!date) return null;
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
   }
 
   private isAllowedFileSize(file: File): boolean {
