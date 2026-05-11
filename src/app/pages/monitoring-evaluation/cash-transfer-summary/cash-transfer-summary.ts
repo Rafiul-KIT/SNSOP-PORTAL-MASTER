@@ -94,6 +94,7 @@ export class CashTransferSummary implements OnInit {
 
   ngOnInit(): void {
     this.loadStates();
+    this.search();
   }
 
   async loadStates(): Promise<void> {

@@ -14,10 +14,8 @@
     <!-- State -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="states" optionLabel="name" optionValue="id"
-          [(ngModel)]="filters.stateId" name="stateId" [filter]="true"
-          filterBy="name" [showClear]="true" (onChange)="onStateChange()"
-          class="w-100"></p-select>
+        <p-select [options]="states" optionLabel="name" optionValue="id" [(ngModel)]="filters.stateId" name="stateId"
+          [filter]="true" filterBy="name" [showClear]="true" (onChange)="onStateChange()" class="w-100"></p-select>
         <label>State</label>
       </p-floatlabel>
     </div>
@@ -25,9 +23,8 @@
     <!-- County -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="counties" optionLabel="name" optionValue="id"
-          [(ngModel)]="filters.countyId" name="countyId" [filter]="true"
-          filterBy="name" [showClear]="true" [disabled]="!filters.stateId"
+        <p-select [options]="counties" optionLabel="name" optionValue="id" [(ngModel)]="filters.countyId"
+          name="countyId" [filter]="true" filterBy="name" [showClear]="true" [disabled]="!filters.stateId"
           (onChange)="onCountyChange()" class="w-100"></p-select>
         <label>County</label>
       </p-floatlabel>
@@ -36,10 +33,9 @@
     <!-- Payam -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="payams" optionLabel="name" optionValue="id"
-          [(ngModel)]="filters.payamId" name="payamId" [filter]="true"
-          filterBy="name" [showClear]="true" [disabled]="!filters.countyId"
-          (onChange)="onPayamChange()" class="w-100"></p-select>
+        <p-select [options]="payams" optionLabel="name" optionValue="id" [(ngModel)]="filters.payamId" name="payamId"
+          [filter]="true" filterBy="name" [showClear]="true" [disabled]="!filters.countyId" (onChange)="onPayamChange()"
+          class="w-100"></p-select>
         <label>Payam</label>
       </p-floatlabel>
     </div>
@@ -47,10 +43,8 @@
     <!-- Boma -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="bomas" optionLabel="name" optionValue="id"
-          [(ngModel)]="filters.bomaId" name="bomaId" [filter]="true"
-          filterBy="name" [showClear]="true" [disabled]="!filters.payamId"
-          class="w-100"></p-select>
+        <p-select [options]="bomas" optionLabel="name" optionValue="id" [(ngModel)]="filters.bomaId" name="bomaId"
+          [filter]="true" filterBy="name" [showClear]="true" [disabled]="!filters.payamId" class="w-100"></p-select>
         <label>Boma</label>
       </p-floatlabel>
     </div>
@@ -58,7 +52,8 @@
     <!-- Age -->
     <div class="col-md-3">
       <p-floatlabel variant="on">
-        <input pInputText type="number" class="form-control" [(ngModel)]="filters.age" name="age" />
+        <input pInputText type="number" class="form-control" [(ngModel)]="filters.age" name="age" min="1" max="100"
+          [class.is-invalid]="isAgeInvalid" />
         <label>Age</label>
       </p-floatlabel>
     </div>
@@ -66,9 +61,8 @@
     <!-- Gender -->
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
-        <p-select [options]="genderOptions" optionLabel="label" optionValue="value"
-          [(ngModel)]="filters.gender" name="gender" [showClear]="true"
-          class="w-100"></p-select>
+        <p-select [options]="genderOptions" optionLabel="label" optionValue="value" [(ngModel)]="filters.gender"
+          name="gender" [showClear]="true" class="w-100"></p-select>
         <label>Gender</label>
       </p-floatlabel>
     </div>
@@ -77,8 +71,7 @@
     <div class="col-md-3">
       <p-floatlabel variant="on" class="w-100">
         <p-select [options]="selectionCriteriaOptions" optionLabel="label" optionValue="value"
-          [(ngModel)]="filters.selectionCriteria" name="selectionCriteria" [showClear]="true"
-          class="w-100"></p-select>
+          [(ngModel)]="filters.selectionCriteria" name="selectionCriteria" [showClear]="true" class="w-100"></p-select>
         <label>Selection Criteria</label>
       </p-floatlabel>
     </div>
@@ -88,8 +81,9 @@
       <div class="d-flex justify-content-end gap-2">
         <p-button label="Reset" icon="fas fa-refresh" severity="danger" size="small" outlined="true"
           (onClick)="resetFilters()"></p-button>
-        <p-button label="Search" icon="fas fa-search" severity="primary" size="small"
-          (onClick)="search()"></p-button>
+        <p-button label="Search" icon="fas fa-search" severity="primary" size="small" [disabled]="isAgeInvalid"
+          (onClick)="search()">
+        </p-button>
       </div>
     </div>
   </form>
@@ -103,8 +97,7 @@
     </h5>
     <div class="d-flex align-items-center gap-2">
       <p-select [options]="reportFormatOptions" optionLabel="label" optionValue="value"
-        [(ngModel)]="selectedReportFormat" name="reportFormat"
-        [style]="{ 'min-width': '120px' }"></p-select>
+        [(ngModel)]="selectedReportFormat" name="reportFormat" [style]="{ 'min-width': '120px' }"></p-select>
       <p-button label="Download" icon="fas fa-download" severity="success" size="small"
         (onClick)="download()"></p-button>
     </div>
@@ -164,8 +157,7 @@
   <!-- Paginator -->
   <div class="border-top">
     <p-paginator class="paginator-sticky" [rows]="pageSize" [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)"
-      [first]="currentPage * pageSize"
+      [rowsPerPageOptions]="[10, 25, 50]" (onPageChange)="onPageChange($event)" [first]="currentPage * pageSize"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
     </p-paginator>
   </div>

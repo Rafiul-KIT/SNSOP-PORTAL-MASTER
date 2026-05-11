@@ -65,8 +65,12 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
   payams: IdName[] = [];
   bomas: IdName[] = [];
 
-  get genderOptions() { return this.lookupService.genderOptions; }
-  get selectionCriteriaOptions() { return this.lookupService.selectionCriteriaOptions; }
+  get genderOptions() {
+    return this.lookupService.genderOptions;
+  }
+  get selectionCriteriaOptions() {
+    return this.lookupService.selectionCriteriaOptions;
+  }
 
   reportFormatOptions = [
     { label: 'PDF', value: 'PDF' },
@@ -96,11 +100,12 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
     private api: ApiService,
     private lookupService: LookupService,
     private cdr: ChangeDetectorRef,
-    private msg: MessageService
+    private msg: MessageService,
   ) {}
 
   ngOnInit(): void {
     this.loadStates();
+    this.search();
   }
 
   async loadStates(): Promise<void> {
@@ -121,7 +126,9 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
 
     if (this.filters.stateId) {
       try {
-        this.counties = await this.lookupService.getCountyListByStateId(this.filters.stateId);
+        this.counties = await this.lookupService.getCountyListByStateId(
+          this.filters.stateId,
+        );
       } catch (err) {
         console.error('Failed to load counties', err);
       }
@@ -136,7 +143,9 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
 
     if (this.filters.countyId) {
       try {
-        this.payams = await this.lookupService.getPayamListByCountyId(this.filters.countyId);
+        this.payams = await this.lookupService.getPayamListByCountyId(
+          this.filters.countyId,
+        );
       } catch (err) {
         console.error('Failed to load payams', err);
       }
@@ -149,7 +158,9 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
 
     if (this.filters.payamId) {
       try {
-        this.bomas = await this.lookupService.getBomaListByPayamId(this.filters.payamId);
+        this.bomas = await this.lookupService.getBomaListByPayamId(
+          this.filters.payamId,
+        );
       } catch (err) {
         console.error('Failed to load bomas', err);
       }
@@ -186,9 +197,13 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
       if (this.filters.bomaId) params.bomaId = this.filters.bomaId;
       if (this.filters.age != null) params.age = this.filters.age;
       if (this.filters.gender != null) params.gender = this.filters.gender;
-      if (this.filters.selectionCriteria != null) params.selectionCriteria = this.filters.selectionCriteria;
+      if (this.filters.selectionCriteria != null)
+        params.selectionCriteria = this.filters.selectionCriteria;
 
-      const res = await this.api.GET<BeneficiaryEnrollmentResponse>('/api/monitoring/beneficiariry/enrollment', params);
+      const res = await this.api.GET<BeneficiaryEnrollmentResponse>(
+        '/api/monitoring/beneficiariry/enrollment',
+        params,
+      );
       const data = res?.data ?? {};
       const content = Array.isArray(data.content)
         ? data.content
@@ -200,9 +215,19 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
         ...item,
         formattedEnrollmentDate: this.formatEnrollmentDate(item.enrollmentDate),
       }));
-      this.totalRecords = Number(data.pagination?.totalElements ?? data.totalElements ?? data.totalRecords ?? content.length ?? 0);
-      this.currentPage = Number(data.pagination?.page ?? data.pageNumber ?? this.currentPage ?? 0);
-      this.pageSize = Number(data.pagination?.size ?? data.pageSize ?? this.pageSize ?? 10);
+      this.totalRecords = Number(
+        data.pagination?.totalElements ??
+          data.totalElements ??
+          data.totalRecords ??
+          content.length ??
+          0,
+      );
+      this.currentPage = Number(
+        data.pagination?.page ?? data.pageNumber ?? this.currentPage ?? 0,
+      );
+      this.pageSize = Number(
+        data.pagination?.size ?? data.pageSize ?? this.pageSize ?? 10,
+      );
     } catch (err) {
       console.error('Failed to load beneficiaries', err);
       this.msg.add({
@@ -239,17 +264,21 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
       if (this.filters.bomaId) payload.bomaId = this.filters.bomaId;
       if (this.filters.age != null) payload.age = this.filters.age;
       if (this.filters.gender != null) payload.gender = this.filters.gender;
-      if (this.filters.selectionCriteria != null) payload.selectionCriteria = this.filters.selectionCriteria;
+      if (this.filters.selectionCriteria != null)
+        payload.selectionCriteria = this.filters.selectionCriteria;
 
       const res = await this.api.POST(
         '/api/monitoring/beneficiaryEnrollment/download',
         payload,
         'global',
-        { responseType: 'blob' }
+        { responseType: 'blob' },
       );
 
       const blob = new Blob([res.data], {
-        type: this.selectedReportFormat === 'PDF' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        type:
+          this.selectedReportFormat === 'PDF'
+            ? 'application/pdf'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       const ext = this.selectedReportFormat === 'PDF' ? 'pdf' : 'xlsx';
       const url = window.URL.createObjectURL(blob);
@@ -294,8 +323,19 @@ export class BeneficiaryEnrolmentSummary implements OnInit {
     this.totalRecords = 0;
     this.currentPage = 0;
   }
+  get isAgeInvalid(): boolean {
+    const age = this.filters.age;
 
-  private formatEnrollmentDate(value: string | Date | null | undefined): string {
+    if (age === null || age === undefined || age === '') {
+      return false;
+    }
+
+    return Number(age) < 1 || Number(age) > 100;
+  }
+
+  private formatEnrollmentDate(
+    value: string | Date | null | undefined,
+  ): string {
     if (!value) return '';
 
     const date = value instanceof Date ? value : new Date(value);
