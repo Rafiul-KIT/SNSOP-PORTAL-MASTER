@@ -37,7 +37,12 @@ export class Dashboard {
         link: environment.portals.grm,
         tooltipText: 'Grievance Redress Mechanism'
       },
-      {
+      // {
+      //   label: 'Report',
+      //   routerLink: '/home/metabase',
+      //   icon: 'fas fa-chart-line',
+      // },
+         {
         label: 'Report',
         icon: 'fas fa-chart-line',
         // link: environment.portals.report,
