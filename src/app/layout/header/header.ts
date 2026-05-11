@@ -95,62 +95,68 @@ export class Header {
 
     // Static portal links
     this.portalList = [
+      // {
+      //   label: 'Dashboard',
+      //   link: environment.portals.master,
+      //   icon: 'fas fa-dashboard',
+      // },
       {
         label: 'Beneficiary',
-        link: environment.portals.beneficiary,
         icon: 'fas fa-user-friends',
+        link: environment.portals.beneficiary,
+        tooltipText: 'Beneficiary Management Portal'
       },
       {
         label: 'Payment',
-         link: environment.portals.payment,
         icon: 'fas fa-credit-card',
+        link: environment.portals.payment,
+        tooltipText: 'Payment Portal'
       },
       {
         label: 'GRM',
+        icon: 'fas fa-sitemap',
         link: environment.portals.grm,
-        icon: 'fas fa-sitemap'
+        tooltipText: 'Grievance Redress Mechanism'
       },
       {
         label: 'Report',
-        link: environment.portals.UnderConstruction,
-        // link: environment.portals.report,
         icon: 'fas fa-chart-line',
-        Tooltip: 'Reports Dashboard'
+        link: environment.portals.report,
+        // link: environment.portals.UnderConstruction,
+        tooltipText: 'Reports Dashboard'
       },
       {
         label: 'Settings',
         icon: 'fas fa-cog',
-        command: () => {
-          this.router.navigate(['/user-management/users']);
-          this.showPortalOptions = false;
-        },
+        link: environment.portals.masterSettings,
+        tooltipText: 'Settings portal - User & Role Management'
       },
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
         link: environment.portals.surveyCTO,
-        Tooltip: 'SurveyCTO Dashboard'
+        tooltipText: 'Survey CTO Portal'
       },
-      {
+         {
         label: 'Help Desk',
         icon: 'fas fa-headset',
-        link: environment.portals.UnderConstruction,
-        Tooltip: 'IT Support Help Desk'
-        // link: environment.portals.helpDesk,
-
+        link: environment.portals.helpDesk,
+        // link: environment.portals.UnderConstruction,
+        tooltipText: 'Help Desk Portal - IT Support'
       },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
         link: environment.portals.mNe,
-        tooltipText: 'Monitoring & Evaluation'
+        tooltipText: 'Monitoring & Evaluation Portal'
       },
+
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
-        link: environment.portals.UnderConstruction,
-        tooltipText: 'Economic Opportunities'
-        //link: environment.portals.economicOpportunities,
+        link: environment.portals.economicOpportunities,
+        // link: environment.portals.UnderConstruction,
+        tooltipText: 'Economic Opportunities Portal'
       },
     ];
   }
