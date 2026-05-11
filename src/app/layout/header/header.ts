@@ -237,7 +237,6 @@ export class Header {
     return menus
       .filter((menu) =>
         (menu.label && allowedNames.includes(menu.label)) ||
-        (menu.label === 'Assigned Requests' && allowedNames.includes('Support Management')) ||
         menu.separator
       )
       .map((menu) => ({
