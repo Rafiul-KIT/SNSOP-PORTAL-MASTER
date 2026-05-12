@@ -142,7 +142,7 @@ export class Header {
         icon: 'fas fa-headset',
         link: environment.portals.helpDesk,
         // link: environment.portals.UnderConstruction,
-        tooltipText: 'Help Desk Portal - IT Support'
+        tooltipText: 'Help Desk Portal - IT Support',
       },
       {
         label: 'Monitoring & Evaluation',
