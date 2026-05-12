@@ -16,6 +16,7 @@ export const environment = {
     economicOpportunities: 'https://localhost:4010/#/economic-opportunities/dashboard',
     UnderConstruction: 'https://localhost:4010/#/under-construction',
     helpDesk: 'https://localhost:4010/#/help-desk/dashboard',
+    dms: 'https://localhost:8086',
   },
   msalConfig: {
     auth: {

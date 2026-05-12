@@ -77,6 +77,12 @@ export class Dashboard {
         // link: environment.portals.UnderConstruction,
         tooltipText: 'Economic Opportunities Portal'
       },
+      {
+        label: 'DMS',
+        icon: 'fas fa-file',
+        link: environment.portals.dms,
+        tooltipText: 'Document Management System'
+      },
     ];
   }
 }
