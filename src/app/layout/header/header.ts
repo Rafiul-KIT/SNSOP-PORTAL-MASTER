@@ -121,8 +121,7 @@ export class Header {
       {
         label: 'Report',
         icon: 'fas fa-chart-line',
-        // link: environment.portals.report,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.report,
         tooltipText: 'Reports Dashboard'
       },
       {
@@ -140,8 +139,8 @@ export class Header {
          {
         label: 'Help Desk',
         icon: 'fas fa-headset',
-        // link: environment.portals.helpDesk,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.helpDesk,
+     
         tooltipText: 'Help Desk Portal - IT Support'
       },
       {
@@ -154,8 +153,8 @@ export class Header {
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
-        // link: environment.portals.economicOpportunities,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.economicOpportunities,
+        
         tooltipText: 'Economic Opportunities Portal'
       },
     ];

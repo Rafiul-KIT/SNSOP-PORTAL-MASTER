@@ -45,8 +45,8 @@ export class Dashboard {
          {
         label: 'Report',
         icon: 'fas fa-chart-line',
-        // link: environment.portals.report,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.report,
+       
         tooltipText: 'Reports Dashboard'
       },
       {
@@ -64,8 +64,8 @@ export class Dashboard {
          {
         label: 'Help Desk',
         icon: 'fas fa-headset',
-        // link: environment.portals.helpDesk,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.helpDesk,
+       
         tooltipText: 'Help Desk Portal - IT Support'
       },
       {
@@ -77,8 +77,8 @@ export class Dashboard {
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
-        // link: environment.portals.economicOpportunities,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.economicOpportunities,
+ 
         tooltipText: 'Economic Opportunities Portal'
       },
     ];

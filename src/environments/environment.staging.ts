@@ -14,7 +14,7 @@ export const environment = {
     mNe: 'https://newmis.southsudansafetynet.info/trial/master/#/monitoring-evaluation/beneficiary-enrolment-summary',
     report: 'https://newmis.southsudansafetynet.info/trial/master/#/home/metabase',
     economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard',
-    UnderConstruction: 'https://newmis.southsudansafetynet.info/trial/master/#/under-construction',
+    // UnderConstruction: 'https://newmis.southsudansafetynet.info/trial/master/#/under-construction',
     helpDesk: 'https://newmis.southsudansafetynet.info/trial/master/#/help-desk/dashboard',
   },
   msalConfig: {
