@@ -16,7 +16,7 @@ export const environment = {
     economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard',
     UnderConstruction: 'https://newmis.southsudansafetynet.info/trial/master/#/under-construction',
     helpDesk: 'https://newmis.southsudansafetynet.info/trial/master/#/help-desk/dashboard',
-   dms: 'https://167.86.68.15:8086',
+    dms: 'https://167.86.68.15:8086',
   },
   msalConfig: {
     auth: {
