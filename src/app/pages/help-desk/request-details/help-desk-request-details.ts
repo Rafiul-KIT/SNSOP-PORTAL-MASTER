@@ -12,6 +12,7 @@ import { ApiService } from '../../../../services/api.service';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
+type HistoryChange = { field: string; oldValue: string; newValue: string; isInitialValue: boolean };
 
 type WorkflowAction = {
   label: string;
@@ -253,16 +254,30 @@ export class HelpDeskRequestDetails implements OnInit {
     return otherCategory ? `${categoryName} (${otherCategory})` : categoryName;
   }
 
-  parseHistoryChanges(changes?: string): Array<{ field: string; oldValue: string; newValue: string }> {
+  private isInitialHistoryValue(value: unknown): boolean {
+    const normalized = String(value ?? '').trim().toUpperCase();
+    return !normalized || normalized === '-' || normalized === 'NULL' || normalized === 'INITIAL';
+  }
+
+  private formatHistoryValue(value: unknown, fallback = '-'): string {
+    if (this.isInitialHistoryValue(value)) return fallback;
+    return String(value).trim();
+  }
+
+  parseHistoryChanges(changes?: string): HistoryChange[] {
     if (!changes) return [];
     try {
       const parsed = JSON.parse(changes);
       if (!Array.isArray(parsed)) return [];
-      return parsed.map((item: any) => ({
-        field: String(item?.field || '-').replace(/_/g, ' '),
-        oldValue: String(item?.oldValue ?? '-'),
-        newValue: String(item?.newValue ?? '-'),
-      }));
+      return parsed.map((item: any) => {
+        const isInitialValue = this.isInitialHistoryValue(item?.oldValue);
+        return {
+          field: String(item?.field || '-').replace(/_/g, ' '),
+          oldValue: isInitialValue ? 'Initial' : this.formatHistoryValue(item?.oldValue),
+          newValue: this.formatHistoryValue(item?.newValue),
+          isInitialValue,
+        };
+      });
     } catch {
       return [];
     }
@@ -270,6 +285,8 @@ export class HelpDeskRequestDetails implements OnInit {
 
   getTimelineTitle(action?: string): string {
     switch (String(action || '').toUpperCase()) {
+      case 'INITIAL':
+        return 'Initial Update';
       case 'CREATED':
         return 'Request Created';
       case 'ATTACHMENT_ADDED':
@@ -283,6 +300,8 @@ export class HelpDeskRequestDetails implements OnInit {
 
   getTimelineIcon(action?: string): string {
     switch (String(action || '').toUpperCase()) {
+      case 'INITIAL':
+        return 'fas fa-flag';
       case 'CREATED':
         return 'fas fa-plus';
       case 'ATTACHMENT_ADDED':
@@ -296,6 +315,7 @@ export class HelpDeskRequestDetails implements OnInit {
 
   getTimelineTone(action?: string): string {
     switch (String(action || '').toUpperCase()) {
+      case 'INITIAL':
       case 'CREATED':
         return 'created';
       case 'ATTACHMENT_ADDED':

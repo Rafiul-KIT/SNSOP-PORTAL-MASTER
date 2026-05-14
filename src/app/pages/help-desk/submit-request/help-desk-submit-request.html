@@ -41,7 +41,7 @@
                   <small class="error-text">Issue type is required.</small>
                 }
               </div>
-              <div class="col-12 col-md-6">
+                   <div class="col-12 col-md-6">
                 <label class="form-label">Category <span class="required-asterisk">*</span></label>
                 <p-select [options]="categories" formControlName="category" optionLabel="label" optionValue="value" placeholder="Select category" class="w-100" />
                 @if (requestForm.get('category')?.invalid && (requestForm.get('category')?.dirty || requestForm.get('category')?.touched)) {
@@ -58,19 +58,20 @@
                 </div>
               }
               <div class="col-12 col-md-6">
+                <label class="form-label">Preferred Notification <span class="required-asterisk">*</span></label>
+                <p-select [options]="notificationPrefs" formControlName="notification" optionLabel="label" optionValue="value" placeholder="Select notification" class="w-100" />
+                @if (requestForm.get('notification')?.invalid && (requestForm.get('notification')?.dirty || requestForm.get('notification')?.touched)) {
+                  <small class="error-text">Preferred notification is required.</small>
+                }
+              </div>
+              <div class="col-12 col-md-6">
                 <label class="form-label">Priority <span class="required-asterisk">*</span></label>
                 <p-select [options]="priorities" formControlName="priority" optionLabel="label" optionValue="value" placeholder="Select priority" class="w-100" />
                 @if (requestForm.get('priority')?.invalid && (requestForm.get('priority')?.dirty || requestForm.get('priority')?.touched)) {
                   <small class="error-text">Priority is required.</small>
                 }
               </div>
-              <div class="col-12">
-                <label class="form-label">Description <span class="required-asterisk">*</span></label>
-                <textarea pTextarea formControlName="description" rows="5" class="w-100" placeholder="Describe the issue in detail..."></textarea>
-                @if (requestForm.get('description')?.invalid && (requestForm.get('description')?.dirty || requestForm.get('description')?.touched)) {
-                  <small class="error-text">Description is required.</small>
-                }
-              </div>
+
               <div class="col-12 col-md-6">
                 <label class="form-label">Module</label>
                 <p-select [options]="modules" formControlName="module" optionLabel="label" optionValue="value" placeholder="Select module" class="w-100" />
@@ -93,19 +94,17 @@
                   <small class="hint-text">No submodules found for the selected module.</small>
                 }
               </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label">Preferred Notification <span class="required-asterisk">*</span></label>
-                <p-select [options]="notificationPrefs" formControlName="notification" optionLabel="label" optionValue="value" placeholder="Select notification" class="w-100" />
-                @if (requestForm.get('notification')?.invalid && (requestForm.get('notification')?.dirty || requestForm.get('notification')?.touched)) {
-                  <small class="error-text">Preferred notification is required.</small>
+
+              <div class="col-12">
+                <label class="form-label">Description <span class="required-asterisk">*</span></label>
+                <textarea pTextarea formControlName="description" rows="5" class="w-100" placeholder="Describe the issue in detail..."></textarea>
+                @if (requestForm.get('description')?.invalid && (requestForm.get('description')?.dirty || requestForm.get('description')?.touched)) {
+                  <small class="error-text">Description is required.</small>
                 }
               </div>
               <div class="col-12">
-                <label class="form-label">Attachments <span class="required-asterisk">*</span></label>
-                <input type="file" class="form-control" (change)="onFileSelect($event)" multiple [ngClass]="{'is-invalid': requestForm.get('attachments')?.invalid && (requestForm.get('attachments')?.dirty || requestForm.get('attachments')?.touched)}" />
-                @if (requestForm.get('attachments')?.invalid && (requestForm.get('attachments')?.dirty || requestForm.get('attachments')?.touched)) {
-                  <small class="error-text">At least one attachment is required.</small>
-                }
+                <label class="form-label">Attachments</label>
+                <input type="file" class="form-control" (change)="onFileSelect($event)" multiple />
                 @if (selectedFiles.length > 0) {
                   <div class="selected-files mt-2">
                     @for (file of selectedFiles; track file.name + '-' + file.size + '-' + file.lastModified; let i = $index) {
@@ -159,24 +158,34 @@
           </ul>
         </div>
 
-        <div class="card p-3 mb-3 setup-shortcut">
-          <span class="shortcut-kicker">Admin setup</span>
-          <div class="shortcut-head">
-            <span class="shortcut-icon"><i class="fas fa-sliders"></i></span>
-            <div>
-              <h6 class="card-section-title mb-1">Missing an option?</h6>
-              <p class="mb-0">Add or edit the category, module and submodule lists used in this form.</p>
+        @if (isAdmin) {
+          <div class="card p-3 mb-3 setup-shortcut">
+            <div class="shortcut-content">
+              <span class="shortcut-icon"><i class="fas fa-sliders"></i></span>
+              <div class="shortcut-copy">
+                <span class="shortcut-kicker">Admin setup</span>
+                <h6 class="card-section-title mb-1">Missing an option?</h6>
+                <p class="mb-0">Add or edit the category, module and submodule lists used in this form.</p>
+                <div class="shortcut-meta" aria-label="Setup lists">
+                  <span>Category</span>
+                  <span>Module</span>
+                  <span>Submodule</span>
+                </div>
+              </div>
+            </div>
+            <div class="shortcut-actions">
+              <p-button
+                label="Manage Lists"
+                icon="fas fa-arrow-right"
+                iconPos="right"
+                severity="primary"
+                size="small"
+                styleClass="w-100 setup-action-button"
+                (onClick)="navigateToSetup()"
+              ></p-button>
             </div>
           </div>
-          <p-button
-            label="Categories, Modules & Submodules"
-            icon="fas fa-sliders"
-            severity="primary"
-            size="small"
-            styleClass="w-100"
-            (onClick)="navigateToSetup()"
-          ></p-button>
-        </div>
+        }
 
         @if (trackingNumber) {
           <div class="card p-3 tracking-result">

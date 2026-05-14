@@ -13,6 +13,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITCategory, ITModule, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
+import { ApiService } from '../../../../services/api.service';
 
 @Component({
   selector: 'app-help-desk-submit-request',
@@ -63,7 +64,8 @@ export class HelpDeskSubmitRequest implements OnInit {
     private itSupportService: ItSupportService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService
   ) {
     this.requestForm = this.fb.group({
       issueTitle: ['', Validators.required],
@@ -75,8 +77,13 @@ export class HelpDeskSubmitRequest implements OnInit {
       module: [null],
       submodule: [null],
       notification: [null, Validators.required],
-      attachments: [null, Validators.required]
+      attachments: [null]
     });
+  }
+
+  get isAdmin(): boolean {
+    const user = this.apiService.loginState()?.user;
+    return Number(user?.roleId) === 1;
   }
 
   ngOnInit(): void {

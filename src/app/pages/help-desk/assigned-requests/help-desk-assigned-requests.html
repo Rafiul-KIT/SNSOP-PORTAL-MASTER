@@ -55,6 +55,7 @@
           <label>Submodule</label>
           <p-select [options]="filteredSubmoduleOptions" [(ngModel)]="selectedSubmoduleId" optionLabel="label" optionValue="value" placeholder="All submodules" [showClear]="true" class="w-100"></p-select>
         </div>
+   
         <div class="queue-filter-actions">
           <p-button label="Reset" icon="fas fa-rotate-left" severity="secondary" size="small" [outlined]="true" (onClick)="resetFilters()"></p-button>
           <p-button label="Search" icon="fas fa-search" severity="primary" size="small" (onClick)="applyFilters()"></p-button>

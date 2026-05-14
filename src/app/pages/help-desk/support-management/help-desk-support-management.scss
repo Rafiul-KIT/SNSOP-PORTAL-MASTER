@@ -91,6 +91,56 @@
   }
 }
 
+.actions-column {
+  width: 340px;
+  min-width: 320px;
+}
+
+.request-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 300px;
+  max-width: 340px;
+  white-space: nowrap;
+}
+
+.action-button-item {
+  flex: 0 0 auto;
+}
+
+.action-button-item--status {
+  flex: 1 1 145px;
+  min-width: 130px;
+  max-width: 165px;
+}
+
+:host ::ng-deep {
+  .request-actions .table-action-button.p-button {
+    width: auto;
+    min-height: 28px;
+    justify-content: center;
+    padding: 0.28rem 0.5rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  .request-actions .table-action-button .p-button-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .request-actions .table-action-button .p-button-icon {
+    font-size: 0.72rem;
+  }
+
+  .request-actions .status-action-button.p-button {
+    width: 100%;
+  }
+}
+
 .assign-modal {
   display: grid;
   gap: 1rem;
@@ -287,6 +337,114 @@
   margin-bottom: 0.3rem;
 }
 
+.setup-shortcut {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 0.9rem;
+  border-color: #bfdbfe;
+  background:
+    linear-gradient(135deg, #f0fdfa 0%, #ffffff 52%, #eff6ff 100%);
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.12);
+
+  &.setup-shortcut--wide {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, #0f766e, #2563eb);
+  }
+
+  p {
+    font-size: 0.86rem;
+    line-height: 1.4;
+    color: #475569;
+  }
+}
+
+.shortcut-content {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.shortcut-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0f766e, #2563eb);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+}
+
+.shortcut-copy {
+  min-width: 0;
+}
+
+.shortcut-kicker {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.45rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid #99f6e4;
+  border-radius: 999px;
+  background: rgba(204, 251, 241, 0.75);
+  color: #0f766e;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.shortcut-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #dbeafe;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    color: #334155;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+}
+
+.shortcut-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+:host ::ng-deep .setup-shortcut .setup-action-button.p-button {
+  justify-content: center;
+  border-color: #0f766e;
+  background: #0f766e;
+  font-weight: 700;
+  box-shadow: 0 8px 16px rgba(15, 118, 110, 0.2);
+  white-space: nowrap;
+}
+
+:host ::ng-deep .setup-shortcut .setup-action-button.p-button:not(:disabled):hover {
+  border-color: #0f5f58;
+  background: #0f5f58;
+}
+
 @media (max-width: 767px) {
   .helpdesk-container {
     padding: 0.5rem 0.75rem;
@@ -335,6 +493,35 @@
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .actions-column {
+    width: 300px;
+    min-width: 280px;
+  }
+
+  .request-actions {
+    min-width: 260px;
+    max-width: 300px;
+    gap: 0.3rem;
+  }
+
+  .action-button-item--status {
+    flex-basis: 120px;
+    min-width: 110px;
+  }
+
+  .setup-shortcut.setup-shortcut--wide {
+    grid-template-columns: 1fr;
+  }
+
+  .shortcut-content {
+    flex-direction: column;
+  }
+
+  .shortcut-actions,
+  :host ::ng-deep .setup-shortcut .setup-action-button.p-button {
+    width: 100%;
   }
 
   .assign-summary,

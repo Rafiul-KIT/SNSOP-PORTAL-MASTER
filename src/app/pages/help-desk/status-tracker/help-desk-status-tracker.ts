@@ -10,6 +10,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ITRequest, ItSupportService } from '../../../../services/it-support.service';
 
+type TimelineChange = { field: string; oldValue: string; newValue: string; isInitialValue: boolean };
 
 @Component({
   selector: 'app-help-desk-status-tracker',
@@ -27,6 +28,7 @@ export class HelpDeskStatusTracker {
   isLoading = false;
   notFound = false;
   private readonly actionUiMap: Record<string, { label: string; icon: string; tone: string }> = {
+    INITIAL: { label: 'Initial Update', icon: 'fas fa-flag', tone: 'created' },
     CREATED: { label: 'Request Created', icon: 'fas fa-plus-circle', tone: 'created' },
     UPDATED: { label: 'Request Updated', icon: 'fas fa-pen', tone: 'updated' },
     STATUS_CHANGED: { label: 'Status Changed', icon: 'fas fa-arrows-rotate', tone: 'status' },
@@ -134,8 +136,18 @@ export class HelpDeskStatusTracker {
       .replace(/^./, (ch) => ch.toUpperCase());
   }
 
-  private parseTimelineChanges(changes?: string): Array<{ field: string; oldValue: string; newValue: string }> {
-    const rows: Array<{ field: string; oldValue: string; newValue: string }> = [];
+  private isInitialHistoryValue(value: unknown): boolean {
+    const normalized = String(value ?? '').trim().toUpperCase();
+    return !normalized || normalized === '-' || normalized === 'NULL' || normalized === 'INITIAL';
+  }
+
+  private formatHistoryValue(value: unknown, fallback = '-'): string {
+    if (this.isInitialHistoryValue(value)) return fallback;
+    return String(value).trim();
+  }
+
+  private parseTimelineChanges(changes?: string): TimelineChange[] {
+    const rows: TimelineChange[] = [];
 
     if (!changes) return rows;
 
@@ -146,10 +158,12 @@ export class HelpDeskStatusTracker {
       parsed
         .filter((change) => change?.field && !this.ignoredFields.includes(String(change.field)))
         .forEach((change) => {
+          const isInitialValue = this.isInitialHistoryValue(change.oldValue);
           rows.push({
             field: this.prettifyFieldName(String(change.field)),
-            oldValue: String(change.oldValue ?? '-'),
-            newValue: String(change.newValue ?? '-'),
+            oldValue: isInitialValue ? 'Initial' : this.formatHistoryValue(change.oldValue),
+            newValue: this.formatHistoryValue(change.newValue),
+            isInitialValue,
           });
         });
     } catch {
@@ -164,7 +178,7 @@ export class HelpDeskStatusTracker {
   }
 
   private isCommentAlreadyInChanges(
-    rows: Array<{ field: string; oldValue: string; newValue: string }>,
+    rows: TimelineChange[],
     comment: string
   ): boolean {
     if (!comment) return false;
@@ -176,7 +190,7 @@ export class HelpDeskStatusTracker {
     title: string;
     icon: string;
     tone: string;
-    changeRows: Array<{ field: string; oldValue: string; newValue: string }>;
+    changeRows: TimelineChange[];
     note?: string;
     date: string;
   }[] {
