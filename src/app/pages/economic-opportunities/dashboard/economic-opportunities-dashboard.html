@@ -1,3 +1,341 @@
-<div class="eo-page">
-<p>Economic Opportunities</p>
+<div class="eo-dashboard-container p-4">
+  <!-- Header Section -->
+  <div class="header-section d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="dashboard-title">Economic Opportunities Dashboard</h1>
+      <p class="text-muted mb-0" *ngIf="dashboardData()">
+        <i class="fa-solid fa-clock-rotate-left me-2"></i>
+        Last updated: {{ dashboardData()?.generatedAt | date:'medium' }}
+      </p>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline-primary" (click)="fetchData()" [disabled]="loading()">
+        <i class="fa-solid fa-arrows-rotate me-2" [class.fa-spin]="loading()"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Skeletons -->
+  <div *ngIf="loading()" class="grid-container">
+    <div class="row mb-4">
+      <div class="col-12 col-md-3" *ngFor="let i of [1,2,3,4]">
+        <p-skeleton height="120px" borderRadius="12px"></p-skeleton>
+      </div>
+    </div>
+    <p-skeleton height="500px" borderRadius="12px"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading() && dashboardData() as data" class="fade-in">
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+      <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="summary-card total-groups">
+          <div class="card-icon"><i class="fa-solid fa-users-viewfinder"></i></div>
+          <div class="card-content">
+            <span class="card-label">Total Groups</span>
+            <h2 class="card-value">{{ data.summary.totalGroups }}</h2>
+            <span class="card-subtext">{{ data.summary.vlsaFormedGroups }} VLSA Formed</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="summary-card enrolled-beneficiaries">
+          <div class="card-icon"><i class="fa-solid fa-user-check"></i></div>
+          <div class="card-content">
+            <span class="card-label">Enrolled Beneficiaries</span>
+            <h2 class="card-value">{{ data.summary.enrolledBeneficiaries }}</h2>
+            <span class="card-subtext">{{ data.summary.treatmentBeneficiaries }} Treatment</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="summary-card business-plans">
+          <div class="card-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <div class="card-content">
+            <span class="card-label">Approved Business Plans</span>
+            <h2 class="card-value">{{ data.summary.approvedBusinessPlans }}</h2>
+            <span class="card-subtext">{{ (data.businessPlans.approvalRate * 100) | number:'1.0-1' }}% Approval Rate</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3 mb-3">
+        <div class="summary-card grants-paid">
+          <div class="card-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          <div class="card-content">
+            <span class="card-label">Grants Paid</span>
+            <h2 class="card-value">{{ formatCurrency(data.livelihoodGrants.paidAmount) }}</h2>
+            <span class="card-subtext">{{ data.livelihoodGrants.paidPayments }} Payments Made</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Tabs (PrimeNG 18+ Structure) -->
+    <p-tabs value="0" class="dashboard-tabs">
+      <p-tablist>
+        <p-tab value="0">Enrollment & Coverage</p-tab>
+        <p-tab value="1">Training & Attendance</p-tab>
+        <p-tab value="2">Business Plans & Grants</p-tab>
+        <p-tab value="3">Financial Linkage</p-tab>
+        <p-tab value="4">Group Performance</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <!-- Tab 1: Enrollment & Coverage -->
+        <p-tabpanel value="0">
+          <div class="row pt-4">
+            <div class="col-12 col-lg-6 mb-4">
+              <p-card header="Enrollment Funnel" styleClass="chart-card h-100">
+                <p-chart type="bar" [data]="enrollmentFunnelData" [options]="enrollmentFunnelOptions" height="300px"></p-chart>
+              </p-card>
+            </div>
+            <div class="col-12 col-lg-6 mb-4">
+              <p-card header="Geographic Coverage" styleClass="h-100">
+                <p-table [value]="data.geoCoverage" [paginator]="true" [rows]="5" styleClass="p-datatable-sm p-datatable-striped">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>State/County</th>
+                      <th>Beneficiaries</th>
+                      <th>Groups</th>
+                      <th>Grants Paid</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-geo>
+                    <tr>
+                      <td>{{ geo.stateName }} / {{ geo.countyName }}</td>
+                      <td>{{ geo.enrolledBeneficiaries }}</td>
+                      <td>{{ geo.groups }}</td>
+                      <td>{{ formatCurrency(geo.grantAmount) }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </p-card>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-4 mb-4">
+              <p-card header="Gender Distribution" styleClass="stat-card">
+                <div class="stat-list">
+                  <div class="stat-item d-flex justify-content-between align-items-center mb-2" *ngFor="let item of data.enrollment.gender">
+                    <span>{{ item.label }}</span>
+                    <div class="d-flex align-items-center">
+                      <span class="me-2 fw-bold">{{ item.count }}</span>
+                      <p-tag [value]="(item.percentage * 100 | number:'1.0-0') + '%'" severity="info"></p-tag>
+                    </div>
+                  </div>
+                </div>
+              </p-card>
+            </div>
+            <div class="col-12 col-md-4 mb-4">
+              <p-card header="Age Groups" styleClass="stat-card">
+                <div class="stat-list">
+                  <div class="stat-item d-flex justify-content-between align-items-center mb-2" *ngFor="let item of data.enrollment.ageGroups">
+                    <span>{{ item.label }}</span>
+                    <div class="d-flex align-items-center">
+                      <span class="me-2 fw-bold">{{ item.count }}</span>
+                      <p-tag [value]="(item.percentage * 100 | number:'1.0-0') + '%'" severity="info"></p-tag>
+                    </div>
+                  </div>
+                </div>
+              </p-card>
+            </div>
+            <div class="col-12 col-md-4 mb-4">
+              <p-card header="Treatment Arm" styleClass="stat-card">
+                <div class="stat-list">
+                  <div class="stat-item d-flex justify-content-between align-items-center mb-2" *ngFor="let item of data.enrollment.treatmentArm">
+                    <span>{{ item.label }}</span>
+                    <div class="d-flex align-items-center">
+                      <span class="me-2 fw-bold">{{ item.count }}</span>
+                      <p-tag [value]="(item.percentage * 100 | number:'1.0-0') + '%'" severity="info"></p-tag>
+                    </div>
+                  </div>
+                </div>
+              </p-card>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab 2: Training -->
+        <p-tabpanel value="1">
+          <div class="row mb-4 pt-4">
+            <div class="col-12 col-md-3 mb-3">
+              <div class="mini-stat-card h-100">
+                <span class="label">Total Courses</span>
+                <span class="value">{{ data.training.overview.totalCourses }}</span>
+              </div>
+            </div>
+            <div class="col-12 col-md-3 mb-3">
+              <div class="mini-stat-card h-100">
+                <span class="label">Attendance Rate</span>
+                <span class="value">{{ (data.training.overview.attendanceRate * 100) | number:'1.0-1' }}%</span>
+                <p-progressBar [value]="data.training.overview.attendanceRate * 100" [showValue]="false"></p-progressBar>
+              </div>
+            </div>
+            <div class="col-12 col-md-3 mb-3">
+              <div class="mini-stat-card h-100">
+                <span class="label">Total Participants</span>
+                <span class="value">{{ data.training.overview.participants }}</span>
+              </div>
+            </div>
+            <div class="col-12 col-md-3 mb-3">
+              <div class="mini-stat-card h-100">
+                <span class="label">Scheduled Classes</span>
+                <span class="value">{{ data.training.overview.scheduledClasses }}</span>
+              </div>
+            </div>
+          </div>
+          <p-card header="Course Detailed Performance">
+            <p-table [value]="data.training.courses" styleClass="p-datatable-gridlines">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Course Name</th>
+                  <th>Classes</th>
+                  <th>Participants</th>
+                  <th>Attendance Rate</th>
+                  <th>Present/Absent</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-course>
+                <tr>
+                  <td><strong>{{ course.courseCode }}:</strong> {{ course.courseName }}</td>
+                  <td>{{ course.scheduledClasses }}</td>
+                  <td>{{ course.participants }}</td>
+                  <td>
+                    <p-tag [value]="(course.attendanceRate * 100 | number:'1.0-1') + '%'" 
+                           [severity]="getAttendanceSeverity(course.attendanceRate)"></p-tag>
+                  </td>
+                  <td>
+                    <span class="text-success">{{ course.presentRecords }}</span> / 
+                    <span class="text-danger">{{ course.absentRecords }}</span>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-card>
+        </p-tabpanel>
+
+        <!-- Tab 3: Business & Grants -->
+        <p-tabpanel value="2">
+          <div class="row pt-4">
+            <div class="col-12 col-lg-5 mb-4">
+              <p-card header="Business Types Distribution" styleClass="chart-card">
+                <p-chart type="doughnut" [data]="businessTypeData" [options]="businessTypeOptions" height="300px"></p-chart>
+              </p-card>
+            </div>
+            <div class="col-12 col-lg-7 mb-4">
+              <p-card header="Livelihood Grant Cycles">
+                <p-table [value]="data.livelihoodGrants.cycles">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>Cycle</th>
+                      <th>Beneficiaries</th>
+                      <th>Planned</th>
+                      <th>Paid</th>
+                      <th>Progress</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-cycle>
+                    <tr>
+                      <td>Cycle {{ cycle.paymentCycle }}</td>
+                      <td>{{ cycle.beneficiaries }}</td>
+                      <td>{{ formatCurrency(cycle.totalAmount) }}</td>
+                      <td>{{ formatCurrency(cycle.paidAmount) }}</td>
+                      <td>
+                        <p-progressBar [value]="(cycle.paidAmount / cycle.totalAmount) * 100" [showValue]="true"></p-progressBar>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </p-card>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab 4: Financial Linkage -->
+        <p-tabpanel value="3">
+          <div class="row pt-4">
+            <div class="col-12 col-md-6 mb-4">
+              <p-card header="Financial Services Usage" styleClass="chart-card">
+                <p-chart type="pie" [data]="financialServiceData" [options]="financialServiceOptions" height="300px"></p-chart>
+              </p-card>
+            </div>
+            <div class="col-12 col-md-6 mb-4">
+              <div class="row h-100">
+                <div class="col-12 mb-4">
+                  <div class="linkage-stat-box">
+                    <div class="box-icon"><i class="fa-solid fa-link"></i></div>
+                    <div class="box-details">
+                      <span class="box-label">Connection Rate</span>
+                      <span class="box-value">{{ (data.financialLinkage.connectionRate * 100) | number:'1.0-1' }}%</span>
+                      <span class="box-subtext">{{ data.financialLinkage.connectedToFinancialService }} Linked Beneficiaries</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="linkage-stat-box secondary">
+                    <div class="box-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+                    <div class="box-details">
+                      <span class="box-label">Deposit Account Rate</span>
+                      <span class="box-value">{{ (data.financialLinkage.depositAccountRate * 100) | number:'1.0-1' }}%</span>
+                      <span class="box-subtext">{{ data.financialLinkage.depositAccountOpened }} Accounts Opened</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab 5: Group Performance -->
+        <p-tabpanel value="4">
+          <div class="pt-4">
+            <p-table [value]="data.groupPerformance" [paginator]="true" [rows]="10" 
+                     [rowsPerPageOptions]="[10, 25, 50]" styleClass="p-datatable-gridlines p-datatable-sm"
+                     [globalFilterFields]="['groupName']" #dt>
+              <ng-template pTemplate="caption">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span>Performance across {{ data.groupPerformance.length }} Groups</span>
+                  <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Search Group..." 
+                           class="form-control form-control-sm d-inline-block w-auto" />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Group Name</th>
+                  <th>VLSA</th>
+                  <th>Members</th>
+                  <th>Attendance</th>
+                  <th>Approved Plans</th>
+                  <th>Grants Paid</th>
+                  <th>Linkage</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-group>
+                <tr>
+                  <td>{{ group.groupName }}</td>
+                  <td class="text-center">
+                    <i class="fa-solid fa-circle-check text-success" *ngIf="group.vlsaFormed"></i>
+                    <i class="fa-solid fa-circle-xmark text-danger" *ngIf="!group.vlsaFormed"></i>
+                  </td>
+                  <td>{{ group.groupMembers }} ({{ group.enrolledBeneficiaries }} Enrolled)</td>
+                  <td>
+                    <p-tag [value]="(group.attendanceRate * 100 | number:'1.0-0') + '%'" 
+                           [severity]="getAttendanceSeverity(group.attendanceRate)"></p-tag>
+                  </td>
+                  <td class="text-center">{{ group.approvedBusinessPlans }}</td>
+                  <td>{{ formatCurrency(group.grantAmount) }}</td>
+                  <td class="text-center">
+                    <span class="badge bg-primary rounded-pill">{{ group.financialServiceConnectedBeneficiaries }}</span>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
 </div>

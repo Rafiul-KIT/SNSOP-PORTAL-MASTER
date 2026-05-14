@@ -1,134 +1,280 @@
-.eo-page {
-  padding: 0.75rem 0.25rem;
+.eo-dashboard-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Ubuntu', sans-serif;
+
+  .dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  // Summary Cards
+  .summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    cursor: default;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-right: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .card-content {
+      .card-label {
+        display: block;
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+      .card-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+      }
+      .card-subtext {
+        display: block;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+      }
+    }
+
+    // Colors
+    &.total-groups { .card-icon { background: #eff6ff; color: #3b82f6; } }
+    &.enrolled-beneficiaries { .card-icon { background: #f0fdf4; color: #22c55e; } }
+    &.business-plans { .card-icon { background: #fffbeb; color: #f59e0b; } }
+    &.grants-paid { .card-icon { background: #fdf2f8; color: #ec4899; } }
+  }
+
+  // Tabs (PrimeNG 18+ Structure)
+  ::ng-deep .dashboard-tabs {
+    .p-tablist {
+      background: transparent;
+      border: none;
+      margin-bottom: 0.5rem;
+      
+      .p-tablist-content {
+        background: transparent;
+        border: none;
+      }
+
+      .p-tablist-tab-list {
+        display: flex;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #e2e8f0;
+        background: transparent;
+      }
+      
+      .p-tab {
+        background: transparent;
+        border: none;
+        color: #64748b;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+
+        &:hover { 
+          color: #3b82f6; 
+          background: rgba(59, 130, 246, 0.05); 
+        }
+        
+        &.p-tab-active {
+          color: #3b82f6;
+          border-bottom-color: #3b82f6;
+          background: rgba(59, 130, 246, 0.05);
+        }
+
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+    
+    .p-tabpanels {
+      background: transparent;
+      padding: 0;
+    }
+  }
+
+  // Cards
+  ::ng-deep .p-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 1rem;
+
+    .p-card-header { font-weight: 700; color: #1e293b; }
+    .p-card-title { font-size: 1.1rem; margin-bottom: 1rem; font-weight: 700; }
+    .p-card-body { padding: 1.25rem; }
+  }
+
+  // Stat Boxes
+  .mini-stat-card {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+    .label { display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 600; }
+    .value { display: block; font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+  }
+
+  .linkage-stat-box {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    height: 100%;
+
+    .box-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #3b82f6;
+      margin-right: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .box-details {
+      display: flex;
+      flex-direction: column;
+      .box-label { font-size: 0.9rem; color: #64748b; font-weight: 600; }
+      .box-value { font-size: 1.75rem; font-weight: 800; color: #1e293b; }
+      .box-subtext { font-size: 0.8rem; color: #94a3b8; }
+    }
+
+    &.secondary { 
+      .box-icon { background: #f0fdf4; color: #10b981; } 
+    }
+  }
+
+  // Table Styling
+  ::ng-deep .p-datatable {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+
+    .p-datatable-header {
+      background: white;
+      border: none;
+      padding: 1.25rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .p-datatable-thead > tr > th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .p-datatable-tbody > tr {
+      font-size: 0.9rem;
+      color: #1e293b;
+      
+      &:last-child td { border-bottom: none; }
+    }
+  }
+
+  // Progress Bar
+  ::ng-deep .p-progressbar {
+    height: 8px;
+    border-radius: 4px;
+    background: #f1f5f9;
+    
+    .p-progressbar-value {
+      background: #3b82f6;
+    }
+  }
+
+  .stat-list {
+    .stat-item {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      &:last-child { border-bottom: none; }
+      
+      span { font-size: 0.9rem; color: #475569; }
+    }
+  }
 }
 
-.eo-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  margin: 0.35rem 0 1rem;
-  font-size: 1.1rem;
-}
-
-.crumb-muted {
-  color: #101828;
-}
-
-.crumb-link,
-.crumb-current {
-  color: #2b6eb3;
-}
-
-.eo-panel {
-  border: 1px solid #2f76b5;
-  border-radius: 4px;
-  background: #f7f7f7;
-}
-
-.eo-panel-header {
-  background: #3579b4;
-  color: #fff;
-  font-weight: 600;
-  font-size: 1.9rem;
-  padding: 0.9rem 1.1rem;
-}
-
-.eo-panel-body {
-  padding: 1.5rem 1.6rem 1rem;
-}
-
-.eo-chart-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.eo-chart-card h4 {
-  color: #2e6eb0;
-  font-size: 2.2rem;
-  margin-bottom: 0.8rem;
-}
-
-.chart-placeholder {
-  background: #f7f7f7;
-  border-radius: 3px;
-  height: 290px;
-  position: relative;
+// Skeleton animations
+::ng-deep .p-skeleton {
+  background-color: #e2e8f0;
   overflow: hidden;
-}
-
-.grid-line {
-  border-top: 1px solid #d4d4d4;
-  width: 100%;
-  height: 10%;
-}
-
-.bar-wrap {
-  position: absolute;
-  left: 20%;
-  right: 14%;
-  bottom: 24px;
-  top: 18px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-}
-
-.bar {
-  width: 62px;
-  background: rgba(93, 168, 221, 0.9);
-}
-
-.bar-juba {
-  height: 82%;
-}
-
-.bar-pibor {
-  height: 36%;
-}
-
-.axis-labels {
-  position: absolute;
-  left: 22%;
-  right: 16%;
-  bottom: 0;
-  display: flex;
-  justify-content: space-around;
-  color: #5f6368;
-  font-size: 0.95rem;
-}
-
-.empty-chart {
-  min-height: 290px;
-}
-
-.eo-footer-title {
-  margin-top: 1rem;
-  color: #2e6eb0;
-  font-size: 1.95rem;
-  letter-spacing: 0.2px;
-}
-
-@media (max-width: 991.98px) {
-  .eo-breadcrumb {
-    flex-wrap: wrap;
-    gap: 0.8rem 1.4rem;
-    font-size: 1rem;
+  position: relative;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.2) 20%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0));
+    animation: p-skeleton-animation 1.2s infinite;
   }
+}
 
-  .eo-panel-header {
-    font-size: 1.25rem;
-  }
+@keyframes p-skeleton-animation {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
 
-  .eo-chart-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .eo-chart-card h4 {
-    font-size: 1.35rem;
-  }
-
-  .eo-footer-title {
-    font-size: 1.15rem;
+@media (max-width: 768px) {
+  .eo-dashboard-container {
+    padding: 1rem !important;
+    
+    .dashboard-title { font-size: 1.5rem; }
+    
+    .summary-card {
+      padding: 1rem;
+      .card-icon { width: 48px; height: 48px; font-size: 1.25rem; margin-right: 1rem; }
+      .card-value { font-size: 1.25rem; }
+    }
   }
 }
