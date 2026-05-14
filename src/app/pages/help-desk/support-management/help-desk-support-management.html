@@ -12,7 +12,9 @@
         <p class="page-subtitle">Manage workflow transitions and monitor support requests.</p>
       </div>
       <div class="header-actions">
+        @if (canAssignRequests()) {
         <p-button label="Setup Categories, Modules & Submodules" icon="fas fa-sliders" size="small" styleClass="setup-cta-button" (onClick)="navigateToSetup()"></p-button>
+        }
         <p-button label="Refresh" icon="fas fa-rotate" severity="primary" size="small" (onClick)="loadRequests(false)"></p-button>
       </div>
     </div>
@@ -153,7 +155,7 @@
                 <th class="fw-bold">Module</th>
                 <th class="fw-bold">Submodule</th>
                 <th class="fw-bold">Assigned To</th>
-                <th class="fw-bold">Actions</th>
+                <th class="fw-bold actions-column">Actions</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-ticket>
@@ -178,31 +180,39 @@
                     }
                   </div>
                 </td>
-                <td>
-                  <div class="d-flex flex-wrap gap-1">
+                <td class="actions-column">
+                  <div class="request-actions">
                     <p-button
+                      class="action-button-item"
                       label="View"
+                      icon="fas fa-eye"
                       severity="secondary"
                       size="small"
                       [outlined]="true"
+                      styleClass="table-action-button"
                       (onClick)="onView(ticket)"
                     ></p-button>
                     @if (canAssignRequests()) {
                       <p-button
+                        class="action-button-item"
                         [label]="getAssignButtonLabel(ticket)"
                         icon="fas fa-user-check"
                         severity="success"
                         size="small"
                         [outlined]="true"
+                        styleClass="table-action-button"
                         (onClick)="openAssignDialog(ticket)"
                       ></p-button>
                     }
                     <p-button
+                      class="action-button-item action-button-item--status"
                       [label]="getStatusActionLabel(ticket)"
+                      icon="fas fa-rotate"
                       severity="info"
                       size="small"
                       [disabled]="!getAvailableActions(ticket).length"
                       [outlined]="!getAvailableActions(ticket).length"
+                      styleClass="table-action-button status-action-button"
                       (onClick)="onAction(ticket)"
                     ></p-button>
                   </div>

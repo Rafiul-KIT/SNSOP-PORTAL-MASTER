@@ -94,7 +94,7 @@
                           <div class="change-row">
                             <div class="change-field">{{ row.field }}</div>
                             <div class="change-values">
-                              <span class="value-pill value-old">{{ row.oldValue }}</span>
+                              <span class="value-pill value-old" [class.initial]="row.isInitialValue">{{ row.oldValue }}</span>
                               <i class="fas fa-arrow-right"></i>
                               <span class="value-pill value-new">{{ row.newValue }}</span>
                             </div>

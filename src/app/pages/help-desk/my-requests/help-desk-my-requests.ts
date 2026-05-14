@@ -41,6 +41,7 @@ export class HelpDeskMyRequests implements OnInit {
   isLoading = false;
   requests: ITRequest[] = [];
   filteredRequests: ITRequest[] = [];
+  totalRecords = 0;
   searchText = '';
   trackingNumber = '';
   selectedCategoryId: number | null = null;
@@ -130,6 +131,7 @@ export class HelpDeskMyRequests implements OnInit {
         this.zone.run(() => {
           this.requests = result.items;
           this.filteredRequests = result.items;
+          this.totalRecords = result.total;
           this.calculateSummary();
           this.isLoading = false;
           this.detectChanges();
@@ -137,6 +139,9 @@ export class HelpDeskMyRequests implements OnInit {
       } catch (error) {
         console.error('Error loading requests:', error);
         this.zone.run(() => {
+          this.requests = [];
+          this.filteredRequests = [];
+          this.totalRecords = 0;
           this.isLoading = false;
           this.detectChanges();
         });
@@ -191,7 +196,7 @@ export class HelpDeskMyRequests implements OnInit {
   }
 
   calculateSummary(): void {
-    this.summary.total = this.requests.length;
+    this.summary.total = this.totalRecords;
     this.summary.resolved = this.requests.filter(
       (r) => r.status?.toLowerCase() === 'resolved' || r.status?.toLowerCase() === 'closed'
     ).length;

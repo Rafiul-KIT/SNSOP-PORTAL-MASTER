@@ -89,7 +89,7 @@
                           <div class="timeline-change-row">
                             <div class="timeline-field">{{ c.field }}</div>
                             <div class="timeline-flow">
-                              <span class="value-chip old">{{ c.oldValue }}</span>
+                              <span class="value-chip old" [class.initial]="c.isInitialValue">{{ c.oldValue }}</span>
                               <i class="fas fa-arrow-right timeline-arrow"></i>
                               <span class="value-chip new">{{ c.newValue }}</span>
                             </div>
