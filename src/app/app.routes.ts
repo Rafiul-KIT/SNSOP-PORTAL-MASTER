@@ -56,6 +56,10 @@ export const routes: Routes = [
         path: 'profile',
         component: Profile,
       },
+       {
+        path: 'report',
+        component: UnderConstruction,
+      },
       {
         path: 'metabase',
         component: Metabase,

@@ -94,7 +94,7 @@ export class Header {
       });
 
     // Static portal links
-    this.portalList = [
+     this.portalList = [
       // {
       //   label: 'Dashboard',
       //   link: environment.portals.master,
@@ -122,7 +122,6 @@ export class Header {
         label: 'Report',
         icon: 'fas fa-chart-line',
         link: environment.portals.report,
-        // link: environment.portals.UnderConstruction,
         tooltipText: 'Reports Dashboard'
       },
       {
@@ -141,7 +140,7 @@ export class Header {
         label: 'Help Desk',
         icon: 'fas fa-headset',
         link: environment.portals.helpDesk,
-        // link: environment.portals.UnderConstruction,
+     
         tooltipText: 'Help Desk Portal - IT Support',
       },
       {
@@ -155,7 +154,7 @@ export class Header {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
         link: environment.portals.economicOpportunities,
-        // link: environment.portals.UnderConstruction,
+        
         tooltipText: 'Economic Opportunities Portal'
       },
       {
