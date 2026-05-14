@@ -1,88 +1,131 @@
 .eo-dashboard-container {
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
   font-family: 'Ubuntu', sans-serif;
+  color: #1e293b;
 
   .dashboard-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1e293b;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #1e293b, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 0.25rem;
   }
 
   .fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  // Summary Cards
+  // Summary Cards - More Colorful & Lively
   .summary-card {
     background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
+    border-radius: 16px;
+    padding: 1.75rem;
     display: flex;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
-    cursor: default;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
 
     &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      &::before { opacity: 1; }
     }
 
     .card-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       margin-right: 1.25rem;
       flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+
+    &:hover .card-icon {
+      transform: rotate(-5deg) scale(1.1);
     }
 
     .card-content {
+      z-index: 1;
       .card-label {
         display: block;
-        font-size: 0.875rem;
+        font-size: 0.9rem;
         color: #64748b;
-        font-weight: 500;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         margin-bottom: 0.25rem;
       }
       .card-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1e293b;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
         margin: 0;
+        line-height: 1.2;
       }
       .card-subtext {
         display: block;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         color: #94a3b8;
+        font-weight: 500;
         margin-top: 0.25rem;
       }
     }
 
-    // Colors
-    &.total-groups { .card-icon { background: #eff6ff; color: #3b82f6; } }
-    &.enrolled-beneficiaries { .card-icon { background: #f0fdf4; color: #22c55e; } }
-    &.business-plans { .card-icon { background: #fffbeb; color: #f59e0b; } }
-    &.grants-paid { .card-icon { background: #fdf2f8; color: #ec4899; } }
+    // Lively Gradients & Colors
+    &.total-groups { 
+      border-left: 5px solid #3b82f6;
+      .card-icon { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb; } 
+    }
+    &.enrolled-beneficiaries { 
+      border-left: 5px solid #10b981;
+      .card-icon { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); color: #059669; } 
+    }
+    &.business-plans { 
+      border-left: 5px solid #f59e0b;
+      .card-icon { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); color: #d97706; } 
+    }
+    &.grants-paid { 
+      border-left: 5px solid #ec4899;
+      .card-icon { background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); color: #db2777; } 
+    }
   }
 
-  // Tabs (PrimeNG 18+ Structure)
+  // Tabs (PrimeNG 18+ Structure) - More Modern
   ::ng-deep .dashboard-tabs {
     .p-tablist {
-      background: transparent;
-      border: none;
-      margin-bottom: 0.5rem;
+      background: white;
+      border-radius: 12px;
+      padding: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+      border: 1px solid #e2e8f0;
       
       .p-tablist-content {
         background: transparent;
@@ -92,29 +135,32 @@
       .p-tablist-tab-list {
         display: flex;
         flex-wrap: wrap;
-        border-bottom: 1px solid #e2e8f0;
+        border: none;
         background: transparent;
+        gap: 0.5rem;
       }
       
       .p-tab {
         background: transparent;
         border: none;
         color: #64748b;
-        font-weight: 600;
-        padding: 1rem 1.5rem;
-        transition: all 0.2s;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -1px;
+        font-weight: 700;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 8px;
+        margin-bottom: 0;
 
         &:hover { 
           color: #3b82f6; 
-          background: rgba(59, 130, 246, 0.05); 
+          background: #f1f5f9; 
         }
         
         &.p-tab-active {
-          color: #3b82f6;
-          border-bottom-color: #3b82f6;
-          background: rgba(59, 130, 246, 0.05);
+          color: white;
+          background: #3b82f6;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+          
+          &:hover { background: #2563eb; }
         }
 
         &:focus {
@@ -129,115 +175,175 @@
     }
   }
 
-  // Cards
+  // Cards - Polished Depth
   ::ng-deep .p-card {
-    border-radius: 12px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
-    margin-bottom: 1rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    background: white;
+    transition: transform 0.3s;
 
-    .p-card-header { font-weight: 700; color: #1e293b; }
-    .p-card-title { font-size: 1.1rem; margin-bottom: 1rem; font-weight: 700; }
-    .p-card-body { padding: 1.25rem; }
+    .p-card-header { 
+      font-weight: 800; 
+      color: #0f172a; 
+      font-size: 1.1rem;
+      padding: 1.5rem 1.5rem 0.5rem;
+      border: none;
+    }
+    .p-card-title { 
+      font-size: 1.25rem; 
+      margin-bottom: 1.25rem; 
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .p-card-body { padding: 1.5rem; }
   }
 
-  // Stat Boxes
+  // Stat Boxes - Vibrant & Engaging
   .mini-stat-card {
     background: white;
-    padding: 1.25rem;
-    border-radius: 12px;
+    padding: 1.5rem;
+    border-radius: 18px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.3s;
 
-    .label { display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 600; }
-    .value { display: block; font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+    &:hover {
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+      border-color: #3b82f6;
+    }
+
+    .label { display: block; font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase; }
+    .value { display: block; font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-bottom: 0.75rem; }
   }
 
   .linkage-stat-box {
     background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
+    padding: 2rem;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     height: 100%;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: scale(1.03);
+      border-color: #3b82f6;
+    }
 
     .box-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: #eff6ff;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 2rem;
       color: #3b82f6;
-      margin-right: 1.5rem;
+      margin-right: 1.75rem;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
     }
 
     .box-details {
       display: flex;
       flex-direction: column;
-      .box-label { font-size: 0.9rem; color: #64748b; font-weight: 600; }
-      .box-value { font-size: 1.75rem; font-weight: 800; color: #1e293b; }
-      .box-subtext { font-size: 0.8rem; color: #94a3b8; }
+      .box-label { font-size: 0.95rem; color: #64748b; font-weight: 700; }
+      .box-value { font-size: 2rem; font-weight: 900; color: #0f172a; }
+      .box-subtext { font-size: 0.85rem; color: #94a3b8; font-weight: 500; }
     }
 
     &.secondary { 
-      .box-icon { background: #f0fdf4; color: #10b981; } 
+      .box-icon { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1); } 
     }
   }
 
-  // Table Styling
+  // Table Styling - Clean & Modern
   ::ng-deep .p-datatable {
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     border: 1px solid #e2e8f0;
 
     .p-datatable-header {
       background: white;
       border: none;
-      padding: 1.25rem;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
     }
     
     .p-datatable-thead > tr > th {
       background: #f8fafc;
       color: #475569;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.85rem;
-      padding: 1rem;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 1.25rem 1rem;
+      border-bottom: 2px solid #f1f5f9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .p-datatable-tbody > tr {
-      font-size: 0.9rem;
-      color: #1e293b;
+      font-size: 0.95rem;
+      color: #334155;
+      transition: background 0.2s;
       
+      &:hover { background-color: #f8fafc; }
       &:last-child td { border-bottom: none; }
+
+      td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
     }
   }
 
-  // Progress Bar
+  // Progress Bar - Colorful
   ::ng-deep .p-progressbar {
-    height: 8px;
-    border-radius: 4px;
+    height: 10px;
+    border-radius: 6px;
     background: #f1f5f9;
+    border: 1px solid #e2e8f0;
     
     .p-progressbar-value {
-      background: #3b82f6;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 6px;
     }
   }
 
   .stat-list {
     .stat-item {
-      padding: 0.75rem 0;
+      padding: 1rem 0;
       border-bottom: 1px solid #f1f5f9;
       &:last-child { border-bottom: none; }
       
-      span { font-size: 0.9rem; color: #475569; }
+      span { font-size: 0.95rem; color: #475569; font-weight: 500; }
+    }
+  }
+}
+
+// Badge/Tag enhancements
+::ng-deep .p-tag {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  
+  &.p-tag-info { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+  &.p-tag-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+  &.p-tag-warning { background: #fffbeb; color: #92400e; border: 1px solid #fef3c7; }
+  &.p-tag-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+}
+
+@media (max-width: 768px) {
+  .eo-dashboard-container {
+    padding: 1rem !important;
+    
+    .dashboard-title { font-size: 1.5rem; }
+    
+    .summary-card {
+      padding: 1.25rem;
+      .card-icon { width: 56px; height: 56px; font-size: 1.5rem; margin-right: 1rem; }
+      .card-value { font-size: 1.5rem; }
     }
   }
 }
