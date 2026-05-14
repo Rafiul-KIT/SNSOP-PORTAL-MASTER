@@ -16,7 +16,7 @@ export const environment = {
     economicOpportunities: 'https://qa-mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard',
     // UnderConstruction: 'https://qa-mis.southsudansafetynet.info/v2/#/under-construction',
     helpDesk: 'https://qa-mis.southsudansafetynet.info/v2/#/help-desk/dashboard',
-    dms: 'https://qa-mis.southsudansafetynet.info/v2/#/under-construction'
+    dms: 'https://qa-mis.southsudansafetynet.info/v2/dms'
   },
   msalConfig: {
     auth: {
