@@ -141,7 +141,7 @@ export class Header {
         icon: 'fas fa-headset',
         link: environment.portals.helpDesk,
      
-        tooltipText: 'Help Desk Portal - IT Support'
+        tooltipText: 'Help Desk Portal - IT Support',
       },
       {
         label: 'Monitoring & Evaluation',
@@ -156,6 +156,12 @@ export class Header {
         link: environment.portals.economicOpportunities,
         
         tooltipText: 'Economic Opportunities Portal'
+      },
+      {
+        label: 'DMS',
+        icon: 'fas fa-file',
+        link: environment.portals.dms,
+        tooltipText: 'Document Management System'
       },
     ];
   }
