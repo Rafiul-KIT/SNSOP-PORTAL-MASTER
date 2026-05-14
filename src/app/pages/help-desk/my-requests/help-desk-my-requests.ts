@@ -484,4 +484,8 @@ export class HelpDeskMyRequests implements OnInit {
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
+
+  navigateTo(path: string): void {
+    this.router.navigateByUrl(path);
+  }
 }

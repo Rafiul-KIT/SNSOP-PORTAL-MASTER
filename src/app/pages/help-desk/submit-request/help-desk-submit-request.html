@@ -28,42 +28,23 @@
           <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <label class="form-label">Issue Title <span class="required-asterisk">*</span></label>
+                <label class="form-label">Issue Title</label>
                 <input type="text" pInputText class="w-100" formControlName="issueTitle" placeholder="Enter issue title" />
-                @if (requestForm.get('issueTitle')?.invalid && (requestForm.get('issueTitle')?.dirty || requestForm.get('issueTitle')?.touched)) {
-                  <small class="error-text">Issue title is required.</small>
-                }
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label">Issue Type <span class="required-asterisk">*</span></label>
+                <label class="form-label">Issue Type</label>
                 <p-select [options]="issueTypes" formControlName="issueType" optionLabel="label" optionValue="value" placeholder="Select issue type" class="w-100" />
-                @if (requestForm.get('issueType')?.invalid && (requestForm.get('issueType')?.dirty || requestForm.get('issueType')?.touched)) {
-                  <small class="error-text">Issue type is required.</small>
-                }
               </div>
                    <div class="col-12 col-md-6">
-                <label class="form-label">Category <span class="required-asterisk">*</span></label>
+                <label class="form-label">Category</label>
                 <p-select [options]="categories" formControlName="category" optionLabel="label" optionValue="value" placeholder="Select category" class="w-100" />
-                @if (requestForm.get('category')?.invalid && (requestForm.get('category')?.dirty || requestForm.get('category')?.touched)) {
-                  <small class="error-text">Category is required.</small>
-                }
               </div>
               @if (isOtherCategorySelected()) {
                 <div class="col-12 col-md-6">
-                  <label class="form-label">Other Category <span class="required-asterisk">*</span></label>
+                  <label class="form-label">Other Category</label>
                   <input type="text" pInputText class="w-100" formControlName="otherCategory" placeholder="Enter other category" />
-                  @if (requestForm.get('otherCategory')?.invalid && (requestForm.get('otherCategory')?.dirty || requestForm.get('otherCategory')?.touched)) {
-                    <small class="error-text">Other category is required.</small>
-                  }
                 </div>
               }
-              <div class="col-12 col-md-6">
-                <label class="form-label">Preferred Notification <span class="required-asterisk">*</span></label>
-                <p-select [options]="notificationPrefs" formControlName="notification" optionLabel="label" optionValue="value" placeholder="Select notification" class="w-100" />
-                @if (requestForm.get('notification')?.invalid && (requestForm.get('notification')?.dirty || requestForm.get('notification')?.touched)) {
-                  <small class="error-text">Preferred notification is required.</small>
-                }
-              </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Priority <span class="required-asterisk">*</span></label>
                 <p-select [options]="priorities" formControlName="priority" optionLabel="label" optionValue="value" placeholder="Select priority" class="w-100" />
@@ -73,8 +54,11 @@
               </div>
 
               <div class="col-12 col-md-6">
-                <label class="form-label">Module</label>
+                <label class="form-label">Module <span class="required-asterisk">*</span></label>
                 <p-select [options]="modules" formControlName="module" optionLabel="label" optionValue="value" placeholder="Select module" class="w-100" />
+                @if (requestForm.get('module')?.invalid && (requestForm.get('module')?.dirty || requestForm.get('module')?.touched)) {
+                  <small class="error-text">Module is required.</small>
+                }
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Submodule</label>
@@ -96,11 +80,8 @@
               </div>
 
               <div class="col-12">
-                <label class="form-label">Description <span class="required-asterisk">*</span></label>
+                <label class="form-label">Description</label>
                 <textarea pTextarea formControlName="description" rows="5" class="w-100" placeholder="Describe the issue in detail..."></textarea>
-                @if (requestForm.get('description')?.invalid && (requestForm.get('description')?.dirty || requestForm.get('description')?.touched)) {
-                  <small class="error-text">Description is required.</small>
-                }
               </div>
               <div class="col-12">
                 <label class="form-label">Attachments</label>

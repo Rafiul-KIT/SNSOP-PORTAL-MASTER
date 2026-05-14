@@ -53,12 +53,6 @@ export class HelpDeskSubmitRequest implements OnInit {
     { label: 'Other', value: 'OTHER' }
   ];
 
-  notificationPrefs = [
-    { label: 'Email', value: 'EMAIL' },
-    // { label: 'SMS', value: 'SMS' },
-    // { label: 'Both', value: 'BOTH' }
-  ];
-
   constructor(
     private fb: FormBuilder,
     private itSupportService: ItSupportService,
@@ -68,15 +62,15 @@ export class HelpDeskSubmitRequest implements OnInit {
     private apiService: ApiService
   ) {
     this.requestForm = this.fb.group({
-      issueTitle: ['', Validators.required],
-      issueType: [null, Validators.required],
-      category: [null, Validators.required],
+      issueTitle: [''],
+      issueType: [null],
+      category: [null],
       otherCategory: [null],
       priority: [null, Validators.required],
-      description: ['', Validators.required],
-      module: [null],
+      description: [''],
+      module: [null, Validators.required],
       submodule: [null],
-      notification: [null, Validators.required],
+      notification: ['EMAIL'],
       attachments: [null]
     });
   }
@@ -176,10 +170,8 @@ export class HelpDeskSubmitRequest implements OnInit {
     const otherCategoryControl = this.requestForm.get('otherCategory');
     if (!otherCategoryControl) return;
 
-    if (this.isOtherCategorySelected()) {
-      otherCategoryControl.setValidators([Validators.required, Validators.pattern(/\S/)]);
-    } else {
-      otherCategoryControl.clearValidators();
+    otherCategoryControl.clearValidators();
+    if (!this.isOtherCategorySelected()) {
       otherCategoryControl.setValue(null, { emitEvent: false });
     }
 
@@ -335,4 +327,3 @@ export class HelpDeskSubmitRequest implements OnInit {
     });
   }
 }
-

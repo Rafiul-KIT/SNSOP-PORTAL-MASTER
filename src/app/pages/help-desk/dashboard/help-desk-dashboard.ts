@@ -124,11 +124,13 @@ export class HelpDeskDashboard implements OnInit {
           this.sixMonthsIssues = result?.reportedIssuesLastSixMonths || [];
 
           const priorityMap = result?.countsByPriority || {};
-          this.prioritySummary = Object.keys(priorityMap).map((priority) => ({
-            priority,
-            totalRequests: priorityMap[priority]?.totalRequests || 0,
-            resolvedRequests: priorityMap[priority]?.resolvedRequests || 0
-          }));
+          this.prioritySummary = Object.keys(priorityMap)
+            .filter((priority) => priority?.toUpperCase() !== 'CRITICAL')
+            .map((priority) => ({
+              priority,
+              totalRequests: priorityMap[priority]?.totalRequests || 0,
+              resolvedRequests: priorityMap[priority]?.resolvedRequests || 0
+            }));
           this.buildCharts();
 
           this.isLoading = false;
