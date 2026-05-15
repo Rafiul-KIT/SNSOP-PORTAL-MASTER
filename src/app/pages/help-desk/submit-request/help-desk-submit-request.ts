@@ -12,7 +12,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { IT_SUPPORT_ISSUE_TYPE_OPTIONS, IT_SUPPORT_PRIORITY_OPTIONS, ITCategory, ITModule, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
+import { ITCategory, ITModule, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 @Component({
@@ -40,9 +40,17 @@ export class HelpDeskSubmitRequest implements OnInit {
   modules: { label: string; value: number }[] = [];
   submodules: Array<{ label: string; value: number; parentModuleId: number }> = [];
 
-  priorities = IT_SUPPORT_PRIORITY_OPTIONS;
+  priorities = [
+    { label: 'Low', value: 'LOW' },
+    { label: 'Medium', value: 'MEDIUM' },
+    { label: 'High', value: 'HIGH' }
+  ];
 
-  issueTypes = IT_SUPPORT_ISSUE_TYPE_OPTIONS;
+  issueTypes = [
+    { label: 'Technical', value: 'TECHNICAL' },
+    { label: 'Operational', value: 'OPERATIONAL' },
+    { label: 'Support', value: 'SUPPORT' }
+  ];
 
   constructor(
     private fb: FormBuilder,

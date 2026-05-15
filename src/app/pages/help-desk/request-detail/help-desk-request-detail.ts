@@ -8,7 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { IT_SUPPORT_PRIORITY_OPTIONS, ITAttachment, ITCategory, ITHistory, ITModule, ITRequest, ItSupportService } from '../../../../services/it-support.service';
+import { ITAttachment, ITCategory, ITHistory, ITModule, ITRequest, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 
@@ -40,7 +40,11 @@ export class HelpDeskRequestDetail implements OnInit {
   categories: ITCategory[] = [];
   modules: ITModule[] = [];
 
-  editPriorityOptions = IT_SUPPORT_PRIORITY_OPTIONS;
+  editPriorityOptions = [
+    { label: 'Low', value: 'LOW' },
+    { label: 'Medium', value: 'MEDIUM' },
+    { label: 'High', value: 'HIGH' },
+  ];
 
   editDescription = '';
   editCategoryId: number | null = null;
