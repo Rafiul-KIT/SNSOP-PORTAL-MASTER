@@ -26,7 +26,7 @@ export class HelpDeskRequestDetail implements OnInit {
   private readonly MIS_FIRM_ROLE_IDS = [51];
 
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/dashboard' };
-  breadcrumbItems = [{ label: 'Help Desk', routerLink: '/help-desk/my-requests' }, { label: 'Request Detail' }];
+  breadcrumbItems = [{ label: 'Helpdesk', routerLink: '/help-desk/my-requests' }, { label: 'Request Detail' }];
 
   isLoading = true;
   isSavingDetail = false;
@@ -67,7 +67,7 @@ export class HelpDeskRequestDetail implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.breadcrumbItems = [{ label: 'Help Desk', routerLink: this.getBackRoute() }, { label: 'Request Detail' }];
+    this.breadcrumbItems = [{ label: 'Helpdesk', routerLink: this.getBackRoute() }, { label: 'Request Detail' }];
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isFinite(id) || id <= 0) {
       this.router.navigate([this.getBackRoute()]);

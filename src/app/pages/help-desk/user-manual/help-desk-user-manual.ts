@@ -61,7 +61,7 @@ interface ManualPayload {
 })
 export class HelpDeskUserManual implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'User Manual' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'User Manual' }];
 
   readonly approvalPath = [
     'Implementing Partner (IP)',

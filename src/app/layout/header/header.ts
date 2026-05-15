@@ -37,7 +37,7 @@ export class Header {
   permittedMenus = computed(() => this.loginState()?.menus || []);
   allPermittedNames = computed(() => this.permittedMenus().map((m: any) => m.name));
 
-  // canAccessHelpDesk = computed(() => this.allPermittedNames().includes('Help Desk'));
+  // canAccessHelpDesk = computed(() => this.allPermittedNames().includes('Helpdesk'));
   canAccessHelpDesk = true;
 
   helpDeskChildren = computed(() => {
@@ -137,11 +137,11 @@ export class Header {
         tooltipText: 'Survey CTO Portal'
       },
          {
-        label: 'Help Desk',
+        label: 'Helpdesk',
         icon: 'fas fa-headset',
         link: environment.portals.helpDesk,
      
-        tooltipText: 'Help Desk Portal - IT Support',
+        tooltipText: 'Helpdesk Portal - IT Support',
       },
       {
         label: 'Monitoring & Evaluation',
@@ -256,11 +256,11 @@ export class Header {
 
   getHelpDeskMenuItems(): MenuItem[] {
     return [
-      { label: 'Help Desk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
+      { label: 'Helpdesk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
       { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
       { label: 'My Requests', routerLink: '/help-desk/my-requests', icon: 'fas fa-clipboard-list' },
       { label: 'Support Management', routerLink: '/help-desk/support-management', icon: 'fas fa-users-cog' },
-      { label: 'Assigned Requests', routerLink: '/help-desk/assigned-requests', icon: 'fas fa-user-check' },
+      { label: 'Request List', routerLink: '/help-desk/assigned-requests', icon: 'fas fa-user-check' },
       { label: 'Categories & Modules', routerLink: '/help-desk/setup', icon: 'fas fa-sliders' },
       { label: 'Status Tracker', routerLink: '/help-desk/status-tracker', icon: 'fas fa-search' },
       { label: 'Reports', routerLink: '/help-desk/reports', icon: 'fas fa-chart-bar' },

@@ -28,7 +28,7 @@ import { ApiService } from '../../../../services/api.service';
 })
 export class HelpDeskSubmitRequest implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Submit Support Request' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Submit Support Request' }];
 
   requestForm: FormGroup;
   selectedFiles: File[] = [];

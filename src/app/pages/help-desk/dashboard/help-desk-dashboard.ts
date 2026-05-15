@@ -19,7 +19,7 @@ import { ITDashboardCount, ITDashboardData, ITDashboardModuleSummary, ITDashboar
 })
 export class HelpDeskDashboard implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Dashboard' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Dashboard' }];
 
   isLoading = false;
   dashboard: ITDashboardData | null = null;

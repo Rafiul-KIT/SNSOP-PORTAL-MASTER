@@ -36,7 +36,7 @@ type LookupOption = {
 })
 export class HelpDeskMyRequests implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'My Requests' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'My Requests' }];
 
   isLoading = false;
   requests: ITRequest[] = [];

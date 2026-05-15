@@ -45,7 +45,7 @@ type LookupItem = {
 })
 export class HelpDeskSetup implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Categories & Modules' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Categories & Modules' }];
 
   isLoading = false;
   isSaving = false;

@@ -29,7 +29,7 @@ type WorkflowAction = {
 })
 export class HelpDeskRequestDetails implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/dashboard' };
-  breadcrumbItems = [{ label: 'Help Desk', routerLink: '/help-desk/support-management' }, { label: 'Request Detail' }];
+  breadcrumbItems = [{ label: 'Helpdesk', routerLink: '/help-desk/support-management' }, { label: 'Request Detail' }];
 
   isLoading = true;
   isUpdatingStatus = false;
