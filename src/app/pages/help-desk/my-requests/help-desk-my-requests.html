@@ -12,9 +12,9 @@
         <h2 class="page-title">My Requests</h2>
         <p class="page-subtitle">Review all submitted requests, current progress, and past support outcomes.</p>
       </div>
-      <!-- <div class="header-actions">
-        <p-button label="Export Report" icon="fas fa-download" [outlined]="true" severity="primary" size="small"></p-button>
-      </div> -->
+      <div class="header-actions">
+        <p-button label="New Support Request" icon="fas fa-plus" severity="primary" size="small" (onClick)="navigateTo('/help-desk/submit-request')"></p-button>
+      </div>
     </div>
 
     <div class="row g-3">
@@ -96,7 +96,7 @@
                   <th>Category</th>
                   <th>Module</th>
                   <th>Submodule</th>
-                  <th>Submitted</th>
+                  <!-- <th>Submitted</th> -->
                   <th class="action-col-cell">Action</th>
                 </tr>
              
@@ -120,7 +120,7 @@
                   <td>{{ req.categoryName || '--' }}</td>
                   <td>{{ req.moduleName || '--' }}</td>
                   <td>{{ req.submoduleName || '--' }}</td>
-                  <td>{{ formatDate(req.createdAt) }}</td>
+                  <!-- <td>{{ formatDate(getCreatedAt(req)) }}</td> -->
                   <td class="action-col-cell">
                     <div class="d-flex flex-wrap gap-1">
                       <p-button

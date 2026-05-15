@@ -18,7 +18,7 @@ import { ITReportSummaryRow, ItSupportService } from '../../../../services/it-su
 })
 export class HelpDeskReports implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Reports' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Reports' }];
 
   isLoading = false;
   selectedMonthDate: Date = this.getCurrentMonthDate();

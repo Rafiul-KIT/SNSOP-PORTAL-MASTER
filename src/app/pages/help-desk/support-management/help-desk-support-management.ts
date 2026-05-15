@@ -73,7 +73,7 @@ export class HelpDeskSupportManagement implements OnInit {
   private readonly MIS_FIRM_ROLE_IDS = [1, 51];
 
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Support Management' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Support Management' }];
 
   isLoading = false;
   searchText = '';

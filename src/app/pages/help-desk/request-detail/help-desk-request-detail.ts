@@ -26,7 +26,7 @@ export class HelpDeskRequestDetail implements OnInit {
   private readonly MIS_FIRM_ROLE_IDS = [51];
 
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/dashboard' };
-  breadcrumbItems = [{ label: 'Help Desk', routerLink: '/help-desk/my-requests' }, { label: 'Request Detail' }];
+  breadcrumbItems = [{ label: 'Helpdesk', routerLink: '/help-desk/my-requests' }, { label: 'Request Detail' }];
 
   isLoading = true;
   isSavingDetail = false;
@@ -67,7 +67,7 @@ export class HelpDeskRequestDetail implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.breadcrumbItems = [{ label: 'Help Desk', routerLink: this.getBackRoute() }, { label: 'Request Detail' }];
+    this.breadcrumbItems = [{ label: 'Helpdesk', routerLink: this.getBackRoute() }, { label: 'Request Detail' }];
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isFinite(id) || id <= 0) {
       this.router.navigate([this.getBackRoute()]);
@@ -205,6 +205,12 @@ export class HelpDeskRequestDetail implements OnInit {
     if (!value) return '--';
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString('en-GB');
+  }
+
+  getCreatedAt(request?: ITRequest | null): string {
+    if (!request) return '';
+    const anyRequest = request as any;
+    return anyRequest.createdAt || anyRequest.createdDate || anyRequest.creationDate || anyRequest.created_on || '';
   }
 
   getCategoryDisplay(request?: ITRequest | null): string {

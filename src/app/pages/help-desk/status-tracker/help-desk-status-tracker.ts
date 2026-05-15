@@ -21,7 +21,7 @@ type TimelineChange = { field: string; oldValue: string; newValue: string; isIni
 })
 export class HelpDeskStatusTracker {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Status Tracker' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Status Tracker' }];
 
   searchTrackingNo = '';
   ticketResult: ITRequest | null = null;

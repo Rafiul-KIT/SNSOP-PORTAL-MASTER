@@ -19,7 +19,7 @@ import { ITDashboardCount, ITDashboardData, ITDashboardModuleSummary, ITDashboar
 })
 export class HelpDeskDashboard implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Dashboard' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Dashboard' }];
 
   isLoading = false;
   dashboard: ITDashboardData | null = null;
@@ -124,11 +124,13 @@ export class HelpDeskDashboard implements OnInit {
           this.sixMonthsIssues = result?.reportedIssuesLastSixMonths || [];
 
           const priorityMap = result?.countsByPriority || {};
-          this.prioritySummary = Object.keys(priorityMap).map((priority) => ({
-            priority,
-            totalRequests: priorityMap[priority]?.totalRequests || 0,
-            resolvedRequests: priorityMap[priority]?.resolvedRequests || 0
-          }));
+          this.prioritySummary = Object.keys(priorityMap)
+            .filter((priority) => priority?.toUpperCase() !== 'CRITICAL')
+            .map((priority) => ({
+              priority,
+              totalRequests: priorityMap[priority]?.totalRequests || 0,
+              resolvedRequests: priorityMap[priority]?.resolvedRequests || 0
+            }));
           this.buildCharts();
 
           this.isLoading = false;

@@ -46,7 +46,7 @@ type LookupOption = {
 })
 export class HelpDeskAssignedRequests implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'Assigned Requests' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'Request List' }];
 
   isLoading = false;
   requests: ITRequest[] = [];
@@ -313,6 +313,12 @@ export class HelpDeskAssignedRequests implements OnInit {
       month: 'short',
       year: 'numeric',
     });
+  }
+
+  getCreatedAt(request?: ITRequest | null): string {
+    if (!request) return '';
+    const anyRequest = request as any;
+    return anyRequest.createdAt || anyRequest.createdDate || anyRequest.creationDate || anyRequest.created_on || '';
   }
 
   async onView(request: ITRequest): Promise<void> {

@@ -36,7 +36,7 @@ type LookupOption = {
 })
 export class HelpDeskMyRequests implements OnInit {
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/' };
-  breadcrumbItems = [{ label: 'Help Desk' }, { label: 'My Requests' }];
+  breadcrumbItems = [{ label: 'Helpdesk' }, { label: 'My Requests' }];
 
   isLoading = false;
   requests: ITRequest[] = [];
@@ -483,5 +483,15 @@ export class HelpDeskMyRequests implements OnInit {
     if (!dateStr) return '--';
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  getCreatedAt(request?: ITRequest | null): string {
+    if (!request) return '';
+    const anyRequest = request as any;
+    return anyRequest.createdAt || anyRequest.createdDate || anyRequest.creationDate || anyRequest.created_on || '';
+  }
+
+  navigateTo(path: string): void {
+    this.router.navigateByUrl(path);
   }
 }
