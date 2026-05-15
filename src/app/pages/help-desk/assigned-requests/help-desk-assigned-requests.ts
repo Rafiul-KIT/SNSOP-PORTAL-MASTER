@@ -315,6 +315,12 @@ export class HelpDeskAssignedRequests implements OnInit {
     });
   }
 
+  getCreatedAt(request?: ITRequest | null): string {
+    if (!request) return '';
+    const anyRequest = request as any;
+    return anyRequest.createdAt || anyRequest.createdDate || anyRequest.creationDate || anyRequest.created_on || '';
+  }
+
   async onView(request: ITRequest): Promise<void> {
     await this.router.navigate(['/help-desk/request-details', request.id]);
   }

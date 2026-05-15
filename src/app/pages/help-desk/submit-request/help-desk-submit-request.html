@@ -32,20 +32,6 @@
                 <input type="text" pInputText class="w-100" formControlName="issueTitle" placeholder="Enter issue title" />
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label">Issue Type</label>
-                <p-select [options]="issueTypes" formControlName="issueType" optionLabel="label" optionValue="value" placeholder="Select issue type" class="w-100" />
-              </div>
-                   <div class="col-12 col-md-6">
-                <label class="form-label">Category</label>
-                <p-select [options]="categories" formControlName="category" optionLabel="label" optionValue="value" placeholder="Select category" class="w-100" />
-              </div>
-              @if (isOtherCategorySelected()) {
-                <div class="col-12 col-md-6">
-                  <label class="form-label">Other Category</label>
-                  <input type="text" pInputText class="w-100" formControlName="otherCategory" placeholder="Enter other category" />
-                </div>
-              }
-              <div class="col-12 col-md-6">
                 <label class="form-label">Priority <span class="required-asterisk">*</span></label>
                 <p-select [options]="priorities" formControlName="priority" optionLabel="label" optionValue="value" placeholder="Select priority" class="w-100" />
                 @if (requestForm.get('priority')?.invalid && (requestForm.get('priority')?.dirty || requestForm.get('priority')?.touched)) {
@@ -69,14 +55,24 @@
                   optionValue="value"
                   placeholder="Select submodule"
                   class="w-100"
-                  [disabled]="!requestForm.get('module')?.value"
                 />
-                @if (requestForm.get('submodule')?.invalid && (requestForm.get('submodule')?.dirty || requestForm.get('submodule')?.touched)) {
-                  <small class="error-text">Submodule is required.</small>
-                }
                 @if (requestForm.get('module')?.value && filteredSubmodules.length === 0) {
                   <small class="hint-text">No submodules found for the selected module.</small>
                 }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Category</label>
+                <p-select [options]="categories" formControlName="category" optionLabel="label" optionValue="value" placeholder="Select category" class="w-100" />
+              </div>
+              @if (isOtherCategorySelected()) {
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Other Category</label>
+                  <input type="text" pInputText class="w-100" formControlName="otherCategory" placeholder="Enter other category" />
+                </div>
+              }
+              <div class="col-12 col-md-6">
+                <label class="form-label">Issue Type</label>
+                <p-select [options]="issueTypes" formControlName="issueType" optionLabel="label" optionValue="value" placeholder="Select issue type" class="w-100" />
               </div>
 
               <div class="col-12">

@@ -69,7 +69,7 @@ export class HelpDeskSubmitRequest implements OnInit {
       priority: [null, Validators.required],
       description: [''],
       module: [null, Validators.required],
-      submodule: [null],
+      submodule: [{ value: null, disabled: true }],
       notification: ['EMAIL'],
       attachments: [null]
     });
@@ -155,11 +155,18 @@ export class HelpDeskSubmitRequest implements OnInit {
   }
 
   private onModuleChange(resetSubmodule: boolean = true): void {
+    const moduleControl = this.requestForm.get('module');
     const submoduleControl = this.requestForm.get('submodule');
-    if (!submoduleControl) return;
+    if (!submoduleControl || !moduleControl) return;
 
     if (resetSubmodule) {
       submoduleControl.setValue(null, { emitEvent: false });
+    }
+
+    if (moduleControl.value) {
+      submoduleControl.enable({ emitEvent: false });
+    } else {
+      submoduleControl.disable({ emitEvent: false });
     }
 
     submoduleControl.updateValueAndValidity({ emitEvent: false });

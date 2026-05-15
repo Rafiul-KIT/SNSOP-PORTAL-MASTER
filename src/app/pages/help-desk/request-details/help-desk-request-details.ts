@@ -8,7 +8,6 @@ import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITAttachment, ITHistory, ITRequest, ItSupportService } from '../../../../services/it-support.service';
-import { ApiService } from '../../../../services/api.service';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
@@ -29,8 +28,6 @@ type WorkflowAction = {
   styleUrls: ['./help-desk-request-details.scss'],
 })
 export class HelpDeskRequestDetails implements OnInit {
-  private readonly MANAGER_GRM_ROLE_IDS = [51];
-
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/dashboard' };
   breadcrumbItems = [{ label: 'Help Desk', routerLink: '/help-desk/support-management' }, { label: 'Request Detail' }];
 
@@ -45,8 +42,7 @@ export class HelpDeskRequestDetails implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private itSupportService: ItSupportService,
-    private apiService: ApiService
+    private itSupportService: ItSupportService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -118,92 +114,33 @@ export class HelpDeskRequestDetails implements OnInit {
     }
   }
 
-  private getCurrentUser(): any {
-    return this.apiService.loginState()?.user || {};
-  }
-
-  private getCurrentUserId(): number | null {
-    const user = this.getCurrentUser();
-    const raw = user?.userId ?? user?.id ?? user?.uid ?? user?.sub ?? null;
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }
-
-  private isManagerGrmUser(): boolean {
-    const user = this.getCurrentUser();
-    const roleId = Number(user?.roleId);
-    const roleName = String(user?.roleName || user?.role || '').toUpperCase();
-
-    return (
-      this.MANAGER_GRM_ROLE_IDS.includes(roleId) ||
-      roleName.includes('MANAGERGRM') ||
-      roleName.includes('MANAGER GRM') ||
-      roleName.includes('MIS_FIRM') ||
-      roleName.includes('MIS FIRM')
-    );
-  }
-
-  private isRequestCreator(request?: ITRequest | null): boolean {
-    if (!request) return false;
-    const currentUserId = this.getCurrentUserId();
-    if (!currentUserId) return false;
-    return Number(request.createdBy) === currentUserId;
-  }
-
   private canTransition(fromStatus?: string, toStatus?: string): boolean {
     const from = String(fromStatus || '').toUpperCase();
     const to = String(toStatus || '').toUpperCase();
-    const isManagerGrm = this.isManagerGrmUser();
 
     if (!from || !to) return false;
 
-    if (isManagerGrm) {
-      return (
-        (from === 'NEW' && to === 'PROCESSING') ||
-        (from === 'PROCESSING' && ['REQUIRED_MORE_INFO', 'ADDRESSED', 'CLOSED'].includes(to)) ||
-        (from === 'REOPENED' && to === 'PROCESSING')
-      );
-    }
-
     return (
-      (from === 'ADDRESSED' && to === 'RESOLVED') ||
-      (from === 'RESOLVED' && to === 'CLOSED') ||
-      (from === 'CLOSED' && to === 'REOPENED')
+      (from === 'NEW' && to === 'PROCESSING') ||
+      (from === 'PROCESSING' && ['REQUIRED_MORE_INFO', 'ADDRESSED', 'CLOSED'].includes(to)) ||
+      (from === 'REOPENED' && to === 'PROCESSING')
     );
   }
 
   getAvailableActions(request: ITRequest): WorkflowAction[] {
-    const isManagerGrm = this.isManagerGrmUser();
     const status = request.status?.toUpperCase() || '';
 
-    if (isManagerGrm) {
-      switch (status) {
-        case 'NEW':
-          return [{ label: 'Move to Processing', value: 'PROCESSING', needsComment: false, actionType: 'status' }];
-        case 'PROCESSING':
-          return [
-            { label: 'Ask For More Info', value: 'REQUIRED_MORE_INFO', needsComment: true, actionType: 'status' },
-            { label: 'Mark Addressed', value: 'ADDRESSED', needsComment: false, actionType: 'status' },
-            { label: 'Close', value: 'CLOSED', needsComment: true, actionType: 'status' },
-          ];
-        case 'REOPENED':
-          return [{ label: 'Move to Processing', value: 'PROCESSING', needsComment: false, actionType: 'status' }];
-        default:
-          return [];
-      }
-    }
-
-    if (!this.isRequestCreator(request)) return [];
-
     switch (status) {
-      case 'REQUIRED_MORE_INFO':
-        return [{ label: 'Submit Required Info', value: 'PROCESSING', needsComment: false, actionType: 'submit_info' }];
-      case 'ADDRESSED':
-        return [{ label: 'Mark Resolved', value: 'RESOLVED', needsComment: false, actionType: 'status' }];
-      case 'RESOLVED':
-        return [{ label: 'Close', value: 'CLOSED', needsComment: true, actionType: 'status' }];
-      case 'CLOSED':
-        return [{ label: 'Reopen', value: 'REOPENED', needsComment: true, actionType: 'status' }];
+      case 'NEW':
+        return [{ label: 'Move to Processing', value: 'PROCESSING', needsComment: false, actionType: 'status' }];
+      case 'PROCESSING':
+        return [
+          { label: 'Ask For More Info', value: 'REQUIRED_MORE_INFO', needsComment: true, actionType: 'status' },
+          { label: 'Mark Addressed', value: 'ADDRESSED', needsComment: false, actionType: 'status' },
+          { label: 'Close', value: 'CLOSED', needsComment: true, actionType: 'status' },
+        ];
+      case 'REOPENED':
+        return [{ label: 'Move to Processing', value: 'PROCESSING', needsComment: false, actionType: 'status' }];
       default:
         return [];
     }
@@ -245,6 +182,12 @@ export class HelpDeskRequestDetails implements OnInit {
     if (!value) return '--';
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString('en-GB');
+  }
+
+  getCreatedAt(request?: ITRequest | null): string {
+    if (!request) return '';
+    const anyRequest = request as any;
+    return anyRequest.createdAt || anyRequest.createdDate || anyRequest.creationDate || anyRequest.created_on || '';
   }
 
   getCategoryDisplay(request?: ITRequest | null): string {

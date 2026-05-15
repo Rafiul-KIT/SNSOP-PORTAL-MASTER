@@ -81,7 +81,7 @@
                 <th>Module</th>
                 <th>Submodule</th>
                 <th>Assigned To</th>
-                <th>Submitted</th>
+                <!-- <th>Submitted</th> -->
                 <th>Actions</th>
               </tr>
             </ng-template>
@@ -105,7 +105,7 @@
                     }
                   </div>
                 </td>
-                <td>{{ formatDate(ticket.createdAt) }}</td>
+                <!-- <td>{{ formatDate(getCreatedAt(ticket)) }}</td> -->
                 <td>
                   <div class="d-flex flex-wrap gap-1">
                     <p-button label="View" severity="secondary" size="small" [outlined]="true" (onClick)="onView(ticket)"></p-button>

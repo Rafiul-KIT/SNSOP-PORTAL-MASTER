@@ -207,6 +207,12 @@ export class HelpDeskRequestDetail implements OnInit {
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString('en-GB');
   }
 
+  getCreatedAt(request?: ITRequest | null): string {
+    if (!request) return '';
+    const anyRequest = request as any;
+    return anyRequest.createdAt || anyRequest.createdDate || anyRequest.creationDate || anyRequest.created_on || '';
+  }
+
   getCategoryDisplay(request?: ITRequest | null): string {
     if (!request) return '--';
     const categoryName = request.categoryName || '--';

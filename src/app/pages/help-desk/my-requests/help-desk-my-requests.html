@@ -96,7 +96,7 @@
                   <th>Category</th>
                   <th>Module</th>
                   <th>Submodule</th>
-                  <th>Submitted</th>
+                  <!-- <th>Submitted</th> -->
                   <th class="action-col-cell">Action</th>
                 </tr>
              
@@ -120,7 +120,7 @@
                   <td>{{ req.categoryName || '--' }}</td>
                   <td>{{ req.moduleName || '--' }}</td>
                   <td>{{ req.submoduleName || '--' }}</td>
-                  <td>{{ formatDate(req.createdAt) }}</td>
+                  <!-- <td>{{ formatDate(getCreatedAt(req)) }}</td> -->
                   <td class="action-col-cell">
                     <div class="d-flex flex-wrap gap-1">
                       <p-button
