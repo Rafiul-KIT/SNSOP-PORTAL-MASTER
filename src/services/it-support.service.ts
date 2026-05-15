@@ -157,11 +157,17 @@ export interface ITSubmodulePayload extends ITLookupPayload {
   parentModuleId: number;
 }
 
+type ITIssueType = 'TECHNICAL' | 'OPERATIONAL' | 'SUPPORT';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ItSupportService {
   private readonly baseEndpoint = 'api/v1/it-support';
+  private readonly allowedIssueTypes = new Set<ITIssueType>(['TECHNICAL', 'OPERATIONAL', 'SUPPORT']);
+  private readonly issueTypeAliases: Record<string, ITIssueType> = {
+    OTHER: 'SUPPORT',
+  };
 
   constructor(private api: ApiService) {}
 
@@ -188,6 +194,91 @@ export class ItSupportService {
         formData.append('files', file, file.name);
       }
     });
+  }
+
+  private normalizeIssueType(issueType?: string | null): ITIssueType | null {
+    const normalized = String(issueType || '').trim().toUpperCase();
+    if (!normalized) return null;
+
+    const candidate = this.issueTypeAliases[normalized] || normalized;
+    return this.allowedIssueTypes.has(candidate as ITIssueType) ? (candidate as ITIssueType) : null;
+  }
+
+  private hasApiId(value: unknown): boolean {
+    return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 0;
+  }
+
+  private buildRequestQueryParams(params: ITSearchParams = {}, issueType?: ITIssueType | null): Record<string, any> {
+    const queryParams: Record<string, any> = {};
+
+    if (params.status) queryParams['status'] = params.status;
+    if (params.categoryId) queryParams['categoryId'] = params.categoryId;
+    if (params.moduleId) queryParams['moduleId'] = params.moduleId;
+    if (params.submoduleId) queryParams['submoduleId'] = params.submoduleId;
+    if (issueType) queryParams['issueType'] = issueType;
+    if (params.priority) queryParams['priority'] = params.priority;
+    if (params.trackingNumber) queryParams['trackingNumber'] = params.trackingNumber;
+    if (params.assignedTo) queryParams['assignedTo'] = params.assignedTo;
+    if (params.search) queryParams['search'] = params.search;
+    if (params.page !== undefined) queryParams['page'] = params.page;
+    if (params.size !== undefined) queryParams['size'] = params.size;
+
+    return queryParams;
+  }
+
+  private async fetchRequestList(
+    endpoint: string,
+    queryParams: Record<string, any>
+  ): Promise<{ items: ITRequest[]; total: number; pagination?: ITPagination; failed?: boolean }> {
+    try {
+      const res = await this.api.GET<any>(endpoint, queryParams);
+      const response = this.parseApiResponse<ITRequest[]>(res);
+
+      if (response?.success) {
+        const items = Array.isArray(response.data) ? response.data : [];
+        const total = response.pagination?.totalElements ?? items.length;
+        return { items, total, pagination: response.pagination };
+      }
+
+      return { items: [], total: 0, failed: true };
+    } catch {
+      return { items: [], total: 0, failed: true };
+    }
+  }
+
+  private getRequestTimestamp(request: ITRequest): number {
+    const raw = request.updatedAt || request.createdAt || '';
+    const timestamp = new Date(raw).getTime();
+    if (Number.isFinite(timestamp)) return timestamp;
+
+    const id = Number(request.id);
+    return Number.isFinite(id) ? id : 0;
+  }
+
+  private async fetchRequestsAcrossValidIssueTypes(
+    endpoint: string,
+    params: ITSearchParams = {}
+  ): Promise<{ items: ITRequest[]; total: number; pagination?: ITPagination }> {
+    const page = Number.isFinite(Number(params.page)) && Number(params.page) >= 0 ? Number(params.page) : 0;
+    const size = Number.isFinite(Number(params.size)) && Number(params.size) > 0 ? Number(params.size) : 20;
+    const fetchSize = size * (page + 1);
+
+    const results = await Promise.all(
+      Array.from(this.allowedIssueTypes).map((issueType) =>
+        this.fetchRequestList(endpoint, this.buildRequestQueryParams({ ...params, page: 0, size: fetchSize }, issueType))
+      )
+    );
+
+    const items = results
+      .flatMap((result) => result.items)
+      .sort((a, b) => this.getRequestTimestamp(b) - this.getRequestTimestamp(a));
+    const total = results.reduce((sum, result) => sum + result.total, 0);
+    const start = page * size;
+
+    return {
+      items: items.slice(start, start + size),
+      total,
+    };
   }
 
   async getCategories(): Promise<ITCategory[]> {
@@ -347,64 +438,33 @@ export class ItSupportService {
   }
 
   async getRequests(params: ITSearchParams = {}): Promise<{ items: ITRequest[]; total: number; pagination?: ITPagination }> {
-    const queryParams: Record<string, any> = {};
+    const endpoint = `${this.baseEndpoint}/requests`;
+    const normalizedIssueType = this.normalizeIssueType(params.issueType);
 
-    if (params.status) queryParams['status'] = params.status;
-    if (params.categoryId) queryParams['categoryId'] = params.categoryId;
-    if (params.moduleId) queryParams['moduleId'] = params.moduleId;
-    if (params.submoduleId) queryParams['submoduleId'] = params.submoduleId;
-    if (params.issueType) queryParams['issueType'] = params.issueType;
-    if (params.priority) queryParams['priority'] = params.priority;
-    if (params.trackingNumber) queryParams['trackingNumber'] = params.trackingNumber;
-    if (params.assignedTo) queryParams['assignedTo'] = params.assignedTo;
-    if (params.search) queryParams['search'] = params.search;
-    if (params.page !== undefined) queryParams['page'] = params.page;
-    if (params.size !== undefined) queryParams['size'] = params.size;
+    if (!params.issueType) {
+      const result = await this.fetchRequestList(endpoint, this.buildRequestQueryParams(params));
+      if (!result.failed) return result;
 
-    try {
-      const res = await this.api.GET<any>(`${this.baseEndpoint}/requests`, queryParams);
-      const response = this.parseApiResponse<ITRequest[]>(res);
-
-      if (response?.success) {
-        const items = Array.isArray(response.data) ? response.data : [];
-        const total = response.pagination?.totalElements ?? items.length;
-        return { items, total, pagination: response.pagination };
-      }
-
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
+      return this.fetchRequestsAcrossValidIssueTypes(endpoint, params);
     }
+
+    if (!normalizedIssueType) return { items: [], total: 0 };
+    return this.fetchRequestList(endpoint, this.buildRequestQueryParams(params, normalizedIssueType));
   }
 
   async getAssignedRequests(params: ITSearchParams = {}): Promise<{ items: ITRequest[]; total: number; pagination?: ITPagination }> {
-    const queryParams: Record<string, any> = {};
+    const endpoint = `${this.baseEndpoint}/requests/assigned`;
+    const normalizedIssueType = this.normalizeIssueType(params.issueType);
 
-    if (params.status) queryParams['status'] = params.status;
-    if (params.categoryId) queryParams['categoryId'] = params.categoryId;
-    if (params.moduleId) queryParams['moduleId'] = params.moduleId;
-    if (params.submoduleId) queryParams['submoduleId'] = params.submoduleId;
-    if (params.issueType) queryParams['issueType'] = params.issueType;
-    if (params.priority) queryParams['priority'] = params.priority;
-    if (params.trackingNumber) queryParams['trackingNumber'] = params.trackingNumber;
-    if (params.search) queryParams['search'] = params.search;
-    if (params.page !== undefined) queryParams['page'] = params.page;
-    if (params.size !== undefined) queryParams['size'] = params.size;
+    if (!params.issueType) {
+      const result = await this.fetchRequestList(endpoint, this.buildRequestQueryParams(params));
+      if (!result.failed) return result;
 
-    try {
-      const res = await this.api.GET<any>(`${this.baseEndpoint}/requests/assigned`, queryParams);
-      const response = this.parseApiResponse<ITRequest[]>(res);
-
-      if (response?.success) {
-        const items = Array.isArray(response.data) ? response.data : [];
-        const total = response.pagination?.totalElements ?? items.length;
-        return { items, total, pagination: response.pagination };
-      }
-
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
+      return this.fetchRequestsAcrossValidIssueTypes(endpoint, params);
     }
+
+    if (!normalizedIssueType) return { items: [], total: 0 };
+    return this.fetchRequestList(endpoint, this.buildRequestQueryParams(params, normalizedIssueType));
   }
 
   async getRequestById(id: number): Promise<ITRequest | null> {
@@ -503,8 +563,8 @@ export class ItSupportService {
   async createRequest(payload: {
     title: string;
     description: string;
-    issueType: string | null;
-    categoryId: number;
+    issueType?: string | null;
+    categoryId?: number | null;
     otherCategory?: string | null;
     moduleId?: number | null;
     submoduleId?: number | null;
@@ -513,27 +573,43 @@ export class ItSupportService {
   }): Promise<{ success: boolean; request?: ITRequest; trackingNumber?: string; message?: string }> {
     try {
       const formData = new FormData();
+      const title = String(payload.title || '').trim();
+      const description = String(payload.description || '').trim();
+      const issueType = this.normalizeIssueType(payload.issueType);
+      const categoryId = Number(payload.categoryId);
+      const moduleId = Number(payload.moduleId);
+      const submoduleId = Number(payload.submoduleId);
+      const priority = String(payload.priority || '').trim().toUpperCase();
+      const otherCategory = String(payload.otherCategory || '').trim();
+
+      if (!title) return { success: false, message: 'Title is required' };
+      if (!description) return { success: false, message: 'Description is required' };
+      if (!issueType) return { success: false, message: 'Issue Type is required' };
+      if (!this.hasApiId(payload.moduleId)) {
+        return { success: false, message: 'Module is required' };
+      }
+      if (!priority) return { success: false, message: 'Priority is required' };
 
       const requestPayload: {
         title: string;
         description: string;
-        issueType: string | null;
-        categoryId: number;
-        otherCategory: string | null;
+        issueType: ITIssueType;
+        categoryId?: number;
+        moduleId: number;
         priority: string;
-        moduleId?: number;
         submoduleId?: number;
+        otherCategory?: string;
       } = {
-        title: payload.title,
-        description: payload.description,
-        issueType: payload.issueType,
-        categoryId: payload.categoryId,
-        otherCategory: payload.otherCategory ?? null,
-        priority: payload.priority,
+        title,
+        description,
+        issueType,
+        moduleId,
+        priority,
       };
 
-      if (payload.moduleId) requestPayload.moduleId = payload.moduleId;
-      if (payload.submoduleId) requestPayload.submoduleId = payload.submoduleId;
+      if (this.hasApiId(payload.categoryId)) requestPayload.categoryId = categoryId;
+      if (this.hasApiId(payload.submoduleId)) requestPayload.submoduleId = submoduleId;
+      if (otherCategory) requestPayload.otherCategory = otherCategory;
 
       formData.append('payload', new Blob([JSON.stringify(requestPayload)], { type: 'application/json' }));
       this.appendFiles(formData, payload.files);
