@@ -12,7 +12,7 @@ import { Loader } from '../../../components/loader/loader';
 import Swal from 'sweetalert2';
 
 import { TableModule } from 'primeng/table';
-import { ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
+import { IT_SUPPORT_ISSUE_TYPE_OPTIONS, IT_SUPPORT_PRIORITY_OPTIONS, ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 type WorkflowAction = {
@@ -72,17 +72,12 @@ export class HelpDeskMyRequests implements OnInit {
 
   priorityOptions = [
     { label: 'All Priorities', value: '' },
-    { label: 'Critical', value: 'CRITICAL' },
-    { label: 'High', value: 'HIGH' },
-    { label: 'Medium', value: 'MEDIUM' },
-    { label: 'Low', value: 'LOW' }
+    ...IT_SUPPORT_PRIORITY_OPTIONS
   ];
 
   issueTypeOptions = [
     { label: 'All Types', value: '' },
-    { label: 'Technical', value: 'TECHNICAL' },
-    { label: 'Operational', value: 'OPERATIONAL' },
-    { label: 'Other', value: 'OTHER' }
+    ...IT_SUPPORT_ISSUE_TYPE_OPTIONS
   ];
 
   selectedStatus = '';

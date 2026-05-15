@@ -11,7 +11,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
+import { IT_SUPPORT_ISSUE_TYPE_OPTIONS, IT_SUPPORT_PRIORITY_OPTIONS, ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 
@@ -80,17 +80,12 @@ export class HelpDeskAssignedRequests implements OnInit {
 
   priorityOptions = [
     { label: 'All', value: null },
-    { label: 'Critical', value: 'CRITICAL' },
-    { label: 'High', value: 'HIGH' },
-    { label: 'Medium', value: 'MEDIUM' },
-    { label: 'Low', value: 'LOW' },
+    ...IT_SUPPORT_PRIORITY_OPTIONS,
   ];
 
   issueTypeOptions = [
     { label: 'All', value: null },
-    { label: 'Technical', value: 'TECHNICAL' },
-    { label: 'Operational', value: 'OPERATIONAL' },
-    { label: 'Other', value: 'OTHER' },
+    ...IT_SUPPORT_ISSUE_TYPE_OPTIONS,
   ];
 
   constructor(
