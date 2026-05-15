@@ -116,10 +116,10 @@ export class ApiService {
 
   DELETE= <T = any>(endpoint: string, base: BaseKey = 'global', config?: AxiosRequestConfig) =>
     this.client(base).delete<T>(endpoint, { ...this.apiHeader, ...(config ?? {}) });
-    POST_FORM = async <T = any>(endpoint: string, formData: FormData, base: BaseKey = 'global'): Promise<T> => {
+  POST_FORM = async <T = any>(endpoint: string, formData: FormData, base: BaseKey = 'global'): Promise<T> => {
     const token = this.cookies.get(this.ACCESS_TOKEN);
     const baseURL = base === 'alt' ? this.altApi : this.globalApi;
-    
+
     const response = await fetch(`${baseURL}${endpoint}`, {
       method: 'POST',
       headers: {
@@ -127,9 +127,16 @@ export class ApiService {
       },
       body: formData
     });
-    
-    const data = await response.json();
-    return { data } as T;
+
+    const text = await response.text();
+    let data: any = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = text;
+    }
+
+    return { data, status: response.status } as T;
   };
 
   private buildRequestConfig(payload?: any, config?: AxiosRequestConfig): AxiosRequestConfig {

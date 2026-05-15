@@ -62,7 +62,7 @@ export class HelpDeskSubmitRequest implements OnInit {
   ) {
     this.requestForm = this.fb.group({
       issueTitle: ['', Validators.required],
-      issueType: [null],
+      issueType: [null, Validators.required],
       category: [null],
       otherCategory: [null],
       priority: [null, Validators.required],
@@ -87,6 +87,10 @@ export class HelpDeskSubmitRequest implements OnInit {
 
   private detectChanges(): void {
     this.cdr.detectChanges();
+  }
+
+  private hasSelectedValue(value: unknown): boolean {
+    return value !== null && value !== undefined && value !== '';
   }
 
   async navigateToSetup(): Promise<void> {
@@ -147,8 +151,11 @@ export class HelpDeskSubmitRequest implements OnInit {
   }
 
   get filteredSubmodules(): Array<{ label: string; value: number; parentModuleId: number }> {
-    const selectedModuleId = Number(this.requestForm.get('module')?.value);
-    if (!selectedModuleId) return [];
+    const selectedModuleValue = this.requestForm.get('module')?.value;
+    if (!this.hasSelectedValue(selectedModuleValue)) return [];
+
+    const selectedModuleId = Number(selectedModuleValue);
+    if (!Number.isFinite(selectedModuleId)) return [];
 
     return this.submodules.filter((submodule) => Number(submodule.parentModuleId) === selectedModuleId);
   }
@@ -162,7 +169,7 @@ export class HelpDeskSubmitRequest implements OnInit {
       submoduleControl.setValue(null, { emitEvent: false });
     }
 
-    if (moduleControl.value) {
+    if (this.hasSelectedValue(moduleControl.value)) {
       submoduleControl.enable({ emitEvent: false });
     } else {
       submoduleControl.disable({ emitEvent: false });
@@ -177,7 +184,9 @@ export class HelpDeskSubmitRequest implements OnInit {
     if (!otherCategoryControl) return;
 
     otherCategoryControl.clearValidators();
-    if (!this.isOtherCategorySelected()) {
+    if (this.isOtherCategorySelected()) {
+      otherCategoryControl.setValidators([Validators.required]);
+    } else {
       otherCategoryControl.setValue(null, { emitEvent: false });
     }
 
@@ -265,7 +274,7 @@ export class HelpDeskSubmitRequest implements OnInit {
       this.isSubmitting = true;
       this.detectChanges();
       
-      const formValue = this.requestForm.value;
+      const formValue = this.requestForm.getRawValue();
       const otherCategory = this.isOtherCategorySelected()
         ? String(formValue.otherCategory || '').trim()
         : null;
@@ -279,8 +288,8 @@ export class HelpDeskSubmitRequest implements OnInit {
           issueType: formValue.issueType,
           categoryId: formValue.category,
           otherCategory,
-          moduleId: Number.isFinite(moduleId) && moduleId > 0 ? moduleId : undefined,
-          submoduleId: Number.isFinite(submoduleId) && submoduleId > 0 ? submoduleId : undefined,
+          moduleId: this.hasSelectedValue(formValue.module) && Number.isFinite(moduleId) ? moduleId : undefined,
+          submoduleId: this.hasSelectedValue(formValue.submodule) && Number.isFinite(submoduleId) ? submoduleId : undefined,
           priority: formValue.priority,
           files: this.selectedFiles
         });

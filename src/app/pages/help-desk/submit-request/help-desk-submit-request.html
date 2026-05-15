@@ -64,18 +64,24 @@
                 }
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label">Category</label>
+                <label class="form-label">Category </label>
                 <p-select [options]="categories" formControlName="category" optionLabel="label" optionValue="value" placeholder="Select category" class="w-100" />
               </div>
               @if (isOtherCategorySelected()) {
                 <div class="col-12 col-md-6">
-                  <label class="form-label">Other Category</label>
+                  <label class="form-label">Other Category <span class="required-asterisk">*</span></label>
                   <input type="text" pInputText class="w-100" formControlName="otherCategory" placeholder="Enter other category" />
+                  @if (requestForm.get('otherCategory')?.invalid && (requestForm.get('otherCategory')?.dirty || requestForm.get('otherCategory')?.touched)) {
+                    <small class="error-text">Other Category is required.</small>
+                  }
                 </div>
               }
               <div class="col-12 col-md-6">
-                <label class="form-label">Issue Type</label>
+                <label class="form-label">Issue Type <span class="required-asterisk">*</span></label>
                 <p-select [options]="issueTypes" formControlName="issueType" optionLabel="label" optionValue="value" placeholder="Select issue type" class="w-100" />
+                @if (requestForm.get('issueType')?.invalid && (requestForm.get('issueType')?.dirty || requestForm.get('issueType')?.touched)) {
+                  <small class="error-text">Issue Type is required.</small>
+                }
               </div>
 
               <div class="col-12">
