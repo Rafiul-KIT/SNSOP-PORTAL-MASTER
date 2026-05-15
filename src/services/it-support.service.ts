@@ -48,12 +48,36 @@ export interface ITAssignedUser {
   email: string;
 }
 
+export enum ItSupportPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}
+
+export const IT_SUPPORT_PRIORITY_OPTIONS = [
+  { label: 'Low', value: ItSupportPriority.LOW },
+  { label: 'Medium', value: ItSupportPriority.MEDIUM },
+  { label: 'High', value: ItSupportPriority.HIGH },
+];
+
+export enum ItSupportIssueType {
+  TECHNICAL = 'TECHNICAL',
+  OPERATIONAL = 'OPERATIONAL',
+  SUPPORT = 'SUPPORT',
+}
+
+export const IT_SUPPORT_ISSUE_TYPE_OPTIONS = [
+  { label: 'Technical', value: ItSupportIssueType.TECHNICAL },
+  { label: 'Operational', value: ItSupportIssueType.OPERATIONAL },
+  { label: 'Support', value: ItSupportIssueType.SUPPORT },
+];
+
 export interface ITRequest {
   id: number;
   trackingNumber: string;
   title: string;
   description: string;
-  issueType?: 'TECHNICAL' | 'OPERATIONAL' | 'OTHER' | string;
+  issueType?: ItSupportIssueType | string;
   categoryId: number;
   categoryName: string;
   otherCategory?: string | null;
@@ -61,7 +85,7 @@ export interface ITRequest {
   moduleName: string;
   submoduleId?: number;
   submoduleName?: string;
-  priority: string;
+  priority: ItSupportPriority | string;
   status: string;
   comment: string;
   createdBy: number;
@@ -105,8 +129,8 @@ export interface ITSearchParams {
   categoryId?: number;
   moduleId?: number;
   submoduleId?: number;
-  issueType?: string;
-  priority?: string;
+  issueType?: ItSupportIssueType | string;
+  priority?: ItSupportPriority | string;
   trackingNumber?: string;
   assignedTo?: number;
   search?: string;
@@ -503,12 +527,12 @@ export class ItSupportService {
   async createRequest(payload: {
     title: string;
     description: string;
-    issueType: string;
+    issueType: ItSupportIssueType | string | null;
     categoryId: number;
     otherCategory?: string | null;
     moduleId?: number | null;
     submoduleId?: number | null;
-    priority: string;
+    priority: ItSupportPriority | string;
     files?: File[];
   }): Promise<{ success: boolean; request?: ITRequest; trackingNumber?: string; message?: string }> {
     try {
@@ -517,10 +541,10 @@ export class ItSupportService {
       const requestPayload: {
         title: string;
         description: string;
-        issueType: string;
+        issueType: ItSupportIssueType | string | null;
         categoryId: number;
         otherCategory: string | null;
-        priority: string;
+        priority: ItSupportPriority | string;
         moduleId?: number;
         submoduleId?: number;
       } = {
@@ -557,7 +581,7 @@ export class ItSupportService {
 
   async updateRequest(
     id: number,
-    payload: { description: string; categoryId: number; otherCategory?: string | null; moduleId: number; priority: string }
+    payload: { description: string; categoryId: number; otherCategory?: string | null; moduleId: number; priority: ItSupportPriority | string }
   ): Promise<{ success: boolean; request?: ITRequest; message?: string }> {
     try {
       const res = await this.api.PUT<any>(`${this.baseEndpoint}/requests/${id}`, payload);

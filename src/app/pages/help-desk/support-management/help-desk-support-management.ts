@@ -12,7 +12,7 @@ import { DialogModule } from 'primeng/dialog';
 import { PaginatorModule } from 'primeng/paginator';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
+import { IT_SUPPORT_ISSUE_TYPE_OPTIONS, IT_SUPPORT_PRIORITY_OPTIONS, ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 
@@ -121,17 +121,12 @@ export class HelpDeskSupportManagement implements OnInit {
 
   priorityOptions = [
     { label: 'All', value: null },
-    { label: 'Critical', value: 'CRITICAL' },
-    { label: 'High', value: 'HIGH' },
-    { label: 'Medium', value: 'MEDIUM' },
-    { label: 'Low', value: 'LOW' },
+    ...IT_SUPPORT_PRIORITY_OPTIONS,
   ];
 
   issueTypeOptions = [
     { label: 'All', value: null },
-    { label: 'Technical', value: 'TECHNICAL' },
-    { label: 'Operational', value: 'OPERATIONAL' },
-    { label: 'Other', value: 'OTHER' },
+    ...IT_SUPPORT_ISSUE_TYPE_OPTIONS,
   ];
 
   requests: ITRequest[] = [];

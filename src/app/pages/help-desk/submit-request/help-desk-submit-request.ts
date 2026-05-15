@@ -12,7 +12,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITCategory, ITModule, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
+import { IT_SUPPORT_ISSUE_TYPE_OPTIONS, IT_SUPPORT_PRIORITY_OPTIONS, ITCategory, ITModule, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 @Component({
@@ -40,18 +40,9 @@ export class HelpDeskSubmitRequest implements OnInit {
   modules: { label: string; value: number }[] = [];
   submodules: Array<{ label: string; value: number; parentModuleId: number }> = [];
 
-  priorities = [
-    { label: 'Critical', value: 'CRITICAL' },
-    { label: 'High', value: 'HIGH' },
-    { label: 'Medium', value: 'MEDIUM' },
-    { label: 'Low', value: 'LOW' }
-  ];
+  priorities = IT_SUPPORT_PRIORITY_OPTIONS;
 
-  issueTypes = [
-    { label: 'Technical', value: 'TECHNICAL' },
-    { label: 'Operational', value: 'OPERATIONAL' },
-    { label: 'Other', value: 'OTHER' }
-  ];
+  issueTypes = IT_SUPPORT_ISSUE_TYPE_OPTIONS;
 
   constructor(
     private fb: FormBuilder,
@@ -62,12 +53,12 @@ export class HelpDeskSubmitRequest implements OnInit {
     private apiService: ApiService
   ) {
     this.requestForm = this.fb.group({
-      issueTitle: [''],
+      issueTitle: ['', Validators.required],
       issueType: [null],
       category: [null],
       otherCategory: [null],
       priority: [null, Validators.required],
-      description: [''],
+      description: ['', Validators.required],
       module: [null, Validators.required],
       submodule: [{ value: null, disabled: true }],
       notification: ['EMAIL'],
