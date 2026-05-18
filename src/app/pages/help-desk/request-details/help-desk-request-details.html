@@ -22,6 +22,28 @@
         <div class="stat-box"><span>Category</span><strong>{{ getCategoryDisplay(detailRequest) }}</strong></div>
         <div class="stat-box"><span>Module</span><strong>{{ detailRequest.moduleName || '--' }}</strong></div>
         <div class="stat-box"><span>Created</span><strong>{{ formatDate(getCreatedAt(detailRequest)) }}</strong></div>
+        <div class="stat-box user-stat">
+          <span>Created By</span>
+          <div class="user-detail-list">
+            @for (row of getUserDisplayRows(detailRequest.createdBy); track row.label) {
+              <div class="user-detail-row">
+                <span class="user-detail-label">{{ row.label }}:</span>
+                <strong class="user-detail-value">{{ row.value }}</strong>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="stat-box user-stat">
+          <span>Updated By</span>
+          <div class="user-detail-list">
+            @for (row of getUserDisplayRows(detailRequest.updatedBy); track row.label) {
+              <div class="user-detail-row">
+                <span class="user-detail-label">{{ row.label }}:</span>
+                <strong class="user-detail-value">{{ row.value }}</strong>
+              </div>
+            }
+          </div>
+        </div>
       </div>
     </div>
 
@@ -85,7 +107,17 @@
                       </div>
                     }
                     <small class="timeline-date">{{ formatDate(h.performedAt) }}</small>
-                    <div class="timeline-by">By {{ h.performedBy }}</div>
+                    <div class="timeline-by">
+                      <span class="timeline-by-title">By</span>
+                      <div class="user-detail-list compact">
+                        @for (row of getUserDisplayRows(h.performedBy); track row.label) {
+                          <div class="user-detail-row">
+                            <span class="user-detail-label">{{ row.label }}:</span>
+                            <strong class="user-detail-value">{{ row.value }}</strong>
+                          </div>
+                        }
+                      </div>
+                    </div>
                   </div>
                 </div>
               }

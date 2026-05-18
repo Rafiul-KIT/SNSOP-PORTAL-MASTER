@@ -8,12 +8,13 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITAttachment, ITCategory, ITHistory, ITModule, ITRequest, ItSupportService } from '../../../../services/it-support.service';
+import { ITAttachment, ITCategory, ITHistory, ITModule, ITRequest, ITUserReference, ItSupportService } from '../../../../services/it-support.service';
 import { ApiService } from '../../../../services/api.service';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 type HistoryChange = { field: string; oldValue: string; newValue: string; isInitialValue: boolean };
+type UserDisplayRow = { label: string; value: string };
 
 @Component({
   selector: 'app-help-desk-request-detail',
@@ -139,11 +140,87 @@ export class HelpDeskRequestDetail implements OnInit {
     return this.apiService.loginState()?.user || {};
   }
 
-  private getCurrentUserId(): number | null {
-    const user = this.getCurrentUser();
-    const raw = user?.userId ?? user?.id ?? user?.uid ?? user?.sub ?? null;
+  private getUserReferenceId(value: unknown): number | null {
+    const raw =
+      value && typeof value === 'object'
+        ? (value as Record<string, unknown>)['userId'] ??
+          (value as Record<string, unknown>)['id'] ??
+          (value as Record<string, unknown>)['uid'] ??
+          (value as Record<string, unknown>)['sub']
+        : value;
     const parsed = Number(raw);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  private getUserReferenceValues(value: unknown): string[] {
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      return normalized ? [normalized] : [];
+    }
+
+    if (!value || typeof value !== 'object') return [];
+
+    const user = value as Record<string, unknown>;
+    return [
+      user['email'],
+      user['mail'],
+      user['upn'],
+      user['username'],
+      user['fullName'],
+      user['name'],
+      user['preferred_username'],
+      user['unique_name'],
+    ]
+      .map((item) => String(item ?? '').trim().toLowerCase())
+      .filter(Boolean);
+  }
+
+  private isSameUserReference(left: unknown, right: unknown): boolean {
+    const leftId = this.getUserReferenceId(left);
+    const rightId = this.getUserReferenceId(right);
+    if (leftId && rightId) return leftId === rightId;
+
+    const leftValues = new Set(this.getUserReferenceValues(left));
+    return this.getUserReferenceValues(right).some((value) => leftValues.has(value));
+  }
+
+  formatUserReference(value?: ITUserReference): string {
+    if (value === null || value === undefined || value === '') return '--';
+    if (typeof value !== 'object') return String(value);
+
+    const user = value as Record<string, unknown>;
+    const fullName = String(user['fullName'] ?? user['name'] ?? '').trim();
+    const username = String(user['username'] ?? user['preferred_username'] ?? user['unique_name'] ?? '').trim();
+    const email = String(user['email'] ?? user['mail'] ?? user['upn'] ?? '').trim();
+    const role = String(user['roleName'] ?? user['role'] ?? '').trim();
+    const name = fullName || username || email;
+    if (!name) return '--';
+
+    const details = [username !== name ? username : '', email !== name ? email : '', role]
+      .filter(Boolean)
+      .join(' | ');
+    return details ? `${name} (${details})` : name;
+  }
+
+  getUserDisplayRows(value?: ITUserReference): UserDisplayRow[] {
+    if (value && typeof value === 'object') {
+      const user = value as Record<string, unknown>;
+      return [
+        { label: 'User', value: String(user['fullName'] ?? user['name'] ?? '').trim() || '--' },
+        {
+          label: 'Username',
+          value: String(user['username'] ?? user['preferred_username'] ?? user['unique_name'] ?? '').trim() || '--',
+        },
+        { label: 'Email', value: String(user['email'] ?? user['mail'] ?? user['upn'] ?? '').trim() || '--' },
+      ];
+    }
+
+    const fallback = this.formatUserReference(value);
+    return [
+      { label: 'User', value: fallback },
+      { label: 'Username', value: '--' },
+      { label: 'Email', value: '--' },
+    ];
   }
 
   private isMisFirmUser(): boolean {
@@ -159,9 +236,7 @@ export class HelpDeskRequestDetail implements OnInit {
 
   private isRequestCreator(request?: ITRequest | null): boolean {
     if (!request) return false;
-    const currentUserId = this.getCurrentUserId();
-    if (!currentUserId) return false;
-    return Number(request.createdBy) === currentUserId;
+    return this.isSameUserReference(request.createdBy, this.getCurrentUser());
   }
 
   canEditRequest(request?: ITRequest | null): boolean {
@@ -240,6 +315,7 @@ export class HelpDeskRequestDetail implements OnInit {
   }
 
   private formatHistoryValue(value: unknown, fallback = '-'): string {
+    if (value && typeof value === 'object') return this.formatUserReference(value as ITUserReference);
     if (this.isInitialHistoryValue(value)) return fallback;
     return String(value).trim();
   }
