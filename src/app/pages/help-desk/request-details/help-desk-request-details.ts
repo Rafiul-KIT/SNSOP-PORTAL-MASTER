@@ -7,11 +7,12 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
-import { ITAttachment, ITHistory, ITRequest, ItSupportService } from '../../../../services/it-support.service';
+import { ITAttachment, ITHistory, ITRequest, ITUserReference, ItSupportService } from '../../../../services/it-support.service';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 type HistoryChange = { field: string; oldValue: string; newValue: string; isInitialValue: boolean };
+type UserDisplayRow = { label: string; value: string };
 
 type WorkflowAction = {
   label: string;
@@ -178,6 +179,45 @@ export class HelpDeskRequestDetails implements OnInit {
     return status.replace(/_/g, ' ');
   }
 
+  formatUserReference(value?: ITUserReference): string {
+    if (value === null || value === undefined || value === '') return '--';
+    if (typeof value !== 'object') return String(value);
+
+    const user = value as Record<string, unknown>;
+    const fullName = String(user['fullName'] ?? user['name'] ?? '').trim();
+    const username = String(user['username'] ?? user['preferred_username'] ?? user['unique_name'] ?? '').trim();
+    const email = String(user['email'] ?? user['mail'] ?? user['upn'] ?? '').trim();
+    const role = String(user['roleName'] ?? user['role'] ?? '').trim();
+    const name = fullName || username || email;
+    if (!name) return '--';
+
+    const details = [username !== name ? username : '', email !== name ? email : '', role]
+      .filter(Boolean)
+      .join(' | ');
+    return details ? `${name} (${details})` : name;
+  }
+
+  getUserDisplayRows(value?: ITUserReference): UserDisplayRow[] {
+    if (value && typeof value === 'object') {
+      const user = value as Record<string, unknown>;
+      return [
+        { label: 'User', value: String(user['fullName'] ?? user['name'] ?? '').trim() || '--' },
+        {
+          label: 'Username',
+          value: String(user['username'] ?? user['preferred_username'] ?? user['unique_name'] ?? '').trim() || '--',
+        },
+        { label: 'Email', value: String(user['email'] ?? user['mail'] ?? user['upn'] ?? '').trim() || '--' },
+      ];
+    }
+
+    const fallback = this.formatUserReference(value);
+    return [
+      { label: 'User', value: fallback },
+      { label: 'Username', value: '--' },
+      { label: 'Email', value: '--' },
+    ];
+  }
+
   formatDate(value?: string): string {
     if (!value) return '--';
     const date = new Date(value);
@@ -203,6 +243,7 @@ export class HelpDeskRequestDetails implements OnInit {
   }
 
   private formatHistoryValue(value: unknown, fallback = '-'): string {
+    if (value && typeof value === 'object') return this.formatUserReference(value as ITUserReference);
     if (this.isInitialHistoryValue(value)) return fallback;
     return String(value).trim();
   }

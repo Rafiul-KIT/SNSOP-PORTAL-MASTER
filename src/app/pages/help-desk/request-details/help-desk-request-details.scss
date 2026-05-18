@@ -51,6 +51,42 @@
 .stat-box strong {
   font-size: 0.95rem;
   color: #1f2937;
+  overflow-wrap: anywhere;
+}
+
+.stat-box.user-stat {
+  grid-column: span 2;
+}
+
+.user-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.user-detail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.user-detail-label {
+  color: #526579;
+  font-size: 0.74rem;
+  font-weight: 700;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.user-detail-value {
+  color: #1f2937;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.25;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .card {
@@ -255,6 +291,31 @@
 .timeline-by {
   color: #7a8fa7;
   font-size: 0.78rem;
+  margin-top: 0.45rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #e3eaf3;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.timeline-by-title {
+  display: block;
+  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.user-detail-list.compact {
+  gap: 0.22rem;
+  margin-top: 0;
+}
+
+.user-detail-list.compact .user-detail-label,
+.user-detail-list.compact .user-detail-value {
+  font-size: 0.78rem;
 }
 
 @media (max-width: 991px) {
@@ -274,6 +335,10 @@
 
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .stat-box.user-stat {
+    grid-column: auto;
   }
 
   .attachment-row {

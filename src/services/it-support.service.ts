@@ -27,7 +27,7 @@ export interface ITAttachment {
   originalFileName: string;
   contentType: string;
   fileSize: number;
-  createdBy: number;
+  createdBy: ITUserReference;
   createdAt: string;
   downloadUrl: string;
 }
@@ -38,11 +38,23 @@ export interface ITHistory {
   action: string;
   changes: string;
   comment: string;
-  performedBy: number;
+  performedBy: ITUserReference;
   performedAt: string;
 }
 
-export interface ITAssignedUser {
+export interface ITUserDetails {
+  id?: number;
+  userId?: number;
+  username?: string;
+  fullName?: string;
+  email?: string;
+  role?: string;
+  roleName?: string;
+}
+
+export type ITUserReference = ITUserDetails | number | string | null;
+
+export interface ITAssignedUser extends ITUserDetails {
   username: string;
   fullName: string;
   email: string;
@@ -64,9 +76,9 @@ export interface ITRequest {
   priority: string;
   status: string;
   comment: string;
-  createdBy: number;
+  createdBy: ITUserReference;
   createdAt: string;
-  updatedBy: number;
+  updatedBy: ITUserReference;
   updatedAt: string;
   assignedUserId?: number;
   assignedTo?: ITAssignedUser | number | null;
