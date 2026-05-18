@@ -2,6 +2,8 @@
   <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
 </div>
 
+<app-loader *ngIf="isBusy"></app-loader>
+
 <div class="card p-3 mb-3 shadow-sm">
   <form class="row g-3 align-items-end">
     <div class="col-md-3">
@@ -16,6 +18,7 @@
           filterBy="name"
           [loading]="isLoadingStates"
           [showClear]="true"
+          [disabled]="isBusy"
           (onChange)="onStateChange()"
           class="w-100"
         ></p-select>
@@ -35,7 +38,7 @@
           filterBy="name"
           [loading]="isLoadingCounties"
           [showClear]="true"
-          [disabled]="!selectedState"
+          [disabled]="isBusy || !selectedState"
           (onChange)="onCountyChange()"
           class="w-100"
         ></p-select>
@@ -55,7 +58,7 @@
           filterBy="name"
           [loading]="isLoadingPayams"
           [showClear]="true"
-          [disabled]="!selectedCounty"
+          [disabled]="isBusy || !selectedCounty"
           (onChange)="onPayamChange()"
           class="w-100"
         ></p-select>
@@ -75,7 +78,7 @@
           filterBy="name"
           [loading]="isLoadingBomas"
           [showClear]="true"
-          [disabled]="!selectedPayam"
+          [disabled]="isBusy || !selectedPayam"
           class="w-100"
         ></p-select>
         <label>Boma</label>
@@ -90,6 +93,7 @@
           severity="danger"
           size="small"
           outlined="true"
+          [disabled]="isBusy"
           (onClick)="resetFilters()"
         ></p-button>
         <p-button
@@ -97,7 +101,8 @@
           icon="fas fa-search"
           severity="primary"
           size="small"
-          [disabled]="!canSearch()"
+          [loading]="isSearching"
+          [disabled]="isBusy || !canSearch()"
           (onClick)="onSearch()"
         ></p-button>
       </div>
@@ -109,6 +114,9 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="m-0">Beneficiaries</h5>
     <div class="d-flex gap-2 align-items-center">
+      <p class="fw-bold mb-0">
+        Showing <kbd>{{ beneficiaries.length }}</kbd> of <kbd>{{ totalRecords }}</kbd> records
+      </p>
       <p-select
         [options]="groups"
         optionLabel="groupName"
@@ -119,6 +127,7 @@
         filterBy="groupName"
         [loading]="isLoadingGroups"
         [showClear]="true"
+        [disabled]="isBusy"
         class="w-15rem"
       ></p-select>
       <p-button
@@ -126,7 +135,8 @@
         icon="fas fa-user-plus"
         severity="success"
         size="small"
-        [disabled]="selectedBeneficiaries.length === 0 || !selectedGroup"
+        [loading]="isAssigning"
+        [disabled]="isBusy || selectedBeneficiaries.length === 0 || !selectedGroup"
         (onClick)="onAssign()"
       ></p-button>
     </div>
@@ -134,10 +144,12 @@
 
   <p-table
     [value]="beneficiaries"
-    [(selection)]="selectedBeneficiaries"
-    [paginator]="true"
-    [rows]="10"
+    [selection]="selectedBeneficiaries"
+    (selectionChange)="onSelectionChange($event)"
+    [loading]="isLoadingBeneficiaries"
     [responsiveLayout]="'scroll'"
+    [tableStyle]="{ 'min-width': '1000px', 'margin-bottom': '5px' }"
+    dataKey="rowKey"
     styleClass="p-datatable-sm p-datatable-gridlines"
   >
     <ng-template pTemplate="header">
@@ -145,29 +157,47 @@
         <th style="width: 4rem">
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Household No</th>
-        <th>Location</th>
+        <th>Serial</th>
+        <th>Application ID</th>
+        <th>Respondent Name</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Group</th>
+        <th>VLSA Formed</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-beneficiary>
+    <ng-template pTemplate="body" let-beneficiary let-i="rowIndex">
       <tr>
         <td>
           <p-tableCheckbox [value]="beneficiary"></p-tableCheckbox>
         </td>
-        <td>{{ beneficiary.id }}</td>
-        <td>{{ beneficiary.name }}</td>
-        <td>{{ beneficiary.householdNo }}</td>
-        <td>{{ beneficiary.location }}</td>
+        <td>{{ (currentPage * pageSize) + i + 1 }}</td>
+        <td>{{ beneficiary.applicationId || '--' }}</td>
+        <td>{{ beneficiary.respondentFullName || '--' }}</td>
+        <td>{{ beneficiary.respondentAge }}</td>
+        <td>{{ formatGender(beneficiary.respondentGender) }}</td>
+        <td>{{ beneficiary.groupName || '--' }}</td>
+        <td>{{ beneficiary.vlsaFormed ? 'Yes' : 'No' }}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="5" class="text-center">No beneficiaries found.</td>
+        <td colspan="10" class="text-center">No beneficiaries found.</td>
       </tr>
     </ng-template>
   </p-table>
+
+  <div class="border-top">
+    <p-paginator
+      class="paginator-sticky"
+      [rows]="pageSize"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [first]="currentPage * pageSize"
+      (onPageChange)="onPageChange($event)"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    ></p-paginator>
+  </div>
 </div>
 
 <p-toast position="bottom-right"></p-toast>
