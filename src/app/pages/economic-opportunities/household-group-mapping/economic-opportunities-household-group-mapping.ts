@@ -64,7 +64,7 @@ interface BeneficiaryGroupSearchResponse {
 }
 
 interface BeneficiaryGroupAssignPayload {
-  id: number;
+  id: number | null;
   beneficiaryId: number;
   groupId: number;
 }
@@ -307,7 +307,7 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
 
     try {
       const payload = this.selectedBeneficiaries.map((beneficiary) => ({
-        id: this.normalizeNumber(beneficiary.id),
+        id: this.normalizeNullableId(beneficiary.id),
         beneficiaryId: this.normalizeNumber(beneficiary.beneficiaryId),
         groupId: this.normalizeNumber(this.selectedGroup),
       }));
@@ -454,6 +454,11 @@ export class EconomicOpportunitiesHouseholdGroupMapping implements OnInit {
   private normalizeNumber(value: unknown): number {
     const numericValue = Number(value);
     return Number.isFinite(numericValue) ? numericValue : 0;
+  }
+
+  private normalizeNullableId(value: unknown): number | null {
+    const numericValue = this.normalizeNumber(value);
+    return numericValue > 0 ? numericValue : null;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {
