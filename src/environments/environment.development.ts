@@ -14,7 +14,7 @@ export const environment = {
     mNe: 'https://localhost:4010/#/monitoring-evaluation/beneficiary-enrolment-summary',
     report: 'https://localhost:4010/#/home/metabase',
     economicOpportunities: 'https://localhost:4010/#/economic-opportunities/dashboard',
-    // UnderConstruction: 'https://localhost:4010/#/under-construction',
+    UnderConstruction: 'https://localhost:4010/#/under-construction',
     helpDesk: 'https://localhost:4010/#/help-desk/dashboard',
     dms: 'https://167.86.68.15:8086',
   },
