@@ -146,7 +146,7 @@ export class Header {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
         // link: environment.portals.economicOpportunities,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.economicOpportunities,
         tooltipText: 'Economic Opportunities Portal',
       },
       {
@@ -170,7 +170,7 @@ export class Header {
         label: 'Report',
         icon: 'fas fa-chart-line',
         // link: environment.portals.report,
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.report,
         tooltipText: 'Reports Dashboard',
       },
       // {
@@ -183,7 +183,7 @@ export class Header {
       {
         label: 'DMS',
         icon: 'fas fa-file',
-        link: environment.portals.UnderConstruction,
+        link: environment.portals.dms,
         tooltipText: 'Document Management System'
       },
       {
