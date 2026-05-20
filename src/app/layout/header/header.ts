@@ -35,25 +35,39 @@ export class Header {
   loginState = this.azureService.loginState;
   userInfo = computed(() => this.loginState()?.user);
   permittedMenus = computed(() => this.loginState()?.menus || []);
-  allPermittedNames = computed(() => this.permittedMenus().map((m: any) => m.name));
+  allPermittedNames = computed(() =>
+    this.permittedMenus().map((m: any) => m.name),
+  );
 
   // canAccessHelpDesk = computed(() => this.allPermittedNames().includes('Helpdesk'));
   canAccessHelpDesk = true;
 
   helpDeskChildren = computed(() => {
-
     const names = this.allPermittedNames();
     return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
   });
 
   // Page detection signals
-  isLandingPage = computed(() => this.currentUrl() === '/landing' || this.currentUrl() === '/#/landing');
+  isLandingPage = computed(
+    () =>
+      this.currentUrl() === '/landing' || this.currentUrl() === '/#/landing',
+  );
   isPortalsPage = computed(() => !this.isLandingPage());
-  isSurveyCtoPage = computed(() => this.currentUrl().startsWith('/survey-cto') || this.currentUrl().startsWith('/cto-dashboard'));
-  isMonitoringPage = computed(() => this.currentUrl().startsWith('/monitoring-evaluation'));
-  isEconomicOpportunitiesPage = computed(() => this.currentUrl().startsWith('/economic-opportunities'));
+  isSurveyCtoPage = computed(
+    () =>
+      this.currentUrl().startsWith('/survey-cto') ||
+      this.currentUrl().startsWith('/cto-dashboard'),
+  );
+  isMonitoringPage = computed(() =>
+    this.currentUrl().startsWith('/monitoring-evaluation'),
+  );
+  isEconomicOpportunitiesPage = computed(() =>
+    this.currentUrl().startsWith('/economic-opportunities'),
+  );
   isHelpDeskPage = computed(() => this.currentUrl().startsWith('/help-desk/'));
-  isUserManagementPage = computed(() => this.currentUrl().startsWith('/user-management/'));
+  isUserManagementPage = computed(() =>
+    this.currentUrl().startsWith('/user-management/'),
+  );
 
   // Computed menu list based on current page and permissions
   menuList = computed(() => {
@@ -68,7 +82,10 @@ export class Header {
       return this.filterMenusByAccess(this.getMonitoringMenus(), names);
     }
     if (this.isEconomicOpportunitiesPage()) {
-      return this.filterMenusByAccess(this.getEconomicOpportunitiesMenus(), names);
+      return this.filterMenusByAccess(
+        this.getEconomicOpportunitiesMenus(),
+        names,
+      );
     }
     if (this.isHelpDeskPage()) {
       return this.filterMenusByAccess(this.getHelpDeskMenuItems(), names);
@@ -77,10 +94,13 @@ export class Header {
       const masterMenus = this.permittedMenus().filter(
         (m: any) =>
           m.name === 'User Management' ||
-          (m.parentMenu && m.parentMenu.name === 'User Management')
+          (m.parentMenu && m.parentMenu.name === 'User Management'),
       );
       const allowedNames = masterMenus.map((m: any) => m.name);
-      return this.filterMenusByAccess(this.getStaticMasterMenus(), allowedNames);
+      return this.filterMenusByAccess(
+        this.getStaticMasterMenus(),
+        allowedNames,
+      );
     }
     return [];
   });
@@ -88,13 +108,17 @@ export class Header {
   constructor() {
     // Detect route changes and update signal
     this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        ),
+      )
       .subscribe((event: NavigationEnd) => {
         this.currentUrl.set(event.urlAfterRedirects);
       });
 
     // Static portal links
-     this.portalList = [
+    this.portalList = [
       // {
       //   label: 'Dashboard',
       //   link: environment.portals.master,
@@ -104,67 +128,70 @@ export class Header {
         label: 'Beneficiary',
         icon: 'fas fa-user-friends',
         link: environment.portals.beneficiary,
-        tooltipText: 'Beneficiary Management Portal'
+        tooltipText: 'Beneficiary Management Portal',
       },
       {
         label: 'Payment',
         icon: 'fas fa-credit-card',
         link: environment.portals.payment,
-        tooltipText: 'Payment Portal'
+        tooltipText: 'Payment Portal',
       },
       {
         label: 'GRM',
         icon: 'fas fa-sitemap',
         link: environment.portals.grm,
-        tooltipText: 'Grievance Redress Mechanism'
+        tooltipText: 'Grievance Redress Mechanism',
       },
-      {
-        label: 'Report',
-        icon: 'fas fa-chart-line',
-        // link: environment.portals.report,
-        link: environment.portals.UnderConstruction,
-        tooltipText: 'Reports Dashboard'
-      },
-      {
-        label: 'Settings',
-        icon: 'fas fa-cog',
-        link: environment.portals.masterSettings,
-        tooltipText: 'Settings portal - User & Role Management'
-      },
-      {
-        label: 'Survey CTO',
-        icon: 'fas fa-poll',
-        link: environment.portals.surveyCTO,
-        tooltipText: 'Survey CTO Portal'
-      },
-         {
-        label: 'Helpdesk',
-        icon: 'fas fa-headset',
-        link: environment.portals.helpDesk,
-     
-        tooltipText: 'Helpdesk Portal - IT Support',
-      },
-      {
-        label: 'Monitoring & Evaluation',
-        icon: 'fas fa-chart-bar',
-        link: environment.portals.mNe,
-        tooltipText: 'Monitoring & Evaluation Portal'
-      },
-
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
         // link: environment.portals.economicOpportunities,
         link: environment.portals.UnderConstruction,
-        
-        tooltipText: 'Economic Opportunities Portal'
+        tooltipText: 'Economic Opportunities Portal',
+      },
+      {
+        label: 'Monitoring & Evaluation',
+        icon: 'fas fa-chart-bar',
+        link: environment.portals.mNe,
+        tooltipText: 'Monitoring & Evaluation Portal',
+      },
+      {
+        label: 'Survey CTO',
+        icon: 'fas fa-poll',
+        link: environment.portals.surveyCTO,
+        tooltipText: 'Survey CTO Portal',
       },
       // {
-      //   label: 'DMS',
-      //   icon: 'fas fa-file',
-      //   link: environment.portals.dms,
-      //   tooltipText: 'Document Management System'
+      //   label: 'Report',
+      //   routerLink: '/home/metabase',
+      //   icon: 'fas fa-chart-line',
       // },
+      {
+        label: 'Report',
+        icon: 'fas fa-chart-line',
+        // link: environment.portals.report,
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Reports Dashboard',
+      },
+      // {
+      //   label: 'Help Desk',
+      //   icon: 'fas fa-headset',
+      //   link: environment.portals.helpDesk,
+
+      //   tooltipText: 'Help Desk Portal - IT Support',
+      // },
+      {
+        label: 'DMS',
+        icon: 'fas fa-file',
+        link: environment.portals.UnderConstruction,
+        tooltipText: 'Document Management System'
+      },
+      {
+        label: 'Settings',
+        icon: 'fas fa-cog',
+        link: environment.portals.masterSettings,
+        tooltipText: 'Settings portal - User & Role Management',
+      },
     ];
   }
 
@@ -179,9 +206,21 @@ export class Header {
         label: 'User Management',
         icon: 'fas fa-users',
         items: [
-          { label: 'User List', icon: 'fas fa-users', routerLink: ['/user-management/users'] },
-          { label: 'Register User', icon: 'fas fa-user-plus', routerLink: ['/user-management/register'] },
-          { label: 'Role List', icon: 'fas fa-users-rays', routerLink: ['/user-management/roles'] },
+          {
+            label: 'User List',
+            icon: 'fas fa-users',
+            routerLink: ['/user-management/users'],
+          },
+          {
+            label: 'Register User',
+            icon: 'fas fa-user-plus',
+            routerLink: ['/user-management/register'],
+          },
+          {
+            label: 'Role List',
+            icon: 'fas fa-users-rays',
+            routerLink: ['/user-management/roles'],
+          },
         ],
       },
     ];
@@ -189,52 +228,148 @@ export class Header {
 
   getSurveyCtoMenus(): MenuItem[] {
     return [
-      { label: 'SurveyCTO Dashboard', icon: 'fas fa-chart-line', routerLink: ['/cto-dashboard'] },
-      { label: 'Template Export', icon: 'fas fa-poll', routerLink: ['/survey-cto-export'] },
-      { label: 'Data Import', icon: 'fas fa-upload', routerLink: ['/survey-cto-import'] },
-      { label: 'Survey Data View', icon: 'fas fa-file-alt', routerLink: ['/survey-cto-report'] }
+      {
+        label: 'SurveyCTO Dashboard',
+        icon: 'fas fa-chart-line',
+        routerLink: ['/cto-dashboard'],
+      },
+      {
+        label: 'Template Export',
+        icon: 'fas fa-poll',
+        routerLink: ['/survey-cto-export'],
+      },
+      {
+        label: 'Data Import',
+        icon: 'fas fa-upload',
+        routerLink: ['/survey-cto-import'],
+      },
+      {
+        label: 'Survey Data View',
+        icon: 'fas fa-file-alt',
+        routerLink: ['/survey-cto-report'],
+      },
     ];
   }
 
   getMonitoringMenus(): MenuItem[] {
     return [
-      { label: 'Beneficiary Enrolment Summary', icon: 'fas fa-clipboard-list', routerLink: ['/monitoring-evaluation/beneficiary-enrolment-summary'] },
-      { label: 'Cash Transfer Summary', icon: 'fas fa-money-bill-wave', routerLink: ['/monitoring-evaluation/cash-transfer-summary'] },
-      { label: 'Result Framework', icon: 'fas fa-bullseye', routerLink: ['/monitoring-evaluation/result-framework'] },
-      { label: 'M&E Reports', icon: 'fas fa-list', routerLink: ['/monitoring-evaluation/reports'] },
+      {
+        label: 'Beneficiary Enrolment Summary',
+        icon: 'fas fa-clipboard-list',
+        routerLink: ['/monitoring-evaluation/beneficiary-enrolment-summary'],
+      },
+      {
+        label: 'Cash Transfer Summary',
+        icon: 'fas fa-money-bill-wave',
+        routerLink: ['/monitoring-evaluation/cash-transfer-summary'],
+      },
+      {
+        label: 'Result Framework',
+        icon: 'fas fa-bullseye',
+        routerLink: ['/monitoring-evaluation/result-framework'],
+      },
+      {
+        label: 'M&E Reports',
+        icon: 'fas fa-list',
+        routerLink: ['/monitoring-evaluation/reports'],
+      },
     ];
   }
 
   getEconomicOpportunitiesMenus(): MenuItem[] {
     return [
-      { label: 'E/O Dashboard', icon: 'fas fa-chart-bar', routerLink: ['/economic-opportunities/dashboard'] },
-      { label: 'Excel Template Download', icon: 'fas fa-file-import', routerLink: ['/economic-opportunities/template-importing'] },
-      { label: 'Excel Template Upload', icon: 'fas fa-file-upload', routerLink: ['/economic-opportunities/template-upload'] },
-      { label: 'Household And Group Mapping', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/household-group-mapping'] },
+      {
+        label: 'E/O Dashboard',
+        icon: 'fas fa-chart-bar',
+        routerLink: ['/economic-opportunities/dashboard'],
+      },
+      {
+        label: 'Excel Template Download',
+        icon: 'fas fa-file-import',
+        routerLink: ['/economic-opportunities/template-importing'],
+      },
+      {
+        label: 'Excel Template Upload',
+        icon: 'fas fa-file-upload',
+        routerLink: ['/economic-opportunities/template-upload'],
+      },
+      {
+        label: 'Household And Group Mapping',
+        icon: 'fas fa-object-group',
+        routerLink: ['/economic-opportunities/household-group-mapping'],
+      },
       {
         label: 'Beneficiary Enrollment',
         icon: 'fas fa-user-check',
         items: [
-          { label: 'Beneficiary Randomization Enrollment', icon: 'fas fa-random', routerLink: ['/economic-opportunities/beneficiary-enrollment/beneficiary-randomization-enrollment'] },
-          { label: 'Household Group View', icon: 'fas fa-object-group', routerLink: ['/economic-opportunities/beneficiary-enrollment/household-group-view'] },
+          {
+            label: 'Beneficiary Randomization Enrollment',
+            icon: 'fas fa-random',
+            routerLink: [
+              '/economic-opportunities/beneficiary-enrollment/beneficiary-randomization-enrollment',
+            ],
+          },
+          {
+            label: 'Household Group View',
+            icon: 'fas fa-object-group',
+            routerLink: [
+              '/economic-opportunities/beneficiary-enrollment/household-group-view',
+            ],
+          },
         ],
       },
       {
         label: 'Course and Training Management',
         icon: 'fas fa-book-reader',
         items: [
-          { label: 'Course Entity', icon: 'fas fa-graduation-cap', routerLink: ['/economic-opportunities/course-training/course-entity'] },
-          { label: 'Course Details', icon: 'fas fa-info-circle', routerLink: ['/economic-opportunities/course-training/course-details'] },
-          { label: 'Training Attendance Tracking', icon: 'fas fa-user-check', routerLink: ['/economic-opportunities/course-training/training-attendance-tracking'] },
+          {
+            label: 'Course Entity',
+            icon: 'fas fa-graduation-cap',
+            routerLink: [
+              '/economic-opportunities/course-training/course-entity',
+            ],
+          },
+          {
+            label: 'Course Details',
+            icon: 'fas fa-info-circle',
+            routerLink: [
+              '/economic-opportunities/course-training/course-details',
+            ],
+          },
+          {
+            label: 'Training Attendance Tracking',
+            icon: 'fas fa-user-check',
+            routerLink: [
+              '/economic-opportunities/course-training/training-attendance-tracking',
+            ],
+          },
         ],
       },
       {
         label: 'Others',
         icon: 'fas fa-ellipsis-h',
         items: [
-          { label: 'Business Plan Development', icon: 'fas fa-file-invoice-dollar', routerLink: ['/economic-opportunities/others/business-plan-development'] },
-          { label: 'Livelihood Grant Disbursement', icon: 'fas fa-hand-holding-usd', routerLink: ['/economic-opportunities/others/livelihood-grant-disbursement'] },
-          { label: 'Financial Service Linkage Tracking', icon: 'fas fa-link', routerLink: ['/economic-opportunities/others/financial-service-linkage-tracking'] },
+          {
+            label: 'Business Plan Development',
+            icon: 'fas fa-file-invoice-dollar',
+            routerLink: [
+              '/economic-opportunities/others/business-plan-development',
+            ],
+          },
+          {
+            label: 'Livelihood Grant Disbursement',
+            icon: 'fas fa-hand-holding-usd',
+            routerLink: [
+              '/economic-opportunities/others/livelihood-grant-disbursement',
+            ],
+          },
+          {
+            label: 'Financial Service Linkage Tracking',
+            icon: 'fas fa-link',
+            routerLink: [
+              '/economic-opportunities/others/financial-service-linkage-tracking',
+            ],
+          },
         ],
       },
     ];
@@ -242,13 +377,15 @@ export class Header {
 
   filterMenusByAccess(menus: MenuItem[], allowedNames: string[]): MenuItem[] {
     return menus
-      .filter((menu) =>
-        (menu.label && allowedNames.includes(menu.label)) ||
-        menu.separator
+      .filter(
+        (menu) =>
+          (menu.label && allowedNames.includes(menu.label)) || menu.separator,
       )
       .map((menu) => ({
         ...menu,
-        items: menu.items ? this.filterMenusByAccess(menu.items, allowedNames) : undefined,
+        items: menu.items
+          ? this.filterMenusByAccess(menu.items, allowedNames)
+          : undefined,
       }));
   }
 
@@ -258,16 +395,52 @@ export class Header {
 
   getHelpDeskMenuItems(): MenuItem[] {
     return [
-      { label: 'Helpdesk Dashboard', routerLink: '/help-desk/dashboard', icon: 'fas fa-tachometer-alt' },
-      { label: 'Submit Support Request', routerLink: '/help-desk/submit-request', icon: 'fas fa-plus-circle' },
-      { label: 'My Requests', routerLink: '/help-desk/my-requests', icon: 'fas fa-clipboard-list' },
-      { label: 'Support Management', routerLink: '/help-desk/support-management', icon: 'fas fa-users-cog' },
-      { label: 'Request List', routerLink: '/help-desk/assigned-requests', icon: 'fas fa-user-check' },
-      { label: 'Categories & Modules', routerLink: '/help-desk/setup', icon: 'fas fa-sliders' },
-      { label: 'Status Tracker', routerLink: '/help-desk/status-tracker', icon: 'fas fa-search' },
-      { label: 'Reports', routerLink: '/help-desk/reports', icon: 'fas fa-chart-bar' },
+      {
+        label: 'Helpdesk Dashboard',
+        routerLink: '/help-desk/dashboard',
+        icon: 'fas fa-tachometer-alt',
+      },
+      {
+        label: 'Submit Support Request',
+        routerLink: '/help-desk/submit-request',
+        icon: 'fas fa-plus-circle',
+      },
+      {
+        label: 'My Requests',
+        routerLink: '/help-desk/my-requests',
+        icon: 'fas fa-clipboard-list',
+      },
+      {
+        label: 'Support Management',
+        routerLink: '/help-desk/support-management',
+        icon: 'fas fa-users-cog',
+      },
+      {
+        label: 'Request List',
+        routerLink: '/help-desk/assigned-requests',
+        icon: 'fas fa-user-check',
+      },
+      {
+        label: 'Categories & Modules',
+        routerLink: '/help-desk/setup',
+        icon: 'fas fa-sliders',
+      },
+      {
+        label: 'Status Tracker',
+        routerLink: '/help-desk/status-tracker',
+        icon: 'fas fa-search',
+      },
+      {
+        label: 'Reports',
+        routerLink: '/help-desk/reports',
+        icon: 'fas fa-chart-bar',
+      },
       { separator: true },
-      { label: 'User Manual', routerLink: '/help-desk/user-manual', icon: 'fas fa-book' }
+      {
+        label: 'User Manual',
+        routerLink: '/help-desk/user-manual',
+        icon: 'fas fa-book',
+      },
     ];
   }
 
