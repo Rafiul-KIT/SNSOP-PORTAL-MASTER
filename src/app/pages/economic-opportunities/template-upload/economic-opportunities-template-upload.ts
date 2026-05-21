@@ -11,10 +11,14 @@ import { Toast } from 'primeng/toast';
 import { Loader } from '../../../components/loader/loader';
 import { ApiService } from '../../../../services/api.service';
 import { EconomicOpportunitiesBeneficiaryRandomizationEnrollment } from '../beneficiary-randomization-enrollment/economic-opportunities-beneficiary-randomization-enrollment';
+import Swal from 'sweetalert2';
 
 interface TemplateUploadResponse {
-  code?: number | string | null;
+  status?: string | null;
   message?: string | null;
+  code?: number | string | null;
+  totalRowsImported?: number;
+  failedRows?: Record<string, string>;
 }
 
 @Component({
@@ -110,49 +114,105 @@ export class EconomicOpportunitiesTemplateUpload {
 
       const endpoint = `${this.uploadEndpoint}?templateType=${encodeURIComponent(this.selectedType)}`;
       const res = await this.api.POST<TemplateUploadResponse>(endpoint, formData);
-      const data = res?.data;
-
-      if (!this.isApiSuccess(data)) {
-        throw new Error(data?.message || 'Unable to upload template.');
-      }
-
-      this.msg.add({
-        severity: 'success',
-        summary: 'Imported',
-        detail: data?.message || 'Template imported successfully.',
-      });
-
-      this.selectedFile = null;
-      if (this.fileInput?.nativeElement) {
-        this.fileInput.nativeElement.value = '';
-      }
-    } catch (err) {
+      this.handleResponse(res?.data);
+    } catch (err: any) {
       console.error('Failed to import template', err);
-      this.msg.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Unable to import template.',
-      });
+      const errorData = err.response?.data;
+      if (errorData && errorData.status) {
+        this.handleResponse(errorData);
+      } else {
+        Swal.fire({
+          title: 'Import Failed',
+          text: err.message || 'An unexpected error occurred during import.',
+          icon: 'error',
+          confirmButtonColor: '#d33',
+        });
+      }
     } finally {
       this.isUploading = false;
       this.cdr.detectChanges();
     }
   }
 
-  resetFilters(): void {
-    this.selectedType = '';
+  private handleResponse(data: TemplateUploadResponse | null | undefined): void {
+    if (!data) {
+      throw new Error('No response from server');
+    }
+
+    if (this.isImportSuccess(data)) {
+      Swal.fire({
+        title: 'Import Successful',
+        text: data.message || `Total rows imported: ${data.totalRowsImported}`,
+        icon: 'success',
+        confirmButtonColor: '#3085d6',
+      });
+      this.resetFileOnly();
+    } else if (this.isPartialImport(data) || this.isImportError(data)) {
+      const isError = this.isImportError(data);
+      let errorHtml = `<div style="text-align: left; max-height: 300px; overflow-y: auto;">
+        <p>${data.message || (isError ? 'Validation failed' : 'Import completed with some errors.')}</p>
+        <ul style="padding-left: 20px;">`;
+      
+      if (data.failedRows && Object.keys(data.failedRows).length > 0) {
+        Object.entries(data.failedRows).forEach(([key, msg]) => {
+          errorHtml += `<li><strong>${key}:</strong> ${msg}</li>`;
+        });
+      }
+      
+      errorHtml += `</ul></div>`;
+
+      Swal.fire({
+        title: isError ? 'Import Failed' : 'Partial Import',
+        html: errorHtml,
+        icon: isError ? 'error' : 'warning',
+        confirmButtonColor: '#3085d6',
+      });
+      
+      if (!isError) {
+        this.resetFileOnly();
+      }
+    } else {
+      throw new Error(data.message || 'Unable to upload template.');
+    }
+  }
+
+  private isImportSuccess(data: TemplateUploadResponse): boolean {
+    const status = String(data.status ?? '').trim().toLowerCase();
+    const code = Number(data.code ?? data.status);
+    const message = String(data.message ?? '').trim().toLowerCase();
+
+    return (
+      code === 200 ||
+      status.startsWith('200') ||
+      status === 'success' ||
+      status === 'successful' ||
+      message === 'import successful'
+    );
+  }
+
+  private isPartialImport(data: TemplateUploadResponse): boolean {
+    const status = String(data.status ?? '').trim();
+    const code = Number(data.code ?? data.status);
+    return code === 206 || status.startsWith('206');
+  }
+
+  private isImportError(data: TemplateUploadResponse): boolean {
+    const status = String(data.status ?? '').trim();
+    const code = Number(data.code ?? data.status);
+    return code === 400 || status.startsWith('400');
+  }
+
+  private resetFileOnly(): void {
     this.selectedFile = null;
     if (this.fileInput?.nativeElement) {
       this.fileInput.nativeElement.value = '';
     }
-    this.showBeneficiaryTable = false;
-    this.beneficiaryData = [];
   }
 
-  private isApiSuccess(data: TemplateUploadResponse | null | undefined, fallback = false): boolean {
-    if (!data) return fallback;
-    if (data.code === undefined || data.code === null || data.code === '') return fallback;
-    const code = Number(data.code);
-    return code === 0 || code === 200;
+  resetFilters(): void {
+    this.selectedType = '';
+    this.resetFileOnly();
+    this.showBeneficiaryTable = false;
+    this.beneficiaryData = [];
   }
 }

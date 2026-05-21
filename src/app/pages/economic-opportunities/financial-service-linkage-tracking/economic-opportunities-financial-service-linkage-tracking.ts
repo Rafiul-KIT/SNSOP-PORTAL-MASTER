@@ -23,11 +23,11 @@ interface FinancialServiceFilters {
 }
 
 interface FinancialServiceSearchPayload {
-  stateId: number;
-  countyId: number;
-  payamId: number;
-  bomaId: number;
-  groupId: number;
+  stateId: number | null;
+  countyId: number | null;
+  payamId: number | null;
+  bomaId: number | null;
+  groupId: number | null;
 }
 
 interface FinancialServiceResponse {
@@ -45,10 +45,10 @@ interface FinancialServiceRecord {
   householdNumber: string;
   respondentFullName: string;
   respondentAge: number;
-  connectedToFinancialService: boolean;
+  connectedToFinancialService: boolean | null;
   financialServiceName: string;
   financialServiceConnectedAt: string;
-  depositAccountOpened: boolean;
+  depositAccountOpened: boolean | null;
   depositAccountOpenedAt: string;
   accountLastActivityDate: string;
 }
@@ -223,6 +223,16 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
   async saveRow(row: FinancialServiceRow): Promise<void> {
     if (!row.isDirty || row.isSaving) return;
 
+    const validation = this.isValidData(row, this.validHouseholdNumbers);
+    if (!validation.isValid) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: validation.errorMessage,
+      });
+      return;
+    }
+
     const payload = this.toEditableSnapshot(row);
     row.isSaving = true;
     this.cdr.detectChanges();
@@ -266,6 +276,18 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
       return;
     }
 
+    for (const row of dirtyRows) {
+      const validation = this.isValidData(row, this.validHouseholdNumbers);
+      if (!validation.isValid) {
+        this.msg.add({
+          severity: 'warn',
+          summary: 'Validation Error',
+          detail: `Row for ${row.respondentFullName || row.householdNumber || row.id}: ${validation.errorMessage}`,
+        });
+        return;
+      }
+    }
+
     const payload = dirtyRows.map((row) => this.toEditableSnapshot(row));
     this.isBulkSaving = true;
     dirtyRows.forEach((row) => (row.isSaving = true));
@@ -302,6 +324,44 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
     }
   }
 
+  isValidData(row: FinancialServiceRow, validList: Set<string>): { isValid: boolean; errorMessage: string } {
+    const householdNumber = row.householdNumber.trim();
+
+    if (!householdNumber) {
+      return { isValid: false, errorMessage: 'Household Number is required.' };
+    }
+
+    if (!validList.has(householdNumber)) {
+      return { isValid: false, errorMessage: 'Household Number must be in the valid household list.' };
+    }
+
+    if (row.connectedToFinancialService === null || row.connectedToFinancialService === undefined) {
+      return { isValid: false, errorMessage: 'Connected Financial Services is required.' };
+    }
+
+    if (!row.financialServiceConnectedAt) {
+      return { isValid: false, errorMessage: 'Financial Service Connection Date is required.' };
+    }
+
+    if (row.depositAccountOpened === null || row.depositAccountOpened === undefined) {
+      return { isValid: false, errorMessage: 'Deposit Account Opened is required.' };
+    }
+
+    if (row.depositAccountOpened === true && !row.depositAccountOpenedAt) {
+      return { isValid: false, errorMessage: 'Deposit Account Opening Date is required when Deposit Account Opened is Yes.' };
+    }
+
+    if (row.accountLastActivityDate) {
+      const today = this.toLocalDateOnly(new Date());
+      const activityDate = this.toLocalDateOnly(row.accountLastActivityDate);
+      if (activityDate > today) {
+        return { isValid: false, errorMessage: 'Account Last Activity Date cannot be in the future.' };
+      }
+    }
+
+    return { isValid: true, errorMessage: '' };
+  }
+
   onRowValueChange(row: FinancialServiceRow): void {
     row.respondentAge = this.normalizeNumber(row.respondentAge);
     row.financialServiceName = row.financialServiceName ?? '';
@@ -309,6 +369,14 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
     row.depositAccountOpenedAt = row.depositAccountOpenedAt ?? '';
     row.accountLastActivityDate = row.accountLastActivityDate ?? '';
     this.refreshDirtyState(row);
+  }
+
+  private get validHouseholdNumbers(): Set<string> {
+    return new Set(
+      this.rows
+        .map((row) => row.householdNumber.trim())
+        .filter((householdNumber) => householdNumber.length > 0)
+    );
   }
 
   private async loadRows(): Promise<void> {
@@ -364,11 +432,11 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
 
   private createSearchPayload(): FinancialServiceSearchPayload {
     return {
-      stateId: this.normalizeNumber(this.filters.stateId),
-      countyId: this.normalizeNumber(this.filters.countyId),
-      payamId: this.normalizeNumber(this.filters.payamId),
-      bomaId: this.normalizeNumber(this.filters.bomaId),
-      groupId: 0,
+      stateId: this.normalizeSelectedId(this.filters.stateId),
+      countyId: this.normalizeSelectedId(this.filters.countyId),
+      payamId: this.normalizeSelectedId(this.filters.payamId),
+      bomaId: this.normalizeSelectedId(this.filters.bomaId),
+      groupId: null,
     };
   }
 
@@ -379,10 +447,10 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
       householdNumber: item.householdNumber ?? '',
       respondentFullName: item.respondentFullName ?? '',
       respondentAge: this.normalizeNumber(item.respondentAge),
-      connectedToFinancialService: !!item.connectedToFinancialService,
+      connectedToFinancialService: this.normalizeBooleanNullable(item.connectedToFinancialService),
       financialServiceName: item.financialServiceName ?? '',
       financialServiceConnectedAt: this.normalizeDate(item.financialServiceConnectedAt),
-      depositAccountOpened: !!item.depositAccountOpened,
+      depositAccountOpened: this.normalizeBooleanNullable(item.depositAccountOpened),
       depositAccountOpenedAt: this.normalizeDate(item.depositAccountOpenedAt),
       accountLastActivityDate: this.normalizeDate(item.accountLastActivityDate),
       isDirty: false,
@@ -418,10 +486,10 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
       householdNumber: (row.householdNumber ?? '').trim(),
       respondentFullName: (row.respondentFullName ?? '').trim(),
       respondentAge: this.normalizeNumber(row.respondentAge),
-      connectedToFinancialService: !!row.connectedToFinancialService,
+      connectedToFinancialService: this.normalizeBooleanNullable(row.connectedToFinancialService),
       financialServiceName: (row.financialServiceName ?? '').trim(),
       financialServiceConnectedAt: this.normalizeDate(row.financialServiceConnectedAt),
-      depositAccountOpened: !!row.depositAccountOpened,
+      depositAccountOpened: this.normalizeBooleanNullable(row.depositAccountOpened),
       depositAccountOpenedAt: this.normalizeDate(row.depositAccountOpenedAt),
       accountLastActivityDate: this.normalizeDate(row.accountLastActivityDate),
     };
@@ -432,9 +500,27 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
     return String(value).slice(0, 10);
   }
 
+  private toLocalDateOnly(value: Date | string): Date {
+    const date = value instanceof Date ? value : new Date(value);
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
   private normalizeNumber(value: unknown): number {
     const numericValue = Number(value);
     return Number.isFinite(numericValue) ? numericValue : 0;
+  }
+
+  private normalizeSelectedId(value: unknown): number | null {
+    const numericValue = this.normalizeNumber(value);
+    return numericValue > 0 ? numericValue : null;
+  }
+
+  private normalizeBooleanNullable(value: unknown): boolean | null {
+    if (value === null || value === undefined || value === '') return null;
+    if (typeof value === 'boolean') return value;
+    if (value === 'true' || value === 1 || value === '1') return true;
+    if (value === 'false' || value === 0 || value === '0') return false;
+    return null;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {

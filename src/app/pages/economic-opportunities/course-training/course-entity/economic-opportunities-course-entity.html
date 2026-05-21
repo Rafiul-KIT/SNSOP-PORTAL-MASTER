@@ -14,7 +14,7 @@
   </div>
 
   <form class="row g-3 align-items-end">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <p-floatlabel variant="on">
         <input
           pInputText
@@ -27,7 +27,7 @@
       </p-floatlabel>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-4">
       <p-floatlabel variant="on">
         <input
           pInputText
@@ -37,6 +37,19 @@
           name="courseCode"
         />
         <label>Course Code *</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="col-md-4">
+      <p-floatlabel variant="on">
+        <input
+          pInputText
+          type="number"
+          class="form-control"
+          [(ngModel)]="form.courseDuration"
+          name="courseDuration"
+        />
+        <label>Course Duration *</label>
       </p-floatlabel>
     </div>
 
@@ -94,24 +107,24 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Serial</th>
-        <th>ID</th>
         <th>Course Name</th>
         <th>Course Code</th>
+        <th>Course Duration</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-row let-i="rowIndex">
       <tr>
         <td>{{ (currentPage * pageSize) + i + 1 }}</td>
-        <td>{{ row.id }}</td>
         <td>{{ row.courseName || '--' }}</td>
         <td>{{ row.courseCode || '--' }}</td>
+        <td>{{ row.courseDuration }}</td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="4" class="text-center text-danger">
+        <td colspan="5" class="text-center text-danger">
           <b>No records found!</b>
         </td>
       </tr>

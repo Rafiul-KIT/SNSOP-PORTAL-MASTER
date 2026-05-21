@@ -24,11 +24,11 @@ interface BusinessPlanFilters {
 }
 
 interface BusinessPlanSearchPayload {
-  stateId: number;
-  countyId: number;
-  payamId: number;
-  bomaId: number;
-  groupId: number;
+  stateId: number | null;
+  countyId: number | null;
+  payamId: number | null;
+  bomaId: number | null;
+  groupId: number | null;
 }
 
 interface BusinessPlanResponse {
@@ -46,15 +46,15 @@ interface BusinessPlanRecord {
   householdNumber: string;
   respondentFullName: string;
   respondentAge: number;
-  businessType: number;
+  businessType: number | null;
   businessDescription: string;
   howSpent: string;
-  inPersonPercentage: number;
-  groupPercentage: number;
-  planStatus: boolean;
-  planSubmitted: boolean;
-  planScreened: boolean;
-  planApproved: boolean;
+  inPersonPercentage: number | null;
+  groupPercentage: number | null;
+  planStatus: boolean | null;
+  planSubmitted: boolean | null;
+  planScreened: boolean | null;
+  planApproved: boolean | null;
   planRejectionReason: string;
 }
 
@@ -128,6 +128,11 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
   readonly booleanOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+  ];
+
+  readonly businessTypeOptions = [
+    { label: 'Farm', value: 1 },
+    { label: 'Non-Farm', value: 2 },
   ];
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
@@ -233,6 +238,16 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
   async saveRow(row: BusinessPlanRow): Promise<void> {
     if (!row.isDirty || row.isSaving) return;
 
+    const validation = this.isValidData(row, this.validHouseholdNumbers);
+    if (!validation.isValid) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: validation.errorMessage,
+      });
+      return;
+    }
+
     const payload = this.toEditableSnapshot(row);
     row.isSaving = true;
     this.cdr.detectChanges();
@@ -276,6 +291,18 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
       return;
     }
 
+    for (const row of dirtyRows) {
+      const validation = this.isValidData(row, this.validHouseholdNumbers);
+      if (!validation.isValid) {
+        this.msg.add({
+          severity: 'warn',
+          summary: 'Validation Error',
+          detail: `Row for ${row.respondentFullName || row.householdNumber || row.id}: ${validation.errorMessage}`,
+        });
+        return;
+      }
+    }
+
     const payload = dirtyRows.map((row) => this.toEditableSnapshot(row));
     this.isBulkSaving = true;
     dirtyRows.forEach((row) => (row.isSaving = true));
@@ -312,11 +339,81 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
     }
   }
 
+  isValidData(row: BusinessPlanRow, validHouseholdNumbers: Set<string>): { isValid: boolean; errorMessage: string } {
+    const householdNumber = row.householdNumber.trim();
+
+    if (!householdNumber) {
+      return { isValid: false, errorMessage: 'Household Number is required.' };
+    }
+
+    if (!validHouseholdNumbers.has(householdNumber)) {
+      return { isValid: false, errorMessage: 'Household Number must be in the valid household list.' };
+    }
+
+    if (row.planStatus === null || row.planStatus === undefined) {
+      return { isValid: false, errorMessage: 'Business Plan Status is required.' };
+    }
+
+    if (!row.businessType || (row.businessType !== 1 && row.businessType !== 2)) {
+      return { isValid: false, errorMessage: 'Business Type is required (Farm or Non-Farm).' };
+    }
+
+    if (row.planApproved === null || row.planApproved === undefined) {
+      return { isValid: false, errorMessage: 'Plan Approved status is required.' };
+    }
+
+    if (row.planApproved === false) {
+      if (!row.planRejectionReason || row.planRejectionReason.trim() === '') {
+        return { isValid: false, errorMessage: 'Rejection Reason is required when Plan Approved is No.' };
+      }
+    } else {
+      if (row.planRejectionReason && row.planRejectionReason.trim() !== '') {
+        return { isValid: false, errorMessage: 'Rejection Reason must be blank when Plan Approved is Yes.' };
+      }
+    }
+
+    const inPerson = row.inPersonPercentage;
+    const group = row.groupPercentage;
+
+    if (inPerson !== null || group !== null) {
+      if (inPerson === null || group === null) {
+        return { isValid: false, errorMessage: 'Both In-Person and Group percentages must be provided if either is provided.' };
+      }
+
+      if (inPerson < 0 || inPerson > 100) {
+        return { isValid: false, errorMessage: 'In-Person percentage must be between 0 and 100.' };
+      }
+
+      if (group < 0 || group > 100) {
+        return { isValid: false, errorMessage: 'Group percentage must be between 0 and 100.' };
+      }
+
+      const sum = Number(inPerson) + Number(group);
+      if (Math.abs(sum - 100) > 0.01) {
+        return { isValid: false, errorMessage: 'Sum of In-Person and Group percentages must equal 100.' };
+      }
+    }
+
+    return { isValid: true, errorMessage: '' };
+  }
+
+  private get validHouseholdNumbers(): Set<string> {
+    return new Set(
+      this.rows
+        .map((row) => row.householdNumber.trim())
+        .filter((householdNumber) => householdNumber.length > 0)
+    );
+  }
+
   onRowValueChange(row: BusinessPlanRow): void {
-    row.businessType = this.normalizeNumber(row.businessType);
+    if (row.planApproved === true) {
+      row.planRejectionReason = '';
+    }
+
+    row.businessType = this.normalizeNumberNullable(row.businessType);
     row.respondentAge = this.normalizeNumber(row.respondentAge);
-    row.inPersonPercentage = this.normalizeNumber(row.inPersonPercentage);
-    row.groupPercentage = this.normalizeNumber(row.groupPercentage);
+    row.inPersonPercentage = this.normalizeNumberNullable(row.inPersonPercentage);
+    row.groupPercentage = this.normalizeNumberNullable(row.groupPercentage);
     row.businessDescription = row.businessDescription ?? '';
     row.howSpent = row.howSpent ?? '';
     row.planRejectionReason = row.planRejectionReason ?? '';
@@ -377,11 +474,11 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
 
   private createSearchPayload(): BusinessPlanSearchPayload {
     return {
-      stateId: this.normalizeNumber(this.filters.stateId),
-      countyId: this.normalizeNumber(this.filters.countyId),
-      payamId: this.normalizeNumber(this.filters.payamId),
-      bomaId: this.normalizeNumber(this.filters.bomaId),
-      groupId: 0,
+      stateId: this.normalizeSelectedId(this.filters.stateId),
+      countyId: this.normalizeSelectedId(this.filters.countyId),
+      payamId: this.normalizeSelectedId(this.filters.payamId),
+      bomaId: this.normalizeSelectedId(this.filters.bomaId),
+      groupId: null,
     };
   }
 
@@ -392,15 +489,15 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
       householdNumber: item.householdNumber ?? '',
       respondentFullName: item.respondentFullName ?? '',
       respondentAge: this.normalizeNumber(item.respondentAge),
-      businessType: this.normalizeNumber(item.businessType),
+      businessType: this.normalizeNumberNullable(item.businessType),
       businessDescription: item.businessDescription ?? '',
       howSpent: item.howSpent ?? '',
-      inPersonPercentage: this.normalizeNumber(item.inPersonPercentage),
-      groupPercentage: this.normalizeNumber(item.groupPercentage),
-      planStatus: !!item.planStatus,
-      planSubmitted: !!item.planSubmitted,
-      planScreened: !!item.planScreened,
-      planApproved: !!item.planApproved,
+      inPersonPercentage: this.normalizeNumberNullable(item.inPersonPercentage),
+      groupPercentage: this.normalizeNumberNullable(item.groupPercentage),
+      planStatus: this.normalizeBooleanNullable(item.planStatus),
+      planSubmitted: this.normalizeBooleanNullable(item.planSubmitted),
+      planScreened: this.normalizeBooleanNullable(item.planScreened),
+      planApproved: this.normalizeBooleanNullable(item.planApproved),
       planRejectionReason: item.planRejectionReason ?? '',
       isDirty: false,
       isSaving: false,
@@ -435,15 +532,15 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
       householdNumber: (row.householdNumber ?? '').trim(),
       respondentFullName: (row.respondentFullName ?? '').trim(),
       respondentAge: this.normalizeNumber(row.respondentAge),
-      businessType: this.normalizeNumber(row.businessType),
+      businessType: this.normalizeNumberNullable(row.businessType),
       businessDescription: (row.businessDescription ?? '').trim(),
       howSpent: (row.howSpent ?? '').trim(),
-      inPersonPercentage: this.normalizeNumber(row.inPersonPercentage),
-      groupPercentage: this.normalizeNumber(row.groupPercentage),
-      planStatus: !!row.planStatus,
-      planSubmitted: !!row.planSubmitted,
-      planScreened: !!row.planScreened,
-      planApproved: !!row.planApproved,
+      inPersonPercentage: this.normalizeNumberNullable(row.inPersonPercentage),
+      groupPercentage: this.normalizeNumberNullable(row.groupPercentage),
+      planStatus: this.normalizeBooleanNullable(row.planStatus),
+      planSubmitted: this.normalizeBooleanNullable(row.planSubmitted),
+      planScreened: this.normalizeBooleanNullable(row.planScreened),
+      planApproved: this.normalizeBooleanNullable(row.planApproved),
       planRejectionReason: (row.planRejectionReason ?? '').trim(),
     };
   }
@@ -451,6 +548,25 @@ export class EconomicOpportunitiesBusinessPlanDevelopment implements OnInit {
   private normalizeNumber(value: unknown): number {
     const numericValue = Number(value);
     return Number.isFinite(numericValue) ? numericValue : 0;
+  }
+
+  private normalizeSelectedId(value: unknown): number | null {
+    const numericValue = this.normalizeNumber(value);
+    return numericValue > 0 ? numericValue : null;
+  }
+
+  private normalizeNumberNullable(value: unknown): number | null {
+    if (value === null || value === undefined || value === '') return null;
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : null;
+  }
+
+  private normalizeBooleanNullable(value: unknown): boolean | null {
+    if (value === null || value === undefined || value === '') return null;
+    if (typeof value === 'boolean') return value;
+    if (value === 'true' || value === 1 || value === '1') return true;
+    if (value === 'false' || value === 0 || value === '0') return false;
+    return null;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {

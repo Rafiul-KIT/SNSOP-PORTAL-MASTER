@@ -151,7 +151,8 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Serial</th>
-        <th>Application ID</th>
+        <th>Household Number</th>
+        <th>Beneficiary ID</th>
         <th>Respondent Name</th>
         <th>Age</th>
         <th>Interested In Participating</th>
@@ -169,6 +170,7 @@
       <tr>
         <td>{{ isEmbeddedMode ? i + 1 : (currentPage * pageSize) + i + 1 }}</td>
         <td>{{ row.applicationId || '--' }}</td>
+        <td>{{ row.beneficiaryId || '--' }}</td>
         <td>{{ row.respondentFullName || '--' }}</td>
         <td>{{ row.respondentAge ?? '--' }}</td>
         <td>
@@ -179,6 +181,7 @@
             [(ngModel)]="row.interestedInParticipating"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            placeholder="Select"
             class="w-100 table-select"
           ></p-select>
         </td>
@@ -190,6 +193,7 @@
             [(ngModel)]="row.survivesTargeting"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            placeholder="Select"
             class="w-100 table-select"
           ></p-select>
         </td>
@@ -201,6 +205,7 @@
             [(ngModel)]="row.treatmentArm"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            placeholder="Select"
             class="w-100 table-select"
           ></p-select>
         </td>
@@ -212,6 +217,7 @@
             [(ngModel)]="row.householdEnrollmentStatus"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            placeholder="Select"
             class="w-100 table-select"
           ></p-select>
         </td>

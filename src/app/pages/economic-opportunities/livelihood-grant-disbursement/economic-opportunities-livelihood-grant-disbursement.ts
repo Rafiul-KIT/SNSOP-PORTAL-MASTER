@@ -23,11 +23,11 @@ interface LivelihoodGrantFilters {
 }
 
 interface LivelihoodGrantSearchPayload {
-  stateId: number;
-  countyId: number;
-  payamId: number;
-  bomaId: number;
-  groupId: number;
+  stateId: number | null;
+  countyId: number | null;
+  payamId: number | null;
+  bomaId: number | null;
+  groupId: number | null;
 }
 
 interface LivelihoodGrantResponse {
@@ -110,6 +110,11 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
   bomas: IdName[] = [];
 
   filters: LivelihoodGrantFilters = this.createDefaultFilters();
+
+  readonly paymentCycleOptions = Array.from({ length: 15 }, (_, index) => {
+    const value = index + 1;
+    return { label: `Payment Cycle ${value}`, value };
+  });
 
   home: MenuItem = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
   items: MenuItem[] = [
@@ -214,6 +219,16 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
   async saveRow(row: LivelihoodGrantRow): Promise<void> {
     if (!row.isDirty || row.isSaving) return;
 
+    const validation = this.isValidData(row, this.validHouseholdNumbers);
+    if (!validation.isValid) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: validation.errorMessage,
+      });
+      return;
+    }
+
     const payload = this.toEditableSnapshot(row);
     row.isSaving = true;
     this.cdr.detectChanges();
@@ -257,6 +272,18 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
       return;
     }
 
+    for (const row of dirtyRows) {
+      const validation = this.isValidData(row, this.validHouseholdNumbers);
+      if (!validation.isValid) {
+        this.msg.add({
+          severity: 'warn',
+          summary: 'Validation Error',
+          detail: `Row for ${row.respondentFullName || row.householdNumber || row.id}: ${validation.errorMessage}`,
+        });
+        return;
+      }
+    }
+
     const payload = dirtyRows.map((row) => this.toEditableSnapshot(row));
     this.isBulkSaving = true;
     dirtyRows.forEach((row) => (row.isSaving = true));
@@ -293,6 +320,40 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
     }
   }
 
+  isValidData(row: LivelihoodGrantRow, validHouseholdNumbers: Set<string>): { isValid: boolean; errorMessage: string } {
+    const householdNumber = row.householdNumber.trim();
+
+    if (!householdNumber) {
+      return { isValid: false, errorMessage: 'Household Number is required.' };
+    }
+
+    if (!validHouseholdNumbers.has(householdNumber)) {
+      return { isValid: false, errorMessage: 'Household Number must be in the valid household list.' };
+    }
+
+    if (row.paymentAmount <= 0) {
+      return { isValid: false, errorMessage: 'Payment Amount must be greater than 0.' };
+    }
+
+    if (row.paymentCycle < 1 || row.paymentCycle > 15 || !Number.isInteger(row.paymentCycle)) {
+      return { isValid: false, errorMessage: 'Payment Cycle is required and must be Payment Cycle 1 to Payment Cycle 15.' };
+    }
+
+    if (!row.paymentDate) {
+      return { isValid: false, errorMessage: 'Payment Date is required.' };
+    }
+
+    const paymentDate = this.toLocalDateOnly(row.paymentDate);
+    const minDate = new Date(2020, 0, 1);
+    const today = this.toLocalDateOnly(new Date());
+
+    if (paymentDate < minDate || paymentDate > today) {
+      return { isValid: false, errorMessage: 'Payment Date must be between 01-01-2020 and today.' };
+    }
+
+    return { isValid: true, errorMessage: '' };
+  }
+
   onRowValueChange(row: LivelihoodGrantRow): void {
     row.respondentAge = this.normalizeNumber(row.respondentAge);
     row.paymentCycle = this.normalizeNumber(row.paymentCycle);
@@ -300,6 +361,14 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
     row.paymentDate = row.paymentDate ?? '';
     row.actualPaymentDate = row.actualPaymentDate ?? '';
     this.refreshDirtyState(row);
+  }
+
+  private get validHouseholdNumbers(): Set<string> {
+    return new Set(
+      this.rows
+        .map((row) => row.householdNumber.trim())
+        .filter((householdNumber) => householdNumber.length > 0)
+    );
   }
 
   private async loadRows(): Promise<void> {
@@ -355,11 +424,11 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
 
   private createSearchPayload(): LivelihoodGrantSearchPayload {
     return {
-      stateId: this.normalizeNumber(this.filters.stateId),
-      countyId: this.normalizeNumber(this.filters.countyId),
-      payamId: this.normalizeNumber(this.filters.payamId),
-      bomaId: this.normalizeNumber(this.filters.bomaId),
-      groupId: 0,
+      stateId: this.normalizeSelectedId(this.filters.stateId),
+      countyId: this.normalizeSelectedId(this.filters.countyId),
+      payamId: this.normalizeSelectedId(this.filters.payamId),
+      bomaId: this.normalizeSelectedId(this.filters.bomaId),
+      groupId: null,
     };
   }
 
@@ -419,9 +488,19 @@ export class EconomicOpportunitiesLivelihoodGrantDisbursement implements OnInit 
     return String(value).slice(0, 10);
   }
 
+  private toLocalDateOnly(value: Date | string): Date {
+    const date = value instanceof Date ? value : new Date(value);
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
   private normalizeNumber(value: unknown): number {
     const numericValue = Number(value);
     return Number.isFinite(numericValue) ? numericValue : 0;
+  }
+
+  private normalizeSelectedId(value: unknown): number | null {
+    const numericValue = this.normalizeNumber(value);
+    return numericValue > 0 ? numericValue : null;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {

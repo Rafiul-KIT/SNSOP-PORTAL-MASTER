@@ -55,14 +55,15 @@ interface GroupRecord {
 
 interface EnrollmentRecord {
   id: number;
-  beneficiaryId: number;
+  beneficiaryId: number | null;
+  householdNumber?: string | null;
   applicationId: string;
   respondentFullName: string;
   respondentAge: number;
-  interestedInParticipating: boolean;
-  survivesTargeting: boolean;
-  treatmentArm: boolean;
-  householdEnrollmentStatus: boolean;
+  interestedInParticipating: boolean | null;
+  survivesTargeting: boolean | null;
+  treatmentArm: boolean | null;
+  householdEnrollmentStatus: boolean | null;
   reasonForWhyNotEnrolled: string;
   groupId: number;
   groupName: string;
@@ -253,13 +254,23 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
   async saveRow(row: EnrollmentRow): Promise<void> {
     if (!row.isDirty || row.isSaving) return;
 
+    const validation = this.isValidData(row);
+    if (!validation.isValid) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: validation.errorMessage,
+      });
+      return;
+    }
+
     const payload: EditableEnrollmentSnapshot = {
       id: row.id,
       beneficiaryId: row.beneficiaryId,
-      interestedInParticipating: !!row.interestedInParticipating,
-      survivesTargeting: !!row.survivesTargeting,
-      treatmentArm: !!row.treatmentArm,
-      householdEnrollmentStatus: !!row.householdEnrollmentStatus,
+      interestedInParticipating: row.interestedInParticipating,
+      survivesTargeting: row.survivesTargeting,
+      treatmentArm: row.treatmentArm,
+      householdEnrollmentStatus: row.householdEnrollmentStatus,
       reasonForWhyNotEnrolled: row.reasonForWhyNotEnrolled ?? '',
       groupId: Number(row.groupId) || 0,
       nomineeIndex: Number(row.nomineeIndex) || 0,
@@ -297,7 +308,60 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
     }
   }
 
+  isValidData(row: EnrollmentRow): { isValid: boolean; errorMessage: string } {
+    if (!this.getHouseholdNumber(row)) {
+      return { isValid: false, errorMessage: 'Household Number is required.' };
+    }
+
+    if (row.interestedInParticipating === null || row.interestedInParticipating === undefined) {
+      return { isValid: false, errorMessage: 'Interested In Participating is required.' };
+    }
+
+    if (row.survivesTargeting === null || row.survivesTargeting === undefined) {
+      return { isValid: false, errorMessage: 'Survives Targeting is required.' };
+    }
+
+    if (row.householdEnrollmentStatus === null || row.householdEnrollmentStatus === undefined) {
+      return { isValid: false, errorMessage: 'HH Enrollment Status is required.' };
+    }
+
+    if (row.householdEnrollmentStatus === true) {
+      if (row.treatmentArm === null || row.treatmentArm === undefined) {
+        return { isValid: false, errorMessage: 'Treatment Arm is required when HH Enrollment Status is Yes.' };
+      }
+
+      if (!row.beneficiaryId) {
+        return { isValid: false, errorMessage: 'Enrolled Member ID is required when HH Enrollment Status is Yes.' };
+      }
+
+      if (row.reasonForWhyNotEnrolled && row.reasonForWhyNotEnrolled.trim() !== '') {
+        return { isValid: false, errorMessage: 'Reason For Why Not Enrolled must be blank when HH Enrollment Status is Yes.' };
+      }
+    } else if (row.householdEnrollmentStatus === false) {
+      if (row.treatmentArm !== null && row.treatmentArm !== undefined) {
+        return { isValid: false, errorMessage: 'Treatment Arm must be null when HH Enrollment Status is No.' };
+      }
+
+      if (row.beneficiaryId !== null && row.beneficiaryId !== undefined && row.beneficiaryId !== 0) {
+        return { isValid: false, errorMessage: 'Enrolled Member ID must be null when HH Enrollment Status is No.' };
+      }
+
+      if (!row.reasonForWhyNotEnrolled || row.reasonForWhyNotEnrolled.trim() === '') {
+        return { isValid: false, errorMessage: 'Reason For Why Not Enrolled is required when HH Enrollment Status is No.' };
+      }
+    }
+
+    return { isValid: true, errorMessage: '' };
+  }
+
   onRowValueChange(row: EnrollmentRow): void {
+    if (row.householdEnrollmentStatus === true) {
+      row.reasonForWhyNotEnrolled = '';
+    } else if (row.householdEnrollmentStatus === false) {
+      row.treatmentArm = null;
+      row.beneficiaryId = null;
+    }
+
     row.groupId = this.normalizeNumber(row.groupId);
     row.nomineeIndex = this.normalizeNumber(row.nomineeIndex);
     row.reasonForWhyNotEnrolled = row.reasonForWhyNotEnrolled ?? '';
@@ -410,14 +474,14 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
   private toRow(item: EnrollmentRecord): EnrollmentRow {
     return {
       id: this.normalizeNumber(item.id),
-      beneficiaryId: this.normalizeNumber(item.beneficiaryId),
-      applicationId: item.applicationId ?? '',
+      beneficiaryId: this.normalizeNumberNullable(item.beneficiaryId),
+      applicationId: item.applicationId ?? item.householdNumber ?? '',
       respondentFullName: item.respondentFullName ?? '',
       respondentAge: this.normalizeNumber(item.respondentAge),
-      interestedInParticipating: !!item.interestedInParticipating,
-      survivesTargeting: !!item.survivesTargeting,
-      treatmentArm: !!item.treatmentArm,
-      householdEnrollmentStatus: !!item.householdEnrollmentStatus,
+      interestedInParticipating: this.normalizeBooleanNullable(item.interestedInParticipating),
+      survivesTargeting: this.normalizeBooleanNullable(item.survivesTargeting),
+      treatmentArm: this.normalizeBooleanNullable(item.treatmentArm),
+      householdEnrollmentStatus: this.normalizeBooleanNullable(item.householdEnrollmentStatus),
       reasonForWhyNotEnrolled: item.reasonForWhyNotEnrolled ?? '',
       groupId: this.normalizeNumber(item.groupId),
       groupName: item.groupName ?? '',
@@ -449,26 +513,45 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
       original.householdEnrollmentStatus !== current.householdEnrollmentStatus ||
       original.reasonForWhyNotEnrolled !== current.reasonForWhyNotEnrolled ||
       original.groupId !== current.groupId ||
-      original.nomineeIndex !== current.nomineeIndex;
+      original.nomineeIndex !== current.nomineeIndex ||
+      original.beneficiaryId !== current.beneficiaryId;
   }
 
   private toEditableSnapshot(row: EnrollmentRecord): EditableEnrollmentSnapshot {
     return {
       id: row.id,
-      beneficiaryId: row.beneficiaryId,
-      interestedInParticipating: !!row.interestedInParticipating,
-      survivesTargeting: !!row.survivesTargeting,
-      treatmentArm: !!row.treatmentArm,
-      householdEnrollmentStatus: !!row.householdEnrollmentStatus,
+      beneficiaryId: this.normalizeNumberNullable(row.beneficiaryId),
+      interestedInParticipating: this.normalizeBooleanNullable(row.interestedInParticipating),
+      survivesTargeting: this.normalizeBooleanNullable(row.survivesTargeting),
+      treatmentArm: this.normalizeBooleanNullable(row.treatmentArm),
+      householdEnrollmentStatus: this.normalizeBooleanNullable(row.householdEnrollmentStatus),
       reasonForWhyNotEnrolled: (row.reasonForWhyNotEnrolled ?? '').trim(),
       groupId: this.normalizeNumber(row.groupId),
       nomineeIndex: this.normalizeNumber(row.nomineeIndex),
     };
   }
 
+  private getHouseholdNumber(row: EnrollmentRecord): string {
+    return (row.householdNumber ?? row.applicationId ?? '').trim();
+  }
+
   private normalizeNumber(value: unknown): number {
     const numericValue = Number(value);
     return Number.isFinite(numericValue) ? numericValue : 0;
+  }
+
+  private normalizeNumberNullable(value: unknown): number | null {
+    if (value === null || value === undefined || value === '') return null;
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : null;
+  }
+
+  private normalizeBooleanNullable(value: unknown): boolean | null {
+    if (value === null || value === undefined || value === '') return null;
+    if (typeof value === 'boolean') return value;
+    if (value === 'true' || value === 1 || value === '1') return true;
+    if (value === 'false' || value === 0 || value === '0') return false;
+    return null;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {

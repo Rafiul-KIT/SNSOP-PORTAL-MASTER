@@ -48,6 +48,7 @@ interface CourseOption {
   id: number;
   courseName: string;
   courseCode: string;
+  courseDuration: number;
 }
 
 interface CourseListResponse {
@@ -84,6 +85,20 @@ interface AttendanceRecord {
   classAttendanceDate: string;
   presentInClass: boolean;
   classMissReason: string;
+}
+
+interface CourseDetailsRecord {
+  id: number;
+  courseId: number;
+  courseCode: string;
+  classHoldingDate: string;
+  classDurationInMinutes: number;
+}
+
+interface CourseDetailsListResponse {
+  code?: number | string | null;
+  message?: string | null;
+  content?: CourseDetailsRecord[] | null;
 }
 
 interface AttendanceSearchResponse {
@@ -124,8 +139,10 @@ interface AttendanceSearchResponse {
 export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
   private readonly beneficiaryEndpoint = '/api/beneficiary/getBeneficiaryForEconOp';
   private readonly courseEndpoint = '/api/econ-op/course/get';
+  private readonly courseDetailsEndpoint = '/api/econ-op/course-detail/get';
   private readonly saveEndpoint = '/api/econ-op/course-attendance/save';
   private readonly attendanceSearchEndpoint = '/api/econ-op/course-attendance/get';
+  private readonly validCourseCodes = new Set(['FINLIT', 'LIVETECH', 'LIFESKILL', 'SAVINGS']);
 
   isLoading = false;
   isLoadingCourses = false;
@@ -334,6 +351,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
         id: Number(item.id) || 0,
         courseName: item.courseName ?? '',
         courseCode: item.courseCode ?? '',
+        courseDuration: Number(item.courseDuration) || 0,
       }));
     } catch (err) {
       console.error('Failed to load courses', err);
@@ -421,6 +439,18 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
       return;
     }
 
+    const validCourseDates = await this.loadValidCourseDates(this.selectedCourseId);
+    for (const row of this.attendanceRows) {
+      const validation = this.isValidData(row, validCourseDates);
+      if (!validation.isValid) {
+        this.showWarn(
+          'Validation Error',
+          `Row for ${row.respondentFullName || row.householdNumber || row.beneficiaryId}: ${validation.errorMessage}`
+        );
+        return;
+      }
+    }
+
     const payload: AttendanceDraft[] = this.attendanceRows.map((row) => ({
       courseId: Number(row.courseId) || 0,
       beneficiaryId: Number(row.beneficiaryId) || 0,
@@ -492,6 +522,10 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
 
   get selectedCourseCode(): string {
     return this.courses.find((course) => course.id === this.selectedCourseId)?.courseCode ?? '';
+  }
+
+  private get selectedCourse(): CourseOption | null {
+    return this.courses.find((course) => course.id === this.selectedCourseId) ?? null;
   }
 
   private async loadBeneficiaries(): Promise<void> {
@@ -581,6 +615,74 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
       this.isSearchingAttendance = false;
       this.cdr.detectChanges();
     }
+  }
+
+  private async loadValidCourseDates(courseId: number | null): Promise<Set<string>> {
+    if (!courseId) return new Set<string>();
+
+    try {
+      const res = await this.api.GET<CourseDetailsListResponse>(this.courseDetailsEndpoint, {
+        courseId,
+        offset: 0,
+        pageSize: 1000,
+      });
+      const data = res?.data;
+
+      if (!this.isApiSuccess(data, Array.isArray(data?.content))) {
+        throw new Error(data?.message || 'Unable to load valid course dates');
+      }
+
+      const content = Array.isArray(data?.content) ? data.content : [];
+      return new Set(
+        content
+          .map((detail) => this.normalizeDateString(detail.classHoldingDate))
+          .filter((date): date is string => !!date)
+      );
+    } catch (err) {
+      console.error('Failed to load valid course dates', err);
+      return new Set<string>();
+    }
+  }
+
+  private isValidData(
+    row: AttendanceEntryRow,
+    validCourseDates: Set<string>
+  ): { isValid: boolean; errorMessage: string } {
+    const householdNumber = row.householdNumber.trim();
+    if (!householdNumber) {
+      return { isValid: false, errorMessage: 'Household Number is required.' };
+    }
+
+    const course = this.selectedCourse;
+    const courseCode = (course?.courseCode ?? '').trim().toUpperCase();
+    if (!courseCode) {
+      return { isValid: false, errorMessage: 'Course Code is required.' };
+    }
+
+    if (!this.validCourseCodes.has(courseCode)) {
+      return { isValid: false, errorMessage: 'Course Code must be one of: FINLIT, LIVETECH, LIFESKILL, SAVINGS.' };
+    }
+
+    if ((course?.courseDuration ?? 0) <= 0) {
+      return { isValid: false, errorMessage: 'Course Duration must be positive.' };
+    }
+
+    const rowWithClassCounts = row as AttendanceEntryRow & {
+      classesAttended?: number | null;
+      classesHeld?: number | null;
+    };
+    const classesAttended = this.normalizeNullableNumber(rowWithClassCounts.classesAttended);
+    const classesHeld = this.normalizeNullableNumber(rowWithClassCounts.classesHeld);
+    if (classesAttended != null && classesHeld != null && classesAttended > classesHeld) {
+      return { isValid: false, errorMessage: 'Classes Attended cannot exceed Classes Held.' };
+    }
+
+    const classAttendanceDate = this.normalizeDateString(row.classAttendanceDate);
+    if (!classAttendanceDate || !validCourseDates.has(classAttendanceDate)) {
+      return { isValid: false, errorMessage: 'Class Attendance Date must be within valid course dates for that course.' };
+    }
+
+    return { isValid: true, errorMessage: '' };
   }
 
   private extractAttendanceList(data: AttendanceSearchResponse | AttendanceRecord[] | AttendanceRecord | null | undefined): AttendanceRecord[] {
@@ -676,6 +778,21 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
     const month = String(value.getMonth() + 1).padStart(2, '0');
     const day = String(value.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private normalizeDateString(value: string | null | undefined): string {
+    if (!value) return '';
+    const [date] = value.split('T');
+    return date.trim();
+  }
+
+  private normalizeNullableNumber(value: unknown): number | null {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : null;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {

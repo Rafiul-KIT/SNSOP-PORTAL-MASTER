@@ -142,7 +142,6 @@
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
         <th>Serial</th>
-        <th>ID</th>
         <th>Beneficiary ID</th>
         <th>Household Number</th>
         <th>Respondent Name</th>
@@ -161,29 +160,23 @@
           <p-tableCheckbox [value]="row"></p-tableCheckbox>
         </td>
         <td>{{ (currentPage * pageSize) + i + 1 }}</td>
-        <td>{{ row.id }}</td>
         <td>{{ row.beneficiaryId }}</td>
         <td>{{ row.householdNumber || '--' }}</td>
         <td>{{ row.respondentFullName || '--' }}</td>
         <td>
-          <input
-            pInputText
-            type="number"
-            [(ngModel)]="row.respondentAge"
-            [ngModelOptions]="{ standalone: true }"
-            (ngModelChange)="onRowValueChange(row)"
-            class="form-control table-number"
-          />
+          {{ row.respondentAge || '--' }}
         </td>
         <td>
-          <input
-            pInputText
-            type="number"
+          <p-select
+            [options]="paymentCycleOptions"
+            optionLabel="label"
+            optionValue="value"
             [(ngModel)]="row.paymentCycle"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
-            class="form-control table-number"
-          />
+            placeholder="Select"
+            class="w-100 table-select"
+          ></p-select>
         </td>
         <td>
           <input

@@ -16,12 +16,14 @@ import { ApiService } from '../../../../../services/api.service';
 interface CourseFormModel {
   courseName: string;
   courseCode: string;
+  courseDuration: number | null;
 }
 
 interface CourseRecord {
   id: number;
   courseName: string;
   courseCode: string;
+  courseDuration: number;
 }
 
 interface CourseListResponse {
@@ -86,20 +88,12 @@ export class EconomicOpportunitiesCourseEntity implements OnInit {
   }
 
   async saveCourse(): Promise<void> {
-    if (!this.form.courseName.trim()) {
+    const validation = this.isValidData(this.form);
+    if (!validation.isValid) {
       this.msg.add({
         severity: 'warn',
-        summary: 'Course Name Required',
-        detail: 'Please provide a course name before saving.',
-      });
-      return;
-    }
-
-    if (!this.form.courseCode.trim()) {
-      this.msg.add({
-        severity: 'warn',
-        summary: 'Course Code Required',
-        detail: 'Please provide a course code before saving.',
+        summary: 'Validation Error',
+        detail: validation.errorMessage,
       });
       return;
     }
@@ -107,6 +101,7 @@ export class EconomicOpportunitiesCourseEntity implements OnInit {
     const payload = {
       courseName: this.form.courseName.trim(),
       courseCode: this.form.courseCode.trim(),
+      courseDuration: this.normalizeNumber(this.form.courseDuration),
     };
 
     try {
@@ -180,6 +175,7 @@ export class EconomicOpportunitiesCourseEntity implements OnInit {
         id: Number(item.id) || 0,
         courseName: item.courseName ?? '',
         courseCode: item.courseCode ?? '',
+        courseDuration: Number(item.courseDuration) || 0,
       }));
       this.totalRecords = Number(data?.totalElements ?? content.length ?? 0);
       this.currentPage = Number(data?.pageNumber ?? this.currentPage ?? 0);
@@ -200,7 +196,29 @@ export class EconomicOpportunitiesCourseEntity implements OnInit {
     return {
       courseName: '',
       courseCode: '',
+      courseDuration: null,
     };
+  }
+
+  private isValidData(course: CourseFormModel): { isValid: boolean; errorMessage: string } {
+    if (!course.courseName.trim()) {
+      return { isValid: false, errorMessage: 'Course Name is required.' };
+    }
+
+    if (!course.courseCode.trim()) {
+      return { isValid: false, errorMessage: 'Course Code is required.' };
+    }
+
+    if (this.normalizeNumber(course.courseDuration) <= 0) {
+      return { isValid: false, errorMessage: 'Course Duration must be greater than 0.' };
+    }
+
+    return { isValid: true, errorMessage: '' };
+  }
+
+  private normalizeNumber(value: unknown): number {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) ? numericValue : 0;
   }
 
   private isApiSuccess(data: { code?: number | string | null } | null | undefined, fallback = false): boolean {

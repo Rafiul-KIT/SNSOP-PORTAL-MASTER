@@ -133,7 +133,6 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Serial</th>
-        <th>ID</th>
         <th>Group Name</th>
         <th>Latitude</th>
         <th>Longitude</th>
@@ -144,7 +143,6 @@
     <ng-template pTemplate="body" let-row let-i="rowIndex">
       <tr>
         <td>{{ (currentPage * pageSize) + i + 1 }}</td>
-        <td>{{ row.id }}</td>
         <td>{{ row.groupName || '--' }}</td>
         <td>{{ row.latitude }}</td>
         <td>{{ row.longitude }}</td>

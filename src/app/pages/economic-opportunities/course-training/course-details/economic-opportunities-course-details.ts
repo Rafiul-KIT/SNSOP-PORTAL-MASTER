@@ -159,30 +159,20 @@ export class EconomicOpportunitiesCourseDetails implements OnInit {
   }
 
   async saveCourseDetails(): Promise<void> {
-    if (!this.form.courseId) {
+    const validation = this.isValidData(this.form, this.courses);
+    if (!validation.isValid) {
       this.msg.add({
         severity: 'warn',
-        summary: 'Course Required',
-        detail: 'Please select a course before saving.',
+        summary: 'Validation Error',
+        detail: validation.errorMessage,
       });
       return;
     }
 
-    if (!this.form.classHoldingDate) {
-      this.msg.add({
-        severity: 'warn',
-        summary: 'Class Date Required',
-        detail: 'Please select the class holding date before saving.',
-      });
-      return;
-    }
+    const classHoldingDate = this.form.classHoldingDate;
+    const classDurationInMinutes = this.normalizeNullableNumber(this.form.classDurationInMinutes);
 
-    if (this.normalizeNullableNumber(this.form.classDurationInMinutes) == null) {
-      this.msg.add({
-        severity: 'warn',
-        summary: 'Duration Required',
-        detail: 'Please provide the class duration in minutes before saving.',
-      });
+    if (!classHoldingDate || classDurationInMinutes == null) {
       return;
     }
 
@@ -191,8 +181,8 @@ export class EconomicOpportunitiesCourseDetails implements OnInit {
         id: 0,
         courseId: this.form.courseId,
         courseCode: this.form.courseCode.trim(),
-        classHoldingDate: this.formatDate(this.form.classHoldingDate),
-        classDurationInMinutes: this.normalizeNullableNumber(this.form.classDurationInMinutes) ?? 0,
+        classHoldingDate: this.formatDate(classHoldingDate),
+        classDurationInMinutes,
       },
     ];
 
@@ -326,6 +316,32 @@ export class EconomicOpportunitiesCourseDetails implements OnInit {
       courseId: null,
       courseCode: '',
     };
+  }
+
+  private isValidData(
+    detail: CourseDetailsFormModel,
+    validCourseCode: CourseOption[]
+  ): { isValid: boolean; errorMessage: string } {
+    const courseCode = detail.courseCode.trim();
+
+    if (!courseCode) {
+      return { isValid: false, errorMessage: 'Course Code is required.' };
+    }
+
+    if (!validCourseCode.some((course) => course.courseCode === courseCode)) {
+      return { isValid: false, errorMessage: 'Course Code must exist in the valid course list.' };
+    }
+
+    if (!detail.classHoldingDate) {
+      return { isValid: false, errorMessage: 'Class Holding Date is required.' };
+    }
+
+    const classDuration = this.normalizeNullableNumber(detail.classDurationInMinutes);
+    if (classDuration == null || classDuration <= 0) {
+      return { isValid: false, errorMessage: 'Class Duration Minutes is required and must be greater than 0.' };
+    }
+
+    return { isValid: true, errorMessage: '' };
   }
 
   private normalizeNullableNumber(value: unknown): number | null {
