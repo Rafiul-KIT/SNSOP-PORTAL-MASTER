@@ -131,7 +131,7 @@
     [(selection)]="selectedRows"
     [responsiveLayout]="'scroll'"
     [scrollHeight]="'60vh'"
-    [tableStyle]="{ 'min-width': '1750px', 'margin-bottom': '5px' }"
+    [tableStyle]="{ 'min-width': '1900px', 'margin-bottom': '5px' }"
     dataKey="id"
     size="small"
     styleClass="p-datatable-sm p-datatable-gridlines"
@@ -145,8 +145,8 @@
         <th>Beneficiary ID</th>
         <th>Household Number</th>
         <th>Respondent Name</th>
-        <th>Age</th>
-        <th>Connected To Financial Service</th>
+        <th class="age-col">Age</th>
+        <th class="connected-service-col">Connected To Financial Service</th>
         <th>Financial Service Name</th>
         <th>Connected At</th>
         <th>Deposit Account Opened</th>
@@ -165,10 +165,10 @@
         <td>{{ row.beneficiaryId }}</td>
         <td>{{ row.householdNumber || '--' }}</td>
         <td>{{ row.respondentFullName || '--' }}</td>
-        <td>
+        <td class="age-col">
           {{ row.respondentAge || '--' }}
         </td>
-        <td>
+        <td class="connected-service-col">
           <p-select
             [options]="booleanOptions"
             optionLabel="label"
@@ -176,6 +176,7 @@
             [(ngModel)]="row.connectedToFinancialService"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            appendTo="body"
             placeholder="Select"
             class="w-100 table-select"
           ></p-select>
@@ -187,6 +188,7 @@
             [(ngModel)]="row.financialServiceName"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.connectedToFinancialService !== true"
             class="form-control table-text"
           />
         </td>
@@ -197,6 +199,7 @@
             [(ngModel)]="row.financialServiceConnectedAt"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.connectedToFinancialService !== true"
             class="form-control table-date"
           />
         </td>
@@ -208,6 +211,8 @@
             [(ngModel)]="row.depositAccountOpened"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.connectedToFinancialService !== true"
+            appendTo="body"
             placeholder="Select"
             class="w-100 table-select"
           ></p-select>
@@ -219,6 +224,7 @@
             [(ngModel)]="row.depositAccountOpenedAt"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.depositAccountOpened !== true"
             class="form-control table-date"
           />
         </td>
@@ -229,6 +235,7 @@
             [(ngModel)]="row.accountLastActivityDate"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.depositAccountOpened !== true"
             class="form-control table-date"
           />
         </td>

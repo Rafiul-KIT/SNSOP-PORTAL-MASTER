@@ -342,9 +342,9 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
         return { isValid: false, errorMessage: 'Treatment Arm must be null when HH Enrollment Status is No.' };
       }
 
-      if (row.beneficiaryId !== null && row.beneficiaryId !== undefined && row.beneficiaryId !== 0) {
-        return { isValid: false, errorMessage: 'Enrolled Member ID must be null when HH Enrollment Status is No.' };
-      }
+      // if (row.beneficiaryId !== null && row.beneficiaryId !== undefined && row.beneficiaryId !== 0) {
+      //   return { isValid: false, errorMessage: 'Enrolled Member ID must be null when HH Enrollment Status is No.' };
+      // }
 
       if (!row.reasonForWhyNotEnrolled || row.reasonForWhyNotEnrolled.trim() === '') {
         return { isValid: false, errorMessage: 'Reason For Why Not Enrolled is required when HH Enrollment Status is No.' };
@@ -359,7 +359,6 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
       row.reasonForWhyNotEnrolled = '';
     } else if (row.householdEnrollmentStatus === false) {
       row.treatmentArm = null;
-      row.beneficiaryId = null;
     }
 
     row.groupId = this.normalizeNumber(row.groupId);

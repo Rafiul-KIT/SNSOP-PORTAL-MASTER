@@ -280,6 +280,7 @@
             [(ngModel)]="row.planRejectionReason"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.planApproved !== false"
             rows="2"
             class="form-control table-textarea"
           ></textarea>

@@ -339,16 +339,26 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
       return { isValid: false, errorMessage: 'Connected Financial Services is required.' };
     }
 
-    if (!row.financialServiceConnectedAt) {
-      return { isValid: false, errorMessage: 'Financial Service Connection Date is required.' };
-    }
+    if (row.connectedToFinancialService === true) {
+      if (!row.financialServiceConnectedAt) {
+        return { isValid: false, errorMessage: 'Financial Service Connection Date is required when Connected Financial Services is Yes.' };
+      }
 
-    if (row.depositAccountOpened === null || row.depositAccountOpened === undefined) {
-      return { isValid: false, errorMessage: 'Deposit Account Opened is required.' };
+      if (row.depositAccountOpened === null || row.depositAccountOpened === undefined) {
+        return { isValid: false, errorMessage: 'Deposit Account Opened is required when Connected Financial Services is Yes.' };
+      }
+    } else if (row.connectedToFinancialService === false) {
+      if (row.financialServiceName?.trim() || row.financialServiceConnectedAt || row.depositAccountOpened !== null || row.depositAccountOpenedAt || row.accountLastActivityDate) {
+        return { isValid: false, errorMessage: 'Financial service details must be blank when Connected Financial Services is No.' };
+      }
     }
 
     if (row.depositAccountOpened === true && !row.depositAccountOpenedAt) {
       return { isValid: false, errorMessage: 'Deposit Account Opening Date is required when Deposit Account Opened is Yes.' };
+    }
+
+    if (row.depositAccountOpened === false && (row.depositAccountOpenedAt || row.accountLastActivityDate)) {
+      return { isValid: false, errorMessage: 'Deposit account dates must be blank when Deposit Account Opened is No.' };
     }
 
     if (row.accountLastActivityDate) {
@@ -363,6 +373,17 @@ export class EconomicOpportunitiesFinancialServiceLinkageTracking implements OnI
   }
 
   onRowValueChange(row: FinancialServiceRow): void {
+    if (row.connectedToFinancialService === false) {
+      row.financialServiceName = '';
+      row.financialServiceConnectedAt = '';
+      row.depositAccountOpened = null;
+      row.depositAccountOpenedAt = '';
+      row.accountLastActivityDate = '';
+    } else if (row.depositAccountOpened === false || row.depositAccountOpened === null) {
+      row.depositAccountOpenedAt = '';
+      row.accountLastActivityDate = '';
+    }
+
     row.respondentAge = this.normalizeNumber(row.respondentAge);
     row.financialServiceName = row.financialServiceName ?? '';
     row.financialServiceConnectedAt = row.financialServiceConnectedAt ?? '';

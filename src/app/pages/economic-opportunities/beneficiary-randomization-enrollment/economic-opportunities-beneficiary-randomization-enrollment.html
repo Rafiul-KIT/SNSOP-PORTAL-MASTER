@@ -205,6 +205,7 @@
             [(ngModel)]="row.treatmentArm"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.householdEnrollmentStatus !== true"
             placeholder="Select"
             class="w-100 table-select"
           ></p-select>
@@ -227,6 +228,7 @@
             [(ngModel)]="row.reasonForWhyNotEnrolled"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="onRowValueChange(row)"
+            [disabled]="row.householdEnrollmentStatus !== false"
             rows="2"
             class="form-control table-textarea"
           ></textarea>
