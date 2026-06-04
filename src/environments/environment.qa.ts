@@ -4,6 +4,7 @@ export const environment = {
   useHash: true,
   domain: 'https://qa-mis.southsudansafetynet.info',
   globalApi: 'https://qa-gwapp.southsudansafetynet.info/mis_server/',
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://qa-mis.southsudansafetynet.info/v2/',
     beneficiary: 'https://qa-mis.southsudansafetynet.info/v2/beneficiary',
@@ -16,7 +17,8 @@ export const environment = {
     economicOpportunities: 'https://qa-mis.southsudansafetynet.info/v2/#/economic-opportunities/dashboard',
     UnderConstruction: 'https://qa-mis.southsudansafetynet.info/v2/#/under-construction',
     helpDesk: 'https://qa-mis.southsudansafetynet.info/v2/#/help-desk/dashboard',
-    dms: 'https://qa-mis.southsudansafetynet.info/v2/dms/'
+    dms: 'https://qa-mis.southsudansafetynet.info/v2/dms/',
+    automatedTargeting: 'https://qa-mis.southsudansafetynet.info/v2/#/automated-targeting/dashboard',
   },
   msalConfig: {
     auth: {

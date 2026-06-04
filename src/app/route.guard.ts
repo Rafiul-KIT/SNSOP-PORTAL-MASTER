@@ -69,7 +69,7 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
     if (/^\/help-desk\/request-details\/[^/]+$/.test(cleanUrl)) {
       equivalents.add('/help-desk/support-management');
       equivalents.add('/help-desk/status-tracker');
-      
+
     }
 
     if (cleanUrl === '/help-desk/setup') {
@@ -77,6 +77,25 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
     }
 
     return [...equivalents];
+  };
+
+  const dynamicRoutePrefixes = [
+    '/beneficiary/details/',
+    '/beneficiary/details-view/',
+    '/beneficiary/edit/',
+    '/beneficiary/migrate/',
+    '/adjudication/',
+    '/report/',
+    '/restore/',
+    '/pending-beneficiary/',
+    '/beneficiary-approval/',
+    '/beneficiary-audit/',
+    '/beneficiary/momo-update/',
+  ];
+
+  const isDynamicRoute = (url: string): boolean => {
+    const cleanUrl = normalizeUrl(url);
+    return dynamicRoutePrefixes.some(prefix => cleanUrl.startsWith(prefix));
   };
 
   const hasAccess = (menus: any[], url: string): boolean => {
@@ -88,6 +107,10 @@ export const routeGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, s
       if (candidateUrls.some(candidateUrl => routeMatches(menu.url, candidateUrl))) {
         return true;
       }
+    }
+
+    if (isDynamicRoute(url)) {
+      return true;
     }
 
     return false;

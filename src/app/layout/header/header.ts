@@ -68,6 +68,9 @@ export class Header {
   isUserManagementPage = computed(() =>
     this.currentUrl().startsWith('/user-management/'),
   );
+  isAutomatedTargetingPage = computed(() =>
+    this.currentUrl().startsWith('/automated-targeting'),
+  );
 
   // Computed menu list based on current page and permissions
   menuList = computed(() => {
@@ -101,6 +104,9 @@ export class Header {
         this.getStaticMasterMenus(),
         allowedNames,
       );
+    }
+    if (this.isAutomatedTargetingPage()) {
+      return this.getAutomatedTargetingMenus();
     }
     return [];
   });
@@ -371,6 +377,21 @@ export class Header {
             ],
           },
         ],
+      },
+    ];
+  }
+
+  getAutomatedTargetingMenus(): MenuItem[] {
+    return [
+      {
+        label: 'Dashboard',
+        icon: 'fas fa-chart-line',
+        routerLink: ['/automated-targeting/dashboard'],
+      },
+      {
+        label: 'Beneficiary List',
+        icon: 'fas fa-list',
+        routerLink: ['/automated-targeting/beneficiary-list'],
       },
     ];
   }

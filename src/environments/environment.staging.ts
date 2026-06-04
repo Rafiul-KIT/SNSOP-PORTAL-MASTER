@@ -4,6 +4,7 @@ export const environment = {
   useHash: true,
   domain: 'https://newmis.southsudansafetynet.info',
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://newmis.southsudansafetynet.info/trial/master/',
     beneficiary: 'https://newmis.southsudansafetynet.info/trial/beneficiary/',
@@ -16,7 +17,8 @@ export const environment = {
     economicOpportunities: 'https://newmis.southsudansafetynet.info/trial/master/#/economic-opportunities/dashboard',
     UnderConstruction: 'https://newmis.southsudansafetynet.info/trial/master/#/under-construction',
     helpDesk: 'https://newmis.southsudansafetynet.info/trial/master/#/help-desk/dashboard',
-    dms: 'https://newmis.southsudansafetynet.info/trial/dms/'
+    dms: 'https://newmis.southsudansafetynet.info/trial/dms/',
+    automatedTargeting: 'https://newmis.southsudansafetynet.info/trial/master/#/automated-targeting/dashboard',
   },
   msalConfig: {
     auth: {

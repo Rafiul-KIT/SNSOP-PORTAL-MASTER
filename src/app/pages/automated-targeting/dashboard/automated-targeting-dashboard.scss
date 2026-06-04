@@ -1,0 +1,43 @@
+.breadcrumb-wrapper {
+  margin-bottom: 1rem;
+}
+
+.page-header {
+  align-items: flex-end;
+}
+
+.dashboard-summary {
+  .summary-value {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-top: 0.75rem;
+  }
+}
+
+.breakdown-section {
+  background: #fff;
+  border-radius: 0.5rem;
+}
+
+.section-header {
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 1rem;
+}
+
+.breakdown-table input {
+  border: none;
+  min-width: 70px;
+}
+
+.breakdown-table td,
+.breakdown-table th {
+  vertical-align: middle;
+}
+
+.lactating-row td {
+  background: #f8f9fa;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}

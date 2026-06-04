@@ -35,6 +35,10 @@ import { EconomicOpportunitiesLivelihoodGrantDisbursement } from './pages/econom
 import { EconomicOpportunitiesFinancialServiceLinkageTracking } from './pages/economic-opportunities/financial-service-linkage-tracking/economic-opportunities-financial-service-linkage-tracking';
 import { Metabase } from './pages/metabase/metabase';
 import { MneReports } from './pages/monitoring-evaluation/mne-reports/mne-reports';
+import { AutomatedTargetingDashboard } from './pages/automated-targeting/dashboard/automated-targeting-dashboard';
+import { AutomatedTargetingResults } from './pages/automated-targeting/results/automated-targeting-results';
+import { AutomatedTargetingBeneficiaryDetails } from './pages/automated-targeting/beneficiary-details/automated-targeting-beneficiary-details';
+
 
 
 
@@ -153,6 +157,28 @@ export const routes: Routes = [
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
+  },
+  {
+    path: 'automated-targeting',
+    children: [
+      {
+        path: 'dashboard',
+        component: AutomatedTargetingDashboard,
+      },
+      {
+        path: 'beneficiary-list',
+        component: AutomatedTargetingResults,
+      },
+      {
+        path: 'beneficiary-details/:id',
+        component: AutomatedTargetingBeneficiaryDetails,
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dashboard',
+      },
+    ],
   },
   { path: 'unauthorized', component: Unauthorized },
   { path: 'under-construction', component: UnderConstruction },

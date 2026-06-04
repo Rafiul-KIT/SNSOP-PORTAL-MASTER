@@ -6,6 +6,7 @@ export const environment = {
   useHash: true,
   domain: 'https://mis.southsudansafetynet.info',
   globalApi: 'https://gwapp.southsudansafetynet.info/mis_server/',
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://mis.southsudansafetynet.info/v2/',
     beneficiary: 'https://mis.southsudansafetynet.info/v2/beneficiary',
@@ -19,6 +20,7 @@ export const environment = {
     UnderConstruction: 'https://mis.southsudansafetynet.info/v2/#/under-construction',
     helpDesk: 'https://mis.southsudansafetynet.info/v2/#/help-desk/dashboard',
     dms: 'https://mis.southsudansafetynet.info/v2/dms/',
+    automatedTargeting: 'https://mis.southsudansafetynet.info/v2/#/automated-targeting/dashboard',
   },
   msalConfig: {
     auth: {

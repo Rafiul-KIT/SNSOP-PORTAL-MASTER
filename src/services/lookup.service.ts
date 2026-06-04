@@ -42,6 +42,10 @@ export class LookupService {
   private payamsByCounty = new Map<string | number, IdName[]>();
   private bomasByPayam = new Map<string | number, IdName[]>();
 
+  private allCountyList: IdName[] = [];
+  private allPayamList: IdName[] = [];
+  private allBomaList: IdName[] = [];
+
   private readonly GEO_SEARCH_URL = '/api/lookup/geo/search';
   private readonly MENU_FIND_ALL_URL = '/api/menus/findAll';
 
@@ -55,11 +59,39 @@ export class LookupService {
     return this.statesCache;
   }
 
+  async getOrFetchStateList(): Promise<IdName[]> {
+    return this.getStateList();
+  }
+
+  getStateNameById(stateId: string | number): string {
+    const id = String(stateId);
+    const found = this.statesCache?.find((s) => String(s.id) === id);
+    return found ? found.name : '--';
+  }
+
   async getCountyListByStateId(stateId: string | number, size = 500): Promise<IdName[]> {
     if (this.countiesByState.has(stateId)) return this.countiesByState.get(stateId)!;
     const list = await this.geoSearch('COUNTY', stateId, size);
     this.countiesByState.set(stateId, list);
     return list;
+  }
+
+  async fetchAllCountyList(): Promise<IdName[]> {
+    if (this.allCountyList.length) return this.allCountyList;
+    const list = await this.geoSearch('COUNTY', null, -1);
+    this.allCountyList = list;
+    return list;
+  }
+
+  getCountyNameById(countyId: string | number): string {
+    const id = String(countyId);
+    const found = this.allCountyList.find((c) => String(c.id) === id);
+    if (found) return found.name;
+    for (const counties of this.countiesByState.values()) {
+      const foundState = counties.find((c) => String(c.id) === id);
+      if (foundState) return foundState.name;
+    }
+    return '--';
   }
 
   async getPayamListByCountyId(countyId: string | number, size = 1000): Promise<IdName[]> {
@@ -69,11 +101,47 @@ export class LookupService {
     return list;
   }
 
+  async fetchAllPayamList(): Promise<IdName[]> {
+    if (this.allPayamList.length) return this.allPayamList;
+    const list = await this.geoSearch('PAYAM', null, -1);
+    this.allPayamList = list;
+    return list;
+  }
+
+  getPayamNameById(payamId: string | number): string {
+    const id = String(payamId);
+    const found = this.allPayamList.find((p) => String(p.id) === id);
+    if (found) return found.name;
+    for (const payams of this.payamsByCounty.values()) {
+      const foundPayam = payams.find((p) => String(p.id) === id);
+      if (foundPayam) return foundPayam.name;
+    }
+    return '--';
+  }
+
   async getBomaListByPayamId(payamId: string | number, size = 2000): Promise<IdName[]> {
     if (this.bomasByPayam.has(payamId)) return this.bomasByPayam.get(payamId)!;
     const list = await this.geoSearch('BOMA', payamId, size);
     this.bomasByPayam.set(payamId, list);
     return list;
+  }
+
+  async fetchAllBomaList(): Promise<IdName[]> {
+    if (this.allBomaList.length) return this.allBomaList;
+    const list = await this.geoSearch('BOMA', null, -1);
+    this.allBomaList = list;
+    return list;
+  }
+
+  getBomaNameById(bomaId: string | number): string {
+    const id = String(bomaId);
+    const found = this.allBomaList.find((b) => String(b.id) === id);
+    if (found) return found.name;
+    for (const bomas of this.bomasByPayam.values()) {
+      const foundBoma = bomas.find((b) => String(b.id) === id);
+      if (foundBoma) return foundBoma.name;
+    }
+    return '--';
   }
 
   clearAllCaches() {
@@ -314,4 +382,226 @@ getMenuLabelByValue(value: string): string {
 clearMenuCache(): void {
   this.menuListCache = null;
 }
+
+// ===================== 📊 BENEFICIARY ENUMS ===================== //
+
+  private readonly RelationshipEnum = [
+    { id: 1, value: 'HOUSEHOLD_HEAD', label: 'Household Head' },
+    { id: 2, value: 'SPOUSE', label: 'Spouse' },
+    { id: 3, value: 'SON_DAUGHTER', label: 'Son/Daughter' },
+    { id: 4, value: 'SON_DAUGHTER_IN_LAW', label: 'Son/daughter in law' },
+    { id: 5, value: 'GRANDCHILD', label: 'Grandchild' },
+    { id: 6, value: 'PARENT', label: 'Parent' },
+    { id: 7, value: 'PARENT_IN_LAW', label: 'Parent-in-law' },
+    { id: 8, value: 'SIBLING_IN_LAW', label: 'Sibling-in-law' },
+    { id: 9, value: 'SIBLING', label: 'Sibling' },
+    { id: 10, value: 'OTHER', label: 'Other' },
+    { id: 11, value: 'DOMESTIC_WORKER', label: 'Domestic Worker' },
+    { id: 12, value: 'NO_RELATION', label: 'No Relation' },
+  ];
+
+  getRelationshipEnum = () => {
+    return this.RelationshipEnum;
+  };
+
+  getRelationshipEnumByValue = (value: any) => {
+    const dataFound = this.RelationshipEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly DocumentTypeEnum = [
+    { id: 0, value: 'PASSPORT', label: 'Passport' },
+    { id: 1, value: 'NATIONAL_ID', label: 'National Id' },
+    { id: 2, value: 'OTHER', label: 'Other' },
+    { id: 3, value: 'REFUGEE_RATION_CARD', label: 'Refugee Ration Card' },
+    { id: 4, value: 'REFUGEE_ID_CARD', label: 'Refugee Id Card' },
+    { id: 5, value: 'REFUGEE_PROOF_OF_REGISTRATION', label: 'Refugee Proof of Registration' },
+    { id: 6, value: 'NONE', label: 'None' },
+  ];
+
+  getDocumentTypeEnum = () => {
+    return this.DocumentTypeEnum;
+  };
+
+  getDocumentTypeEnumByValue = (value: any) => {
+    const dataFound = this.DocumentTypeEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly IncomeSourceEnum = [
+    { id: 1, value: 'NONE', label: 'None' },
+    { id: 2, value: 'SELLING_OF_FARM', label: 'Selling of farm' },
+    { id: 3, value: 'SELLING_OF_NON_FARM', label: 'Selling of non farm' },
+    { id: 4, value: 'CAUSAL_LABOUR', label: 'Causal labour' },
+    { id: 5, value: 'FORMAL_EMPLOYMENT', label: 'Formal employment' },
+    { id: 6, value: 'REMITTANCES', label: 'Remittances' },
+    { id: 7, value: 'GIFT', label: 'Gift' },
+    { id: 8, value: 'FROM_GOVT', label: 'From govt' },
+    { id: 9, value: 'FROM_NGO', label: 'From ngo' },
+    { id: 10, value: 'PENSION', label: 'Pension' },
+    { id: 11, value: 'OTHER', label: 'Other' },
+  ];
+
+  getIncomeSourceEnum = () => {
+    return this.IncomeSourceEnum;
+  };
+
+  getIncomeSourceEnumByValue = (value: any) => {
+    const dataFound = this.IncomeSourceEnum.find(
+      (item: any) => item.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly SelectionReasonEnum = [
+    { id: 1, value: 'LIPW_REASON_1', label: 'Poor household with no sufficient income to sustain the household' },
+    { id: 2, value: 'LIPW_REASON_2', label: 'Household contain able bodied youth member (18-35)' },
+    { id: 3, value: 'LIPW_REASON_3', label: 'Household headed by young men and women between the ages of 18 and 35' },
+    { id: 4, value: 'LIPW_REASON_4', label: 'Many members who are dependents (HH with dependants greater than 3)' },
+    { id: 5, value: 'LIPW_REASON_5', label: 'Poor household which have persons with severe disabilities' },
+    { id: 6, value: 'DIS_REASON_1', label: 'Child headed households with no alternate income support' },
+    { id: 7, value: 'DIS_REASON_2', label: 'Elderly headed household lacking alternate income support and able bodied member' },
+    { id: 8, value: 'DIS_REASON_3', label: 'Persons with disability headed household lacking alternate income support and able bodied member' },
+    { id: 9, value: 'DIS_REASON_4', label: 'Chronically ill headed household lacking alternate income and able bodied member' },
+    { id: 10, value: 'DIS_REASON_5', label: 'Female headed household lacking alternate income support and able-bodied member' },
+  ];
+
+  getSelectionReasonEnum = () => {
+    return this.SelectionReasonEnum;
+  };
+
+  getSelectionReasonEnumByValue = (value: any) => {
+    const dataFound = this.SelectionReasonEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly SelectionCriteriaEnum = [
+    { id: 0, value: 'LIPW', name: 'Public Works' },
+    { id: 1, value: 'DIS', name: 'Direct Income Support' },
+  ];
+
+  getSelectionCriteriaEnum = () => {
+    return this.SelectionCriteriaEnum;
+  };
+
+  getSelectionCriteriaEnumByValue = (value: any) => {
+    const dataFound = this.SelectionCriteriaEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.name : '--';
+  };
+
+  private readonly GenderEnum = [
+    { id: 0, value: 'MALE', label: 'Male' },
+    { id: 1, value: 'FEMALE', label: 'Female' },
+  ];
+
+  getGenderEnum = () => {
+    return this.GenderEnum;
+  };
+
+  getGenderEnumByValue = (value: any) => {
+    const dataFound = this.GenderEnum.find((sce: any) => sce.value == value);
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly MaritalStatusEnum = [
+    { id: 0, value: 'SINGLE', label: 'Single' },
+    { id: 1, value: 'MARRIED', label: 'Married' },
+    { id: 2, value: 'WIDOW', label: 'Widow' },
+    { id: 3, value: 'SEPARATED', label: 'Separated' },
+    { id: 4, value: 'DIVORCE', label: 'Divorce' },
+  ];
+
+  getMaritalStatusEnum = () => {
+    return this.MaritalStatusEnum;
+  };
+
+  getMaritalStatusEnumByValue = (value: any) => {
+    const dataFound = this.MaritalStatusEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly LegalStatusEnum = [
+    { id: 0, value: 'HOST', label: 'Host' },
+    { id: 1, value: 'RETURNEE', label: 'Returnee' },
+    { id: 2, value: 'REFUGEE', label: 'Refugee' },
+    { id: 3, value: 'IDP', label: 'IDP' },
+  ];
+
+  getLegalStatusEnum = () => {
+    return this.LegalStatusEnum;
+  };
+
+  getLegalStatusEnumByValue = (value: any) => {
+    const dataFound = this.LegalStatusEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly RegistrationPhaseEnum = [
+    { id: 0, value: 'PARENT', label: 'PP (Parent Project)' },
+    { id: 1, value: 'AF', label: 'AF (Additional Financing)' },
+    { id: 2, value: 'RP', label: 'RP' },
+  ];
+
+  getRegistrationPhaseEnum = () => {
+    return this.RegistrationPhaseEnum;
+  };
+
+  getRegistrationPhaseEnumByValue = (value: any) => {
+    const dataFound = this.RegistrationPhaseEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly OccupationEnum = [
+    { id: 1, value: 'FORMAL_JOB', label: 'Formal Job' },
+    { id: 2, value: 'CASUAL_WORK', label: 'Casual Work' },
+    { id: 3, value: 'SELF_EMPLOYED', label: 'Self Employed' },
+    { id: 4, value: 'AGRICULTURAL_WORK', label: 'Agricultural Work' },
+    { id: 5, value: 'HOMEMAKER', label: 'Homemaker' },
+    { id: 6, value: 'UNEMPLOYED', label: 'Unemployed' },
+    { id: 7, value: 'STUDENT', label: 'Student' },
+    { id: 8, value: 'DISABLED', label: 'Disabled' },
+    { id: 9, value: 'RETIRED', label: 'Retired' },
+    { id: 10, value: 'OTHER', label: 'Other' },
+  ];
+
+  getOccupationEnum = () => {
+    return this.OccupationEnum;
+  };
+
+  getOccupationEnumByValue = (value: any) => {
+    const dataFound = this.OccupationEnum.find(
+      (sce: any) => sce.value == value
+    );
+    return dataFound ? dataFound.label : '--';
+  };
+
+  private readonly CurrencyEnum = [
+    { id: 0, value: 'SUDANESE_POUND', label: 'SDG' },
+    { id: 1, value: 'USD', label: 'USD' },
+    { id: 2, value: 'POUND', label: 'POUND' },
+    { id: 3, value: 'EURO', label: 'EURO' },
+  ];
+
+  getCurrencyEnum = () => {
+    return this.CurrencyEnum;
+  };
+
+  getCurrencyEnumByValue = (value: any) => {
+    const dataFound = this.CurrencyEnum.find((sce: any) => sce.value == value);
+    return dataFound ? dataFound.label : '--';
+  };
 }

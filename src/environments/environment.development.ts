@@ -4,6 +4,7 @@ export const environment = {
   useHash: false,
   domain: 'https://localhost',
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
+  modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
     master: 'https://localhost:4010',
     beneficiary: 'https://localhost:4020',
@@ -17,6 +18,7 @@ export const environment = {
     UnderConstruction: 'https://localhost:4010/#/under-construction',
     helpDesk: 'https://localhost:4010/#/help-desk/dashboard',
     dms: 'https://167.86.68.15:8086',
+    automatedTargeting: 'https://localhost:4010/#/automated-targeting/dashboard',
   },
   msalConfig: {
     auth: {
