@@ -275,7 +275,10 @@ export class HelpDeskAssignedRequests implements OnInit {
     return (
       (from === 'NEW' && to === 'PROCESSING') ||
       (from === 'PROCESSING' && ['REQUIRED_MORE_INFO', 'ADDRESSED', 'CLOSED'].includes(to)) ||
-      (from === 'REOPENED' && to === 'PROCESSING')
+      (from === 'REOPENED' && to === 'PROCESSING') ||
+      (from === 'ADDRESSED' && to === 'RESOLVED') ||
+      (from === 'RESOLVED' && to === 'CLOSED') ||
+      (from === 'CLOSED' && to === 'REOPENED')
     );
   }
 
@@ -293,6 +296,12 @@ export class HelpDeskAssignedRequests implements OnInit {
         ];
       case 'REOPENED':
         return [{ label: 'Move to Processing', value: 'PROCESSING', needsComment: false }];
+      case 'ADDRESSED':
+        return [{ label: 'Mark Resolved', value: 'RESOLVED', needsComment: false }];
+      case 'RESOLVED':
+        return [{ label: 'Close', value: 'CLOSED', needsComment: true }];
+      case 'CLOSED':
+        return [{ label: 'Reopen', value: 'REOPENED', needsComment: true }];
       default:
         return [];
     }
