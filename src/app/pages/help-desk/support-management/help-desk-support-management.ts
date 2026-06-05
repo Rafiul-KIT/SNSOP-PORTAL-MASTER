@@ -383,8 +383,9 @@ export class HelpDeskSupportManagement implements OnInit {
         (from === 'NEW' && to === 'PROCESSING') ||
         (from === 'PROCESSING' && ['REQUIRED_MORE_INFO', 'ADDRESSED', 'CLOSED'].includes(to)) ||
         (from === 'REOPENED' && to === 'PROCESSING') ||
-        (from === 'CLOSED' && to === 'REOPENED') ||
-        (from === 'RESOLVED' && to === 'REOPENED')
+        (from === 'ADDRESSED' && to === 'RESOLVED') ||
+        (from === 'RESOLVED' && to === 'CLOSED') ||
+        (from === 'CLOSED' && to === 'REOPENED')
       );
     }
 
@@ -411,8 +412,10 @@ export class HelpDeskSupportManagement implements OnInit {
           ];
         case 'REOPENED':
           return [{ label: 'Move to Processing', value: 'PROCESSING', needsComment: false, actionType: 'status' }];
+        case 'ADDRESSED':
+          return [{ label: 'Mark Resolved', value: 'RESOLVED', needsComment: false, actionType: 'status' }];
         case 'RESOLVED':
-          return [{ label: 'Reopen', value: 'REOPENED', needsComment: true, actionType: 'status' }];
+          return [{ label: 'Close', value: 'CLOSED', needsComment: true, actionType: 'status' }];
         case 'CLOSED':
           return [{ label: 'Reopen', value: 'REOPENED', needsComment: true, actionType: 'status' }];
         case 'REQUIRED_MORE_INFO':
@@ -440,7 +443,7 @@ export class HelpDeskSupportManagement implements OnInit {
 
   getWorkflowContextText(): string {
     return this.isMisFirmUser()
-      ? 'MIS mode: NEW -> PROCESSING, PROCESSING -> REQUIRED_MORE_INFO/ADDRESSED/CLOSED, REQUIRED_MORE_INFO -> submit info, RESOLVED/CLOSED -> REOPENED, REOPENED -> PROCESSING'
+      ? 'MIS mode: NEW -> PROCESSING, PROCESSING -> REQUIRED_MORE_INFO/ADDRESSED/CLOSED, REQUIRED_MORE_INFO -> submit info, ADDRESSED -> RESOLVED, RESOLVED -> CLOSED, CLOSED -> REOPENED, REOPENED -> PROCESSING'
       : 'Requester mode: REQUIRED_MORE_INFO -> submit info, ADDRESSED -> RESOLVED, RESOLVED -> CLOSED, CLOSED -> REOPENED';
   }
 
