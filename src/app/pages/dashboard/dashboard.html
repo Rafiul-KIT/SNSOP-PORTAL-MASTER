@@ -3,18 +3,18 @@
         @for(portal of portalList; track portal.label){
       @if(portal.link){
         <a class="portal hand" [href]="portal.link" [pTooltip]="portal.tooltipText">
-          <i class="{{ portal.icon }}" class="w-50"></i>
+          <i [class]="portal.icon"></i>
           <span>{{ portal.label }}</span>
         </a>
       } @else if (portal.routerLink) {
         <a class="portal hand" [routerLink]="portal.routerLink" [pTooltip]="portal.tooltipText">
-          <i class="{{ portal.icon }}" class="w-50"></i>
+          <i [class]="portal.icon"></i>
           <span>{{ portal.label }}</span>
         </a>
       }
        @else {
         <span class="portal blocked-pointer" [pTooltip]="portal.tooltipText">
-          <i class="{{ portal.icon }}" class="w-50"></i>
+          <i [class]="portal.icon"></i>
           <span>{{ portal.label }}</span>
         </span>
       }
