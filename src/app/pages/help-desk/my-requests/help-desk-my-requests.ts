@@ -13,13 +13,12 @@ import Swal from 'sweetalert2';
 
 import { TableModule } from 'primeng/table';
 import { ITCategory, ITModule, ITRequest, ITSubmodule, ItSupportService } from '../../../../services/it-support.service';
-import { ApiService } from '../../../../services/api.service';
 
 type WorkflowAction = {
   label: string;
   value: string;
   needsComment: boolean;
-  actionType: 'status' | 'submit_info';
+  actionType: 'status' | 'submit_info' | 'edit';
 };
 
 type LookupOption = {
@@ -96,7 +95,6 @@ export class HelpDeskMyRequests implements OnInit {
     private itSupportService: ItSupportService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-    private apiService: ApiService,
     private router: Router
   ) {}
 
@@ -216,24 +214,6 @@ export class HelpDeskMyRequests implements OnInit {
     return 'Take Action';
   }
 
-  private getCurrentUser(): any {
-    return this.apiService.loginState()?.user || {};
-  }
-
-  private getCurrentUserId(): number | null {
-    const user = this.getCurrentUser();
-    const raw = user?.userId ?? user?.id ?? user?.uid ?? user?.sub ?? null;
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }
-
-  private isRequestCreator(request?: ITRequest | null): boolean {
-    if (!request) return false;
-    const currentUserId = this.getCurrentUserId();
-    if (!currentUserId) return false;
-    return Number(request.createdBy) === currentUserId;
-  }
-
   private canTransition(fromStatus?: string, toStatus?: string): boolean {
     const from = String(fromStatus || '').toUpperCase();
     const to = String(toStatus || '').toUpperCase();
@@ -248,11 +228,11 @@ export class HelpDeskMyRequests implements OnInit {
   }
 
   getAvailableActions(request: ITRequest): WorkflowAction[] {
-    const status = request.status?.toUpperCase() || '';
-
-    if (!this.isRequestCreator(request)) return [];
+    const status = String(request.status || '').trim().toUpperCase();
 
     switch (status) {
+      case 'NEW':
+        return [{ label: 'Update', value: 'EDIT', needsComment: false, actionType: 'edit' }];
       case 'REQUIRED_MORE_INFO':
         return [{ label: 'Submit Required Info', value: 'PROCESSING', needsComment: false, actionType: 'submit_info' }];
       case 'ADDRESSED':
@@ -271,6 +251,11 @@ export class HelpDeskMyRequests implements OnInit {
     if (!actions.length) return;
 
     let selectedAction = actions[0];
+
+    if (selectedAction.actionType === 'edit') {
+      this.onView(request);
+      return;
+    }
 
     if (actions.length > 1) {
       const { value: selectedValue } = await Swal.fire({
