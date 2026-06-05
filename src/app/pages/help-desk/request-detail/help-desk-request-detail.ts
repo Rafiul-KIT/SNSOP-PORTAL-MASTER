@@ -9,7 +9,6 @@ import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITAttachment, ITCategory, ITHistory, ITModule, ITRequest, ITUserReference, ItSupportService } from '../../../../services/it-support.service';
-import { ApiService } from '../../../../services/api.service';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
@@ -24,8 +23,6 @@ type UserDisplayRow = { label: string; value: string };
   styleUrls: ['./help-desk-request-detail.scss'],
 })
 export class HelpDeskRequestDetail implements OnInit {
-  private readonly MIS_FIRM_ROLE_IDS = [51];
-
   breadcrumbHome = { icon: 'fas fa-home', routerLink: '/dashboard' };
   breadcrumbItems = [{ label: 'Helpdesk', routerLink: '/help-desk/my-requests' }, { label: 'Request Detail' }];
 
@@ -57,8 +54,7 @@ export class HelpDeskRequestDetail implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private itSupportService: ItSupportService,
-    private apiService: ApiService
+    private itSupportService: ItSupportService
   ) {}
 
   private getBackRoute(): string {
@@ -136,54 +132,6 @@ export class HelpDeskRequestDetail implements OnInit {
     }
   }
 
-  private getCurrentUser(): any {
-    return this.apiService.loginState()?.user || {};
-  }
-
-  private getUserReferenceId(value: unknown): number | null {
-    const raw =
-      value && typeof value === 'object'
-        ? (value as Record<string, unknown>)['userId'] ??
-          (value as Record<string, unknown>)['id'] ??
-          (value as Record<string, unknown>)['uid'] ??
-          (value as Record<string, unknown>)['sub']
-        : value;
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }
-
-  private getUserReferenceValues(value: unknown): string[] {
-    if (typeof value === 'string') {
-      const normalized = value.trim().toLowerCase();
-      return normalized ? [normalized] : [];
-    }
-
-    if (!value || typeof value !== 'object') return [];
-
-    const user = value as Record<string, unknown>;
-    return [
-      user['email'],
-      user['mail'],
-      user['upn'],
-      user['username'],
-      user['fullName'],
-      user['name'],
-      user['preferred_username'],
-      user['unique_name'],
-    ]
-      .map((item) => String(item ?? '').trim().toLowerCase())
-      .filter(Boolean);
-  }
-
-  private isSameUserReference(left: unknown, right: unknown): boolean {
-    const leftId = this.getUserReferenceId(left);
-    const rightId = this.getUserReferenceId(right);
-    if (leftId && rightId) return leftId === rightId;
-
-    const leftValues = new Set(this.getUserReferenceValues(left));
-    return this.getUserReferenceValues(right).some((value) => leftValues.has(value));
-  }
-
   formatUserReference(value?: ITUserReference): string {
     if (value === null || value === undefined || value === '') return '--';
     if (typeof value !== 'object') return String(value);
@@ -223,31 +171,13 @@ export class HelpDeskRequestDetail implements OnInit {
     ];
   }
 
-  private isMisFirmUser(): boolean {
-    const user = this.getCurrentUser();
-    const roleId = Number(user?.roleId);
-    const roleName = String(user?.roleName || user?.role || '').toUpperCase();
-    return (
-      this.MIS_FIRM_ROLE_IDS.includes(roleId) ||
-      roleName.includes('MIS_FIRM') ||
-      roleName.includes('MIS FIRM')
-    );
-  }
-
-  private isRequestCreator(request?: ITRequest | null): boolean {
-    if (!request) return false;
-    return this.isSameUserReference(request.createdBy, this.getCurrentUser());
-  }
-
   canEditRequest(request?: ITRequest | null): boolean {
     if (!request) return false;
-    
-    return this.isRequestCreator(request) && String(request.status || '').toUpperCase() === 'NEW';
+    return String(request.status || '').toUpperCase() === 'NEW';
   }
 
   canAddAttachments(request?: ITRequest | null): boolean {
-    if (!request) return false;
-    return this.isMisFirmUser() || this.isRequestCreator(request);
+    return !!request;
   }
 
   getStatusSeverity(status: string | undefined): Severity {
@@ -362,8 +292,7 @@ async deleteAttachment(attachment: ITAttachment): Promise<void> {
 }
 
 canDeleteAttachment(request?: ITRequest | null): boolean {
-  if (!request) return false;
-  return this.isMisFirmUser() || this.isRequestCreator(request);
+  return false;
 }
   getTimelineTitle(action?: string): string {
     switch (String(action || '').toUpperCase()) {
