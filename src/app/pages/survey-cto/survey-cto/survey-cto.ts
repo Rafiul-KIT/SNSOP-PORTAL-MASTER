@@ -237,6 +237,10 @@ export class SurveyCto implements OnInit {
     this.performSearch();
   }
 
+  private displayValue(value: any): string | number {
+    return value === null || value === undefined || value === '' ? '-' : value;
+  }
+
   private performSearch(): void {
     if (this.isFilteredSearch && this.searchForm.invalid) {
       Swal.fire({
@@ -284,23 +288,27 @@ export class SurveyCto implements OnInit {
 
     this.apiService.POST('/api/surveycto/search', requestBody)
       .then(response => {
-        if (response.data.operationResult) {
-          this.totalRecords = response.data.total || 0;
-          this.surveyData = (response.data.beneficiaries || []).map((beneficiary: any, index: number) => ({
+        const responseData = response.data || {};
+        const beneficiaries = Array.isArray(responseData.beneficiaries) ? responseData.beneficiaries : [];
+        const hasSearchResults = responseData.operationResult === true || beneficiaries.length > 0 || Number(responseData.total) > 0;
+
+        if (hasSearchResults) {
+          this.totalRecords = responseData.total || 0;
+          this.surveyData = beneficiaries.map((beneficiary: any, index: number) => ({
             sl: this.currentPage * this.pageSize + index + 1,
-            hhId: beneficiary.applicationId,
-            beneficiaryName: [beneficiary.respondentFirstName, beneficiary.respondentMiddleName, beneficiary.respondentLastName].filter(Boolean).join(' '),
-            age: beneficiary.respondentAge,
-            gender: beneficiary.respondentGender,
-            maritalStatus: beneficiary.maritalStatus,
+            hhId: this.displayValue(beneficiary.applicationId),
+            beneficiaryName: this.displayValue([beneficiary.respondentFirstName, beneficiary.respondentMiddleName, beneficiary.respondentLastName].filter(Boolean).join(' ')),
+            age: this.displayValue(beneficiary.respondentAge),
+            gender: this.displayValue(beneficiary.respondentGender),
+            maritalStatus: this.displayValue(beneficiary.maritalStatus),
             education: beneficiary.isReadWrite ? 'Literate' : 'Illiterate',
-            numFamilyMembers: beneficiary.numberOfHouseholds,
-            supportType: beneficiary.selectionCriteria,
+            numFamilyMembers: this.displayValue(beneficiary.numberOfHouseholds),
+            supportType: this.displayValue(beneficiary.selectionCriteria),
             alternate: beneficiary.alternate ? [beneficiary.alternate.payeeFirstName, beneficiary.alternate.payeeMiddleName, beneficiary.alternate.payeeLastName].filter(Boolean).join(' ') : 'No',
             nominee: beneficiary.nominee ? [beneficiary.nominee.nomineeFirstName, beneficiary.nominee.nomineeMiddleName, beneficiary.nominee.nomineeLastName].filter(Boolean).join(' ') : 'No'
           }));
         } else {
-          Swal.fire({ icon: 'error', title: 'Search Failed', text: response.data.errorMsg || 'An unknown error occurred.' });
+          Swal.fire({ icon: 'error', title: 'Search Failed', text: responseData.errorMsg || 'An unknown error occurred.' });
           this.surveyData = [];
           this.totalRecords = 0;
         }
