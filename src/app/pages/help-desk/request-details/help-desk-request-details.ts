@@ -62,13 +62,10 @@ export class HelpDeskRequestDetails implements OnInit {
     this.cdr.detectChanges();
 
     try {
-      const [detail, history] = await Promise.all([
-        this.itSupportService.getRequestById(requestId),
-        this.itSupportService.getRequestHistory(requestId),
-      ]);
+      const detail = await this.itSupportService.getRequestById(requestId);
 
       this.detailRequest = detail;
-      this.detailHistory = history || detail?.history || [];
+      this.detailHistory = detail?.history || [];
       this.detailAttachments = detail?.attachments || [];
 
       if (!detail) {
@@ -98,17 +95,14 @@ export class HelpDeskRequestDetails implements OnInit {
 
   private async refreshDetailSilently(requestId: number): Promise<void> {
     try {
-      const [detail, history] = await Promise.all([
-        this.itSupportService.getRequestById(requestId),
-        this.itSupportService.getRequestHistory(requestId),
-      ]);
+      const detail = await this.itSupportService.getRequestById(requestId);
 
       if (detail) {
         this.detailRequest = detail;
         this.detailAttachments = detail.attachments || [];
       }
 
-      this.detailHistory = history || detail?.history || [];
+      this.detailHistory = detail?.history || [];
     } catch (error) {
       console.error('Failed to refresh detail:', error);
     } finally {
