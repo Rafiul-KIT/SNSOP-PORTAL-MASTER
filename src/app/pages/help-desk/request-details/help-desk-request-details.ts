@@ -250,24 +250,31 @@ export class HelpDeskRequestDetails implements OnInit {
     return String(value).trim();
   }
 
-  parseHistoryChanges(changes?: string): HistoryChange[] {
-    if (!changes) return [];
-    try {
-      const parsed = JSON.parse(changes);
-      if (!Array.isArray(parsed)) return [];
-      return parsed.map((item: any) => {
-        const isInitialValue = this.isInitialHistoryValue(item?.oldValue);
-        return {
-          field: String(item?.field || '-').replace(/_/g, ' '),
-          oldValue: isInitialValue ? 'Initial' : this.formatHistoryValue(item?.oldValue),
-          newValue: this.formatHistoryValue(item?.newValue),
-          isInitialValue,
-        };
-      });
-    } catch {
-      return [];
-    }
+parseHistoryChanges(changes?: string): HistoryChange[] {
+  if (!changes) return [];
+  try {
+    const parsed = JSON.parse(changes);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.map((item: any) => {
+      const isInitialValue = this.isInitialHistoryValue(item?.oldValue);
+      // Determine field name
+      let fieldName = String(item?.field || '-').replace(/_/g, ' ');
+      if (fieldName.toLowerCase() === 'categoryid') {
+        fieldName = 'category';
+      }
+
+      return {
+        field: fieldName,
+        oldValue: isInitialValue ? 'Initial' : this.formatHistoryValue(item?.oldValue),
+        newValue: this.formatHistoryValue(item?.newValue),
+        isInitialValue,
+      };
+    });
+  } catch {
+    return [];
   }
+}
 
   getTimelineTitle(action?: string): string {
     switch (String(action || '').toUpperCase()) {
