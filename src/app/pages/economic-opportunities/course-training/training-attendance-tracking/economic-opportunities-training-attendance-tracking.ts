@@ -439,17 +439,17 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
       return;
     }
 
-    const validCourseDates = await this.loadValidCourseDates(this.selectedCourseId);
-    for (const row of this.attendanceRows) {
-      const validation = this.isValidData(row, validCourseDates);
-      if (!validation.isValid) {
-        this.showWarn(
-          'Validation Error',
-          `Row for ${row.respondentFullName || row.householdNumber || row.beneficiaryId}: ${validation.errorMessage}`
-        );
-        return;
-      }
-    }
+    // const validCourseDates = await this.loadValidCourseDates(this.selectedCourseId);
+    // for (const row of this.attendanceRows) {
+    //   const validation = this.isValidData(row, validCourseDates);
+    //   if (!validation.isValid) {
+    //     this.showWarn(
+    //       'Validation Error',
+    //       `Row for ${row.respondentFullName || row.householdNumber || row.beneficiaryId}: ${validation.errorMessage}`
+    //     );
+    //     return;
+    //   }
+    // }
 
     const payload: AttendanceDraft[] = this.attendanceRows.map((row) => ({
       courseId: Number(row.courseId) || 0,
