@@ -127,6 +127,11 @@
       </div>
 
       <div class="col-lg-5">
+        <app-help-desk-request-assignment
+          [request]="detailRequest"
+          (assigned)="onAssignmentUpdated($event)"
+        ></app-help-desk-request-assignment>
+
         <div class="card p-3">
           <h6 class="section-title">Attachments</h6>
           @if (!detailAttachments.length) {

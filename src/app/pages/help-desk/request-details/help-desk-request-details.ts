@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITAttachment, ITHistory, ITRequest, ITUserReference, ItSupportService } from '../../../../services/it-support.service';
+import { HelpDeskRequestAssignment } from '../request-assignment/help-desk-request-assignment';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
@@ -24,7 +25,7 @@ type WorkflowAction = {
 @Component({
   selector: 'app-help-desk-request-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, BreadcrumbModule, ButtonModule, TagModule, Loader],
+  imports: [CommonModule, FormsModule, RouterModule, BreadcrumbModule, ButtonModule, TagModule, Loader, HelpDeskRequestAssignment],
   templateUrl: './help-desk-request-details.html',
   styleUrls: ['./help-desk-request-details.scss'],
 })
@@ -113,6 +114,13 @@ export class HelpDeskRequestDetails implements OnInit {
     } finally {
       this.cdr.detectChanges();
     }
+  }
+
+  async onAssignmentUpdated(updatedRequest: ITRequest): Promise<void> {
+    this.detailRequest = updatedRequest;
+    this.detailAttachments = updatedRequest.attachments || this.detailAttachments;
+    this.cdr.detectChanges();
+    await this.refreshDetailSilently(updatedRequest.id);
   }
 
   private canTransition(fromStatus?: string, toStatus?: string): boolean {

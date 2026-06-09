@@ -9,6 +9,7 @@ import { TagModule } from 'primeng/tag';
 import Swal from 'sweetalert2';
 import { Loader } from '../../../components/loader/loader';
 import { ITAttachment, ITCategory, ITHistory, ITModule, ITRequest, ITUserReference, ItSupportService } from '../../../../services/it-support.service';
+import { HelpDeskRequestAssignment } from '../request-assignment/help-desk-request-assignment';
 
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
@@ -18,7 +19,7 @@ type UserDisplayRow = { label: string; value: string };
 @Component({
   selector: 'app-help-desk-request-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, BreadcrumbModule, ButtonModule, SelectModule, TagModule, Loader],
+  imports: [CommonModule, FormsModule, RouterModule, BreadcrumbModule, ButtonModule, SelectModule, TagModule, Loader, HelpDeskRequestAssignment],
   templateUrl: './help-desk-request-detail.html',
   styleUrls: ['./help-desk-request-detail.scss'],
 })
@@ -130,6 +131,33 @@ export class HelpDeskRequestDetail implements OnInit {
       this.isLoading = false;
       this.cdr.detectChanges();
     }
+  }
+
+  private async refreshDetailSilently(requestId: number): Promise<void> {
+    try {
+      const [detail, history] = await Promise.all([
+        this.itSupportService.getRequestById(requestId),
+        this.itSupportService.getRequestHistory(requestId),
+      ]);
+
+      if (detail) {
+        this.detailRequest = detail;
+        this.detailAttachments = detail.attachments || [];
+      }
+
+      this.detailHistory = history || detail?.history || [];
+    } catch (error) {
+      console.error('Failed to refresh detail:', error);
+    } finally {
+      this.cdr.detectChanges();
+    }
+  }
+
+  async onAssignmentUpdated(updatedRequest: ITRequest): Promise<void> {
+    this.detailRequest = updatedRequest;
+    this.detailAttachments = updatedRequest.attachments || this.detailAttachments;
+    this.cdr.detectChanges();
+    await this.refreshDetailSilently(updatedRequest.id);
   }
 
   formatUserReference(value?: ITUserReference): string {
