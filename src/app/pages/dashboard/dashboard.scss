@@ -43,13 +43,13 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: repeat(5, minmax(165px, 1fr));
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
   align-items: center;
   justify-content: center;
   padding: 0px;
   gap: 20px;
   width: 100%;
-  max-width: 990px;
+  max-width: 650px;
   height: auto;
 }
 

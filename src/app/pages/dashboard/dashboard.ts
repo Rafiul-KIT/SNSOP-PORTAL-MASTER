@@ -87,12 +87,12 @@ export class Dashboard {
         link: environment.portals.masterSettings,
         tooltipText: 'Settings portal - User & Role Management',
       },
-      {
-        label: 'Automated Targeting',
-        icon: 'fas fa-arrows-down-to-people',
-        routerLink: '/automated-targeting/dashboard',
-        tooltipText: 'Automated Targeting Portal',
-      },
+      // {
+      //   label: 'Automated Targeting',
+      //   icon: 'fas fa-arrows-down-to-people',
+      //   routerLink: '/automated-targeting/dashboard',
+      //   tooltipText: 'Automated Targeting Portal',
+      // },
     ];
   }
 }
