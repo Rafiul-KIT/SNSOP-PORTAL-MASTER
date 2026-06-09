@@ -280,11 +280,20 @@ parseHistoryChanges(changes?: string): HistoryChange[] {
 
     return parsed.map((item: any) => {
       const isInitialValue = this.isInitialHistoryValue(item?.oldValue);
+      // Determine field name
       let fieldName = String(item?.field || '-').replace(/_/g, ' ');
-      if (fieldName.toLowerCase() === 'categoryid') {
-        fieldName = 'category';
+      switch (fieldName.toLowerCase()) {
+        case 'categoryid':
+          fieldName = 'category';
+          break;
+        case 'moduleid':
+          fieldName = 'module';
+          break;
+        case 'submoduleid':
+          fieldName = 'submodule';
+          break;
       }
-
+   
       return {
         field: fieldName,
         oldValue: isInitialValue ? 'Initial' : this.formatHistoryValue(item?.oldValue),
