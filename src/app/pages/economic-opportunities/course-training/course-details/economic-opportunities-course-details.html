@@ -2,7 +2,7 @@
   <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
 </div>
 
-@if (isLoading && !isSearching) {
+@if (isLoading) {
 <app-loader></app-loader>
 } @else {
 
@@ -29,7 +29,7 @@
           (onChange)="onCourseChange()"
           class="w-100"
         ></p-select>
-        <label>Course *</label>
+        <label>Course <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -56,7 +56,7 @@
           [showIcon]="true"
           class="w-100"
         ></p-datepicker>
-        <label>Class Holding Date *</label>
+        <label>Class Holding Date <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -69,7 +69,7 @@
           [(ngModel)]="form.classDurationInMinutes"
           name="classDurationInMinutes"
         />
-        <label>Duration (Min) *</label>
+        <label>Duration (Min) <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -125,7 +125,7 @@
             (onChange)="onSearchCourseChange()"
             class="w-100"
           ></p-select>
-          <label>Search Course *</label>
+          <label>Search Course <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 

@@ -148,6 +148,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
   isLoadingCourses = false;
   isLoadingBeneficiaries = false;
   isSearchingAttendance = false;
+  hasSearchedAttendance = false;
   isSaving = false;
   activeStep: 'filters' | 'beneficiaries' | 'attendance' | 'search' = 'filters';
 
@@ -494,6 +495,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
     }
 
     this.searchCurrentPage = 0;
+    this.hasSearchedAttendance = true;
     await this.loadAttendanceResults();
   }
 
@@ -762,6 +764,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
     this.attendanceSearchResults = [];
     this.searchCurrentPage = 0;
     this.searchTotalRecords = 0;
+    this.hasSearchedAttendance = false;
   }
 
   private createDefaultLocationFilters(): AttendanceLocationFilters {

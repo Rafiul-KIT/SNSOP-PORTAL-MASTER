@@ -2,7 +2,7 @@
   <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
 </div>
 
-@if (isLoading && !isSearching) {
+@if (isLoading) {
 <app-loader></app-loader>
 } @else {
 
@@ -23,7 +23,7 @@
           [(ngModel)]="form.courseName"
           name="courseName"
         />
-        <label>Course Name *</label>
+        <label>Course Name <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -36,7 +36,7 @@
           [(ngModel)]="form.courseCode"
           name="courseCode"
         />
-        <label>Course Code *</label>
+        <label>Course Code <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -49,7 +49,7 @@
           [(ngModel)]="form.courseDuration"
           name="courseDuration"
         />
-        <label>Course Duration *</label>
+        <label>Course Duration <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 

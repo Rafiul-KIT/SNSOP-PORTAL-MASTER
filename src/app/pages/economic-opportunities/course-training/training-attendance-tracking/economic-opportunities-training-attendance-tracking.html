@@ -2,7 +2,7 @@
   <p-breadcrumb [model]="items" [home]="home" class="w-100"></p-breadcrumb>
 </div>
 
-@if (isLoading) {
+@if (isLoading || isLoadingBeneficiaries || isSearchingAttendance) {
 <app-loader></app-loader>
 } @else {
 
@@ -31,7 +31,7 @@
             (onChange)="onStateChange()"
             class="w-100"
           ></p-select>
-          <label>State *</label>
+          <label>State <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -50,7 +50,7 @@
             (onChange)="onCountyChange()"
             class="w-100"
           ></p-select>
-          <label>County *</label>
+          <label>County <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -69,7 +69,7 @@
             (onChange)="onPayamChange()"
             class="w-100"
           ></p-select>
-          <label>Payam *</label>
+          <label>Payam <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -87,7 +87,7 @@
             [disabled]="!beneficiaryFilters.payamId"
             class="w-100"
           ></p-select>
-          <label>Boma *</label>
+          <label>Boma <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -138,7 +138,7 @@
             [loading]="isLoadingCourses"
             class="w-100"
           ></p-select>
-          <label>Course *</label>
+          <label>Course <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -151,7 +151,7 @@
             [showIcon]="true"
             class="w-100"
           ></p-datepicker>
-          <label>Attendance Date *</label>
+          <label>Attendance Date <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -267,7 +267,7 @@
           <th>Respondent Name</th>
           <th>Course</th>
           <th>Date</th>
-          <th>Present</th>
+          <th>Present <span class="text-danger">*</span></th>
           <th>Absent Reason</th>
         </tr>
       </ng-template>
@@ -339,9 +339,11 @@
     <h5 class="mb-0 fw-semibold">
       <i class="fas fa-search me-2"></i> Attendance Search And List
     </h5>
+    @if (hasSearchedAttendance) {
     <p class="fw-bold mb-0">
       Showing <kbd>{{ attendanceSearchResults.length }}</kbd> of <kbd>{{ searchTotalRecords }}</kbd> records
     </p>
+    }
   </div>
 
   <div class="p-3 border-bottom">
@@ -360,7 +362,7 @@
             (onChange)="onSearchStateChange()"
             class="w-100"
           ></p-select>
-          <label>State *</label>
+          <label>State <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -379,7 +381,7 @@
             (onChange)="onSearchCountyChange()"
             class="w-100"
           ></p-select>
-          <label>County *</label>
+          <label>County <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -398,7 +400,7 @@
             (onChange)="onSearchPayamChange()"
             class="w-100"
           ></p-select>
-          <label>Payam *</label>
+          <label>Payam <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -416,7 +418,7 @@
             [disabled]="!attendanceSearchFilters.payamId"
             class="w-100"
           ></p-select>
-          <label>Boma *</label>
+          <label>Boma <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
 
@@ -443,6 +445,7 @@
     </form>
   </div>
 
+  @if (hasSearchedAttendance) {
   <p-table
     [value]="attendanceSearchResults"
     [responsiveLayout]="'scroll'"
@@ -499,6 +502,7 @@
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
     ></p-paginator>
   </div>
+  }
 </div>
 
 }

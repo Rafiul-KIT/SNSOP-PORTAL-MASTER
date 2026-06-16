@@ -22,7 +22,7 @@
           (onChange)="onStateChange()"
           class="w-100"
         ></p-select>
-        <label>State</label>
+        <label>State <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -42,7 +42,7 @@
           (onChange)="onCountyChange()"
           class="w-100"
         ></p-select>
-        <label>County</label>
+        <label>County <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -62,7 +62,7 @@
           (onChange)="onPayamChange()"
           class="w-100"
         ></p-select>
-        <label>Payam</label>
+        <label>Payam <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -81,7 +81,7 @@
           [disabled]="isBusy || !selectedPayam"
           class="w-100"
         ></p-select>
-        <label>Boma</label>
+        <label>Boma <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -146,7 +146,6 @@
     [value]="beneficiaries"
     [selection]="selectedBeneficiaries"
     (selectionChange)="onSelectionChange($event)"
-    [loading]="isLoadingBeneficiaries"
     [responsiveLayout]="'scroll'"
     [tableStyle]="{ 'min-width': '1000px', 'margin-bottom': '5px' }"
     dataKey="rowKey"

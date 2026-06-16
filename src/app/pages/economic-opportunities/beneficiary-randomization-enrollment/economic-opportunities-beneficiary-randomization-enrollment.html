@@ -25,7 +25,7 @@
           [loading]="isLoadingGroups"
           class="w-100"
         ></p-select>
-        <label>Group ID *</label>
+        <label>Group ID <span class="text-danger">*</span></label>
       </p-floatlabel>
     </div>
 
@@ -261,7 +261,7 @@
     <ng-template pTemplate="emptymessage">
       <tr>
         <td colspan="15" class="text-center text-danger">
-          <b>No records found!</b>
+          <b>Select a Group ID first!</b>
         </td>
       </tr>
     </ng-template>
