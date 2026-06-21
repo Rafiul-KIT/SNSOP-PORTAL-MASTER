@@ -80,7 +80,7 @@ interface CourseDetailsListResponse {
 })
 export class EconomicOpportunitiesCourseDetails implements OnInit {
   private readonly courseEndpoint = '/api/econ-op/course/get';
-  private readonly saveEndpoint = '/api/econ-op/course-details/save';
+  private readonly saveEndpoint = '/api/econ-op/course-details/save-bulk';
   private readonly getEndpoint = '/api/econ-op/course-detail/get';
 
   isLoading = false;
@@ -178,7 +178,6 @@ export class EconomicOpportunitiesCourseDetails implements OnInit {
 
     const payload = [
       {
-        id: 0,
         courseId: this.form.courseId,
         courseCode: this.form.courseCode.trim(),
         classHoldingDate: this.formatDate(classHoldingDate),
@@ -208,7 +207,7 @@ export class EconomicOpportunitiesCourseDetails implements OnInit {
       this.form = this.createDefaultForm();
       this.form.courseId = selectedCourseId;
       this.form.courseCode = selectedCourseCode;
-      await this.searchCourseDetails();
+      // await this.searchCourseDetails();
     } catch (err) {
       console.error('Failed to save course details', err);
       this.showError('Unable to save course details.');
@@ -263,8 +262,8 @@ export class EconomicOpportunitiesCourseDetails implements OnInit {
 
       const params = {
         courseId: this.searchFilters.courseId,
-        offset: this.currentPage * this.pageSize,
-        pageSize: this.pageSize,
+        page: this.currentPage,
+        size: this.pageSize,
       };
 
       const res = await this.api.GET<CourseDetailsListResponse>(this.getEndpoint, params);

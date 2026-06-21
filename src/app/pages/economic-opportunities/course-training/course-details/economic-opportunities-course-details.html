@@ -177,8 +177,6 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Serial</th>
-        <th>ID</th>
-        <th>Course ID</th>
         <th>Course Code</th>
         <th>Class Holding Date</th>
         <th>Class Duration In Minutes</th>
@@ -188,8 +186,6 @@
     <ng-template pTemplate="body" let-row let-i="rowIndex">
       <tr>
         <td>{{ (currentPage * pageSize) + i + 1 }}</td>
-        <td>{{ row.id }}</td>
-        <td>{{ row.courseId }}</td>
         <td>{{ row.courseCode || '--' }}</td>
         <td>{{ row.classHoldingDate || '--' }}</td>
         <td>{{ row.classDurationInMinutes }}</td>

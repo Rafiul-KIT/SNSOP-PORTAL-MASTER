@@ -6,7 +6,6 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -99,6 +98,14 @@ interface CourseDetailsListResponse {
   code?: number | string | null;
   message?: string | null;
   content?: CourseDetailsRecord[] | null;
+  pageNumber?: number | null;
+  pageSize?: number | null;
+  totalElements?: number | null;
+}
+
+interface CourseDateOption {
+  label: string;
+  value: string;
 }
 
 interface AttendanceSearchResponse {
@@ -122,7 +129,6 @@ interface AttendanceSearchResponse {
     BreadcrumbModule,
     ButtonModule,
     CheckboxModule,
-    DatePickerModule,
     FloatLabel,
     Loader,
     Paginator,
@@ -146,6 +152,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
 
   isLoading = false;
   isLoadingCourses = false;
+  isLoadingCourseDates = false;
   isLoadingBeneficiaries = false;
   isSearchingAttendance = false;
   hasSearchedAttendance = false;
@@ -163,6 +170,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
   searchBomas: IdName[] = [];
 
   courses: CourseOption[] = [];
+  courseDateOptions: CourseDateOption[] = [];
   beneficiaries: BeneficiaryRecord[] = [];
   selectedBeneficiaries: BeneficiaryRecord[] = [];
   attendanceRows: AttendanceEntryRow[] = [];
@@ -172,7 +180,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
   attendanceSearchFilters: AttendanceSearchFilters = this.createDefaultLocationFilters();
 
   selectedCourseId: number | null = null;
-  attendanceDate: Date | null = null;
+  attendanceDate: string | null = null;
 
   beneficiaryCurrentPage = 0;
   beneficiaryPageSize = 10;
@@ -381,6 +389,12 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
     await this.loadBeneficiaries();
   }
 
+  async onCourseChange(): Promise<void> {
+    this.attendanceDate = null;
+    this.attendanceRows = [];
+    await this.loadCourseDateOptions();
+  }
+
   generateAttendanceRows(): void {
     if (!this.selectedCourseId) {
       this.showWarn('Course Required', 'Please select a course before preparing attendance.');
@@ -397,7 +411,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
       return;
     }
 
-    const attendanceDate = this.formatDate(this.attendanceDate);
+    const attendanceDate = this.attendanceDate;
     this.attendanceRows = this.selectedBeneficiaries.map((item) => ({
       id: Number(item.beneficiaryId) || 0,
       courseId: this.selectedCourseId ?? 0,
@@ -477,8 +491,8 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
         detail: 'Training attendance saved successfully.',
       });
 
-      this.activeStep = 'search';
-      await this.searchAttendance();
+      await this.refreshAttendanceEntryAfterSave();
+      this.activeStep = 'attendance';
     } catch (err) {
       console.error('Failed to save attendance', err);
       this.showError(this.extractErrorMessage(err, 'Unable to save attendance.'));
@@ -578,7 +592,7 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
       this.cdr.detectChanges();
 
       const params = {
-        offset: this.searchCurrentPage * this.searchPageSize,
+        offset: this.searchCurrentPage,
         pageSize: this.searchPageSize,
       };
 
@@ -619,31 +633,54 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
     }
   }
 
+  private async loadCourseDateOptions(): Promise<void> {
+    this.courseDateOptions = [];
+
+    if (!this.selectedCourseId) {
+      this.cdr.detectChanges();
+      return;
+    }
+
+    try {
+      this.isLoadingCourseDates = true;
+      this.cdr.detectChanges();
+
+      const validDates = await this.loadValidCourseDates(this.selectedCourseId);
+      this.courseDateOptions = Array.from(validDates)
+        .sort()
+        .map((date) => ({
+          label: date,
+          value: date,
+        }));
+    } catch (err) {
+      console.error('Failed to load course dates', err);
+      this.showError('Unable to load course dates.');
+    } finally {
+      this.isLoadingCourseDates = false;
+      this.cdr.detectChanges();
+    }
+  }
+
   private async loadValidCourseDates(courseId: number | null): Promise<Set<string>> {
     if (!courseId) return new Set<string>();
 
-    try {
-      const res = await this.api.GET<CourseDetailsListResponse>(this.courseDetailsEndpoint, {
-        courseId,
-        offset: 0,
-        pageSize: 1000,
-      });
-      const data = res?.data;
+    const res = await this.api.GET<CourseDetailsListResponse>(this.courseDetailsEndpoint, {
+      courseId,
+      page: 0,
+      size: 1000,
+    });
+    const data = res?.data;
 
-      if (!this.isApiSuccess(data, Array.isArray(data?.content))) {
-        throw new Error(data?.message || 'Unable to load valid course dates');
-      }
-
-      const content = Array.isArray(data?.content) ? data.content : [];
-      return new Set(
-        content
-          .map((detail) => this.normalizeDateString(detail.classHoldingDate))
-          .filter((date): date is string => !!date)
-      );
-    } catch (err) {
-      console.error('Failed to load valid course dates', err);
-      return new Set<string>();
+    if (!this.isApiSuccess(data, Array.isArray(data?.content))) {
+      throw new Error(data?.message || 'Unable to load valid course dates');
     }
+
+    const content = Array.isArray(data?.content) ? data.content : [];
+    return new Set(
+      content
+        .map((detail) => this.normalizeDateString(detail.classHoldingDate))
+        .filter((date): date is string => !!date)
+    );
   }
 
   private isValidData(
@@ -750,12 +787,25 @@ export class EconomicOpportunitiesTrainingAttendanceTracking implements OnInit {
     ];
   }
 
+  private async refreshAttendanceEntryAfterSave(): Promise<void> {
+    this.selectedBeneficiaries = [];
+    this.attendanceRows = [];
+    this.selectedCourseId = null;
+    this.attendanceDate = null;
+    this.courseDateOptions = [];
+
+    if (this.beneficiaryFilters.bomaId) {
+      await this.loadBeneficiaries();
+    }
+  }
+
   private resetBeneficiarySelection(): void {
     this.beneficiaries = [];
     this.selectedBeneficiaries = [];
     this.attendanceRows = [];
     this.selectedCourseId = null;
     this.attendanceDate = null;
+    this.courseDateOptions = [];
     this.beneficiaryCurrentPage = 0;
     this.beneficiaryTotalRecords = 0;
   }

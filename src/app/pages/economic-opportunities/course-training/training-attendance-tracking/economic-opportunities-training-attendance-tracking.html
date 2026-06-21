@@ -136,6 +136,7 @@
             filterBy="courseName"
             [showClear]="true"
             [loading]="isLoadingCourses"
+            (onChange)="onCourseChange()"
             class="w-100"
           ></p-select>
           <label>Course <span class="text-danger">*</span></label>
@@ -144,13 +145,17 @@
 
       <div class="col-md-3">
         <p-floatlabel variant="on" class="w-100">
-          <p-datepicker
+          <p-select
+            [options]="courseDateOptions"
+            optionLabel="label"
+            optionValue="value"
             [(ngModel)]="attendanceDate"
             name="attendanceDate"
-            dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            [showClear]="true"
+            [loading]="isLoadingCourseDates"
+            [disabled]="!selectedCourseId"
             class="w-100"
-          ></p-datepicker>
+          ></p-select>
           <label>Attendance Date <span class="text-danger">*</span></label>
         </p-floatlabel>
       </div>
