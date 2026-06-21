@@ -413,7 +413,9 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
       this.cdr.detectChanges();
 
       const payload = this.createSearchPayload();
-      const endpoint = `${this.getEndpoint}?page=${this.currentPage}&size=${this.pageSize}`;
+      const requestedPage = this.currentPage;
+      const requestedPageSize = this.pageSize;
+      const endpoint = `${this.getEndpoint}?page=${requestedPage}&size=${requestedPageSize}`;
       const res = await this.api.POST<EnrollmentApiResponse>(
         endpoint,
         payload
@@ -432,8 +434,8 @@ export class EconomicOpportunitiesBeneficiaryRandomizationEnrollment implements 
       const content = Array.isArray(data?.content) ? data.content : [];
       this.rows = content.map((item) => this.toRow(item));
       this.totalRecords = Number(data?.totalElements ?? content.length ?? 0);
-      this.currentPage = Number(data?.pageNumber ?? this.currentPage ?? 0);
-      this.pageSize = Number(data?.pageSize ?? this.pageSize ?? 10) || 10;
+      this.currentPage = requestedPage;
+      this.pageSize = requestedPageSize || 10;
       this.snapshotRows(this.rows);
     } catch (err) {
       console.error('Failed to load beneficiary enrollment list', err);

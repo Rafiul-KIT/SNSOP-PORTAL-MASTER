@@ -300,11 +300,6 @@ export class Header {
         routerLink: ['/economic-opportunities/template-upload'],
       },
       {
-        label: 'Household And Group Mapping',
-        icon: 'fas fa-object-group',
-        routerLink: ['/economic-opportunities/household-group-mapping'],
-      },
-      {
         label: 'Beneficiary Enrollment',
         icon: 'fas fa-user-check',
         items: [
@@ -321,6 +316,11 @@ export class Header {
             routerLink: [
               '/economic-opportunities/beneficiary-enrollment/household-group-view',
             ],
+          },
+          {
+            label: 'Household And Group Mapping',
+            icon: 'fas fa-object-group',
+            routerLink: ['/economic-opportunities/household-group-mapping'],
           },
         ],
       },

@@ -462,8 +462,6 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Serial</th>
-        <th>ID</th>
-        <th>Course ID</th>
         <th>Beneficiary ID</th>
         <th>Attendance Date</th>
         <th>Present</th>
@@ -474,8 +472,6 @@
     <ng-template pTemplate="body" let-row let-i="rowIndex">
       <tr>
         <td>{{ (searchCurrentPage * searchPageSize) + i + 1 }}</td>
-        <td>{{ row.id || '--' }}</td>
-        <td>{{ row.courseId || '--' }}</td>
         <td>{{ row.beneficiaryId || '--' }}</td>
         <td>{{ row.classAttendanceDate || '--' }}</td>
         <td>
