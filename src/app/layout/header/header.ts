@@ -304,13 +304,6 @@ export class Header {
         icon: 'fas fa-user-check',
         items: [
           {
-            label: 'Beneficiary Randomization Enrollment',
-            icon: 'fas fa-random',
-            routerLink: [
-              '/economic-opportunities/beneficiary-enrollment/beneficiary-randomization-enrollment',
-            ],
-          },
-          {
             label: 'Household Group View',
             icon: 'fas fa-object-group',
             routerLink: [
@@ -321,6 +314,13 @@ export class Header {
             label: 'Household And Group Mapping',
             icon: 'fas fa-object-group',
             routerLink: ['/economic-opportunities/household-group-mapping'],
+          },
+          {
+            label: 'Beneficiary Randomization Enrollment',
+            icon: 'fas fa-random',
+            routerLink: [
+              '/economic-opportunities/beneficiary-enrollment/beneficiary-randomization-enrollment',
+            ],
           },
         ],
       },
