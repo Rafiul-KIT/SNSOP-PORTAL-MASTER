@@ -175,8 +175,7 @@ export class Header {
       {
         label: 'Report',
         icon: 'fas fa-chart-line',
-        // link: environment.portals.report,
-        link: environment.portals.report,
+        command: () => this.openReportsDashboard(),
         tooltipText: 'Reports Dashboard',
       },
       // {
@@ -475,6 +474,11 @@ export class Header {
 
   goToProfile = () => {
     this.router.navigateByUrl('/home/profile');
+  };
+
+  openReportsDashboard = () => {
+    this.showPortalOptions = false;
+    this.router.navigateByUrl('/home/metabase');
   };
 
   logout() {

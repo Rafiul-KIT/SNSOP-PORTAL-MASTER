@@ -64,8 +64,7 @@ export class Dashboard {
       {
         label: 'Report',
         icon: 'fas fa-chart-line',
-        // link: environment.portals.report,
-        link: environment.portals.report,
+        routerLink: '/home/metabase',
         tooltipText: 'Reports Dashboard',
       },
       // {
