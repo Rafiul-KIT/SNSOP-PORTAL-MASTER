@@ -59,7 +59,7 @@ export class MetabaseSsoService {
     const configured = (environment as typeof environment & { metabaseSso?: MetabaseSsoConfig }).metabaseSso;
 
     return configured || {
-      endpoint: 'http://localhost:3500/sso/metabase',
+      endpoint: 'https://qa-gwapp.southsudansafetynet.info/metabase_middleware/',
       metabaseUrl: 'https://analytics.southsudansafetynet.info',
     };
   }
