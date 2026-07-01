@@ -36,7 +36,7 @@ export const environment = {
 
   cookie_name:'mis_ta',
   metabaseSso: {
-    endpoint: 'https://qa-gwapp.southsudansafetynet.info/metabase_middleware/',
+    endpoint: 'https://qa-gwapp.southsudansafetynet.info/metabase_middleware/sso/metabase',
     metabaseUrl: 'https://analytics.southsudansafetynet.info',
   },
 };
