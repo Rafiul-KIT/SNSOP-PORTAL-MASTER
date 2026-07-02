@@ -21,7 +21,12 @@ export class MetabaseSsoService {
   constructor(private msalService: MsalService) {}
 
   async startLogin(): Promise<void> {
-    const metabaseTab = window.open('about:blank', '_blank');
+    // A tab opened fresh (no prior in-app navigation, e.g. via window.open()
+    // from another portal) has no recent user gesture by the time this async
+    // flow resolves, so a second window.open() here would be popup-blocked.
+    // In that case redirect the tab itself instead of spawning another one.
+    const isStandaloneTab = window.history.length <= 1;
+    const metabaseTab = isStandaloneTab ? null : window.open('about:blank', '_blank');
 
     if (metabaseTab) {
       metabaseTab.opener = null;
@@ -42,6 +47,11 @@ export class MetabaseSsoService {
 
       const body: MetabaseSsoResponse = await response.json();
       const redirectUrl = body.redirectUrl || config.metabaseUrl;
+
+      if (isStandaloneTab) {
+        window.location.replace(redirectUrl);
+        return;
+      }
 
       if (metabaseTab && !metabaseTab.closed) {
         metabaseTab.location.replace(redirectUrl);

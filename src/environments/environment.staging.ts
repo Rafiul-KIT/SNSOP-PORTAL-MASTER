@@ -35,7 +35,7 @@ export const environment = {
   authBackend: 'https://devgwapp.southsudansafetynet.info/mis_auth',
   cookie_name:'mis_ta',
   metabaseSso: {
-    endpoint: 'https://newmis.southsudansafetynet.info/sso/metabase',
+    endpoint: 'https://qa-gwapp.southsudansafetynet.info/metabase_middleware/sso/metabase',
     metabaseUrl: 'https://analytics.southsudansafetynet.info',
   },
 };

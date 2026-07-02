@@ -173,7 +173,7 @@ export class Header {
       //   icon: 'fas fa-chart-line',
       // },
       {
-        label: 'Report',
+        label: 'Analytics Report',
         icon: 'fas fa-chart-line',
         command: () => this.openReportsDashboard(),
         tooltipText: 'Reports Dashboard',

@@ -62,7 +62,7 @@ export class Dashboard {
       //   icon: 'fas fa-chart-line',
       // },
       {
-        label: 'Report',
+        label: 'Analytics Report',
         icon: 'fas fa-chart-line',
         routerLink: '/home/metabase',
         tooltipText: 'Reports Dashboard',
