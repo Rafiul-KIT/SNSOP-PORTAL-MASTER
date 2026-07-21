@@ -15,6 +15,7 @@ import { MsalBroadcastService } from '@azure/msal-angular';
 import { InteractionStatus } from '@azure/msal-browser';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { Toast } from 'primeng/toast';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-landing',
@@ -34,6 +35,10 @@ import { Toast } from 'primeng/toast';
   providers: [DialogService],
 })
 export class Landing implements OnDestroy, OnInit {
+  readonly environmentBanner = environment.env === 'prod'
+    ? null
+    : environment.env === 'qa' ? 'QA' : 'DEV';
+
   private authService = inject(AzureAdAuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);

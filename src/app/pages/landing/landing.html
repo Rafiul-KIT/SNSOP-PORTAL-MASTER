@@ -2,13 +2,13 @@
 
 
   <!-- Navbar -->
+  @if (environmentBanner) {
   <div class="scroll-banner">
     <p>
-         **QA** ENVIRONMENT**
-
+      <strong>{{ environmentBanner }}</strong> ENVIRONMENT
     </p>
-    <br />
   </div>
+  }
 
   <!-- Scrolling Banner -->
   <!-- <div class="scroll-banner">
