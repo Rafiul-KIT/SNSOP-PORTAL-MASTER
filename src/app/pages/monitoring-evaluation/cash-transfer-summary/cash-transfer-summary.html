@@ -118,7 +118,9 @@
         [(ngModel)]="selectedReportFormat" name="reportFormat"
         [style]="{ 'min-width': '120px' }"></p-select>
       <p-button label="Download" icon="fas fa-download" severity="success" size="small"
-        (onClick)="download()"></p-button>
+        [disabled]="!canDownload"
+        [pTooltip]="canDownload ? 'Download cash transfer summary' : 'Select State and County to enable download'"
+        tooltipPosition="top" (onClick)="download()"></p-button>
     </div>
   </div>
 

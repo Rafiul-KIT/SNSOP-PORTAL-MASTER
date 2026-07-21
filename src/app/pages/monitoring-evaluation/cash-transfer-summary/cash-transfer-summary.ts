@@ -14,6 +14,7 @@ import { Paginator } from 'primeng/paginator';
 import { InputText } from 'primeng/inputtext';
 import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-cash-transfer-summary',
@@ -32,6 +33,7 @@ import { Select } from 'primeng/select';
     Paginator,
     FloatLabel,
     Select,
+    TooltipModule,
   ],
   providers: [MessageService],
 })
@@ -77,6 +79,10 @@ export class CashTransferSummary implements OnInit {
     paidStatus: null,
     selectionCriteria: 'ALL',
   };
+
+  get canDownload(): boolean {
+    return !!this.filters.stateId && !!this.filters.countyId;
+  }
 
   // Breadcrumb
   home = { icon: 'fas fa-home', routerLink: ['/home/portals'] };
@@ -210,6 +216,15 @@ export class CashTransferSummary implements OnInit {
   }
 
   async download(): Promise<void> {
+    if (!this.canDownload) {
+      this.msg.add({
+        severity: 'warn',
+        summary: 'Required Filters',
+        detail: 'Please select both State and County before downloading the report.',
+      });
+      return;
+    }
+
     try {
       this.isLoading = true;
       this.cdr.detectChanges();
