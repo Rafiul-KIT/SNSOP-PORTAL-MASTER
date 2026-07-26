@@ -62,7 +62,8 @@ export const routes: Routes = [
       },
        {
         path: 'report',
-        component: UnderConstruction,
+        redirectTo: 'metabase',
+        pathMatch: 'full',
       },
       {
         path: 'metabase',
