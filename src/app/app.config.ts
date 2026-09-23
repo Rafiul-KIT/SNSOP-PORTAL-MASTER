@@ -60,8 +60,9 @@ function msalInstanceFactory() {
     auth: {
       clientId: cfg.auth.clientId,
       authority: cfg.auth.authority,
-      redirectUri: cfg.auth.redirectUri,
-      postLogoutRedirectUri: cfg.auth.postLogoutRedirectUri,
+      // Resolve against the current origin so login returns to whichever domain the user came from
+      redirectUri: new URL(cfg.auth.redirectUri, window.location.origin).href,
+      postLogoutRedirectUri: new URL(cfg.auth.postLogoutRedirectUri, window.location.origin).href,
     },
     cache: {
       cacheLocation,
@@ -120,10 +121,7 @@ function initMsal(
 
           console.log('/auth/exchange', exchangeResponse);
           if (exchangeResponse?.status === 'OK' && exchangeResponse?.data?.access_token) {
-            const host = (() => {
-              try { return new URL(environment.domain).hostname; }
-              catch { return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, ''); }
-            })();
+            const host = window.location.hostname;
             cookieService.set(
               environment.cookie_name,
               exchangeResponse.data.access_token,

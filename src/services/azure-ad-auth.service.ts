@@ -146,13 +146,7 @@ export class AzureAdAuthService {
   }
 
   logout(): void {
-    const host = (() => {
-      try {
-        return new URL(environment.domain).hostname;
-      } catch {
-        return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-      }
-    })();
+    const host = window.location.hostname;
     this.cookieService.delete(this.ACCESS_TOKEN, '/', host, true, 'Lax');
 
     sessionStorage.clear();
@@ -211,13 +205,7 @@ export class AzureAdAuthService {
   }
 
   public setExchangeTokenCookie(token: string): void {
-    const host = (() => {
-      try {
-        return new URL(environment.domain).hostname;
-      } catch {
-        return environment.domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-      }
-    })();
+    const host = window.location.hostname;
     this.cookieService.set(this.ACCESS_TOKEN, token, undefined, '/', host, true, 'Lax');
   }
 

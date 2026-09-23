@@ -2,7 +2,6 @@ export const environment = {
   production: false,
   env: 'local',
   useHash: false,
-  domain: 'https://localhost',
   globalApi: 'https://devgwapp.southsudansafetynet.info/mis_server/',
   modelApi: 'https://devmismodel.southsudansafetynet.info/',
   portals: {
