@@ -200,10 +200,6 @@ export class Landing implements OnDestroy, OnInit {
     this.startCountUp();
   }
 
-  scrollTo(id: string): void {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
   formatCount(value: number): string {
     return value >= 1_000_000 ? this.compact(value) : value.toLocaleString('en-US');
   }
