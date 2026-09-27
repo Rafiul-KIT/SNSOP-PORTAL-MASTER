@@ -321,12 +321,59 @@
     justify-content: flex-start;
     width: 100%;
   }
-  @media (max-width: 960px) {
-  .navbar-brand span {
-    font-size: 15px;
-    line-height: 12px;
+
+  // Landing page: 100px bar in the brand teal, matching the footer; it overlaps
+  // the top 40px of the page, which the landing hero pads for
+  &.header-landing {
+    height: 100px;
+    background-color: #0C5358;
+    border-bottom: none;
   }
-}
+
+  .landing-nav {
+    width: 100%;
+
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .btn {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+  }
+
+  .landing-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+
+    img {
+      height: 34px;
+    }
+
+    span {
+      padding-left: 14px;
+      border-left: 1px solid rgba(255, 255, 255, 0.25);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 991.98px) {
+      span {
+        display: none;
+      }
+    }
+  }
 }
 
 @media (max-width: 960px) {

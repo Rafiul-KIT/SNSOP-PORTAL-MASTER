@@ -24,247 +24,233 @@
   }
 
   <!-- Main Content -->
-  <div class="container py-4" *ngIf="!isLoading">
-    <!-- Goal -->
-    <h5 class="section-title">Goal and Development Objective</h5>
-    <p>
-      The primary objective of the SNSOP is to
-      <strong>provide cash transfers</strong>,
-      <strong>enhance income-generating opportunities</strong>, and
-      <strong>strengthen the National Safety Net Delivery System</strong> in
-      South Sudan.
-    </p>
+  @if (!isLoading) {
 
-    <!-- Activities -->
-    <h5 class="section-title">SNSOP Core Activities</h5>
-    <div class="row g-4">
-      <div class="col-md-3">
-        <div class="card text-white bg-primary activity-card h-100">
-          <div class="card-body text-center">
-            <h5 class="card-title">Cash Transfers</h5>
-            <p>
-              Providing direct cash assistance to vulnerable households to meet
-              immediate consumption needs.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card text-dark bg-warning activity-card h-100">
-          <div class="card-body text-center">
-            <h5 class="card-title">Economic Opportunities</h5>
-            <p>
-              Enhancing livelihood options, especially for youth, to promote
-              productivity and self-reliance.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-success activity-card h-100">
-          <div class="card-body text-center">
-            <h5 class="card-title">Institutional Strengthening</h5>
-            <p>
-              Building government capacity for Social Protection and
-              strengthening the MIS system.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-dark activity-card h-100">
-          <div class="card-body text-center">
-            <h5 class="card-title">M&E and Knowledge</h5>
-            <p>
-              Managing, monitoring, and generating knowledge for informed
-              policy-making.
-            </p>
-          </div>
-        </div>
-      </div>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-media">
+      <img src="images/landing/hero-public-works.jpg"
+        alt="Public works crews in safety vests digging drainage channels along both sides of a community road"
+        fetchpriority="high" />
     </div>
 
-    <!-- Achievements -->
-    <h5 class="section-title">Key Achievement Updates</h5>
-    <div class="card shadow-sm mb-4">
-      <div class="card-body">
-        <ul>
-          <li>1.
-            <strong>154,426</strong> out of 157,500 households registered across
-            15 counties.
-          </li>
-          <li>2. Cash Transfers launched for registered households.</li>
-          <li>3. LIPW activities created community assets and jobs.</li>
-          <li>4. Government-led MIS under rollout.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <h5 class="section-title">Beneficiary Breakdown (Estimated)</h5>
-    <div class="row text-center">
-      <div class="col-md-2 col-6 mb-3">
-        <div class="card p-3 shadow-sm">
-          <h4 class="text-primary">672,000</h4>
-          <p>Total Beneficiaries</p>
-        </div>
-      </div>
-      <div class="col-md-2 col-6 mb-3">
-        <div class="card p-3 shadow-sm">
-          <h4 class="text-primary">126706</h4>
-          <p>Households</p>
-        </div>
-      </div>
-      <div class="col-md-2 col-6 mb-3">
-        <div class="card p-3 shadow-sm">
-          <h4 class="text-primary">~50%</h4>
-          <p>Female</p>
-        </div>
-      </div>
-      <div class="col-md-2 col-6 mb-3">
-        <div class="card p-3 shadow-sm">
-          <h4 class="text-primary">TBD</h4>
-          <p>Payment Status</p>
-        </div>
-      </div>
-      <div class="col-md-2 col-6 mb-3">
-        <div class="card p-3 shadow-sm">
-          <h4 class="text-primary">7,000+</h4>
-          <p>Refugee/Host HHs</p>
-        </div>
-      </div>
-      <div class="col-md-2 col-6 mb-3">
-        <div class="card p-3 shadow-sm">
-          <h4 class="text-primary">Incl.</h4>
-          <p>PWD Targeted</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Components -->
-    <h5 class="section-title">Project Components</h5>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <div class="card border-success shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="text-success">
-              Component 1: Cash Transfers & Social Measures
-            </h5>
-            <p>
-              Supports LIPW & DIS with human capital growth programs.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card border-success shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="text-success">
-              Component 2: Economic Opportunities
-            </h5>
-            <p>
-              Livelihood support and training for poor and vulnerable youth.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card border-success shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="text-success">
-              Component 3: Institutional Capacity
-            </h5>
-            <p>
-              Strengthens MGCSW & builds the national safety net delivery
-              system.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card border-success shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="text-success">
-              Component 4: M&E and Knowledge
-            </h5>
-            <p>
-              Supports PCU for management, monitoring, and coordination.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Country Context -->
-    <h5 class="section-title">South Sudan Context</h5>
-    <div class="card bg-light border-0 shadow-sm p-3">
-      <p>
-        <strong>Independence:</strong> July 9, 2011. The world’s youngest
-        nation, facing conflict and humanitarian challenges.
+    <div class="container hero-content">
+      <p class="hero-label">Social protection in South Sudan</p>
+      <h1>Safety Net for Socioeconomic Opportunities Project</h1>
+      <p class="hero-objective">
+        Cash transfers, income-generating opportunities and a stronger national safety net
+        delivery system for vulnerable households.
       </p>
-      <div class="row g-3">
-        <div class="col-md-3">
-          <div class="card p-3 border-warning">
-            <strong class="text-warning">Population:</strong> ~15.8M
+      <div class="hero-actions">
+        <button class="btn btn-accent" type="button" (click)="loginWithAzureAD()">
+          MIS Login <i class="fas fa-arrow-right"></i>
+        </button>
+        <button class="btn btn-outline-white" type="button" (click)="scrollTo('figures')">
+          View programme figures
+        </button>
+      </div>
+    </div>
+
+    <!-- <p class="hero-caption">Labour-Intensive Public Works crews improving a community road</p> -->
+  </section>
+
+  <!-- Live programme figures -->
+  <section class="figures" id="figures">
+    <div class="container">
+      <div class="stats-card">
+        <div class="stats-grid">
+          <div class="stat stat-lead">
+            <div class="stat-value" [title]="formatFull(summary()?.totalBeneficiary)">
+              @if (summaryStatus() === 'loading') { <span class="skeleton"></span> }
+              @else { {{ summaryStatus() === 'ready' ? formatCount(animated().totalBeneficiary) : '—' }} }
+            </div>
+            <div class="stat-label">Total beneficiaries</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-value" [title]="'SSP ' + formatFull(summary()?.totalSspPaid)">
+              @if (summaryStatus() === 'loading') { <span class="skeleton"></span> }
+              @else {
+              <span class="unit">SSP</span>{{ summaryStatus() === 'ready' ? compact(animated().totalSspPaid) : '—' }}
+              }
+            </div>
+            <div class="stat-label">Paid to beneficiaries</div>
+            @if (summaryStatus() === 'ready') {
+            <div class="stat-exact">SSP {{ formatFull(summary()?.totalSspPaid) }}</div>
+            }
+          </div>
+
+          <div class="stat">
+            <div class="stat-value" [title]="formatFull(summary()?.totalWorkedBeneficiary)">
+              @if (summaryStatus() === 'loading') { <span class="skeleton"></span> }
+              @else { {{ summaryStatus() === 'ready' ? formatCount(animated().totalWorkedBeneficiary) : '—' }} }
+            </div>
+            <div class="stat-label">Beneficiaries who have worked</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-value" [title]="formatFull(summary()?.totalCompletedSubprojects)">
+              @if (summaryStatus() === 'loading') { <span class="skeleton"></span> }
+              @else { {{ summaryStatus() === 'ready' ? formatCount(animated().totalCompletedSubprojects) : '—' }} }
+            </div>
+            <div class="stat-label">Completed subprojects</div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card p-3 border-warning">
-            <strong class="text-warning">Poverty:</strong> 76% below poverty line
+
+        <div class="stats-foot">
+          @switch (summaryStatus()) {
+          @case ('ready') {
+          <span>Live programme figures from the SNSOP MIS</span>
+          <span>As of {{ asOf() | date: 'd MMMM y' }}</span>
+          }
+          @case ('loading') { <span>Loading latest figures…</span> }
+          @default {
+          <span>
+            Live figures are temporarily unavailable.
+            <button class="retry" type="button" (click)="loadSummary()">Try again</button>
+          </span>
+          }
+          }
+        </div>
+      </div>
+
+      <div class="row g-4 reach">
+        <div class="col-lg-6">
+          <div class="reach-card">
+            <h2>Beneficiaries by gender</h2>
+            <ng-container
+              *ngTemplateOutlet="splitView; context: { $implicit: genderSplit(), names: ['Female beneficiaries', 'Male beneficiaries'] }">
+            </ng-container>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card p-3 border-warning">
-            <strong class="text-warning">Economy:</strong> Oil-dependent, high
-            inflation
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card p-3 border-warning">
-            <strong class="text-warning">Social Security:</strong> Low coverage;
-            SNSOP foundational
+        <div class="col-lg-6">
+          <div class="reach-card">
+            <h2>Beneficiaries by programme</h2>
+            <ng-container
+              *ngTemplateOutlet="splitView; context: { $implicit: programmeSplit(), names: ['Labour-Intensive Public Works', 'Direct Income Support'] }">
+            </ng-container>
           </div>
         </div>
       </div>
     </div>
-    <h5 class="section-title">Stakeholders & Partners</h5>
-    <div class="card bg-light border-0 shadow-sm p-3">
-      <div class="row g-3">
-        <div class="col-md-3">
-          <div class="card p-3 border-info">
-            <strong class="text-info">Implementing Ministries:</strong> MGCSW & MAFS
-          </div>
+  </section>
+
+  <!-- Project components -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Project components</h2>
+      <div class="row g-4">
+        @for (component of components; track component.title; let i = $index) {
+        <div class="col-sm-6 col-lg-3">
+          <article class="component">
+            <div class="component-photo">
+              <img [src]="component.image" [alt]="component.alt" loading="lazy" />
+            </div>
+            <div class="component-body">
+              <span class="component-label">Component {{ i + 1 }}</span>
+              <h3>{{ component.title }}</h3>
+              <p>{{ component.text }}</p>
+            </div>
+          </article>
         </div>
-        <div class="col-md-3">
-          <div class="card p-3 border-info">
-            <strong class="text-info">Financing Partner:</strong> The World Bank (IDA)
-          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Key achievements -->
+  <section class="band">
+    <div class="container">
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-5">
+          <figure class="band-photo">
+            <img src="images/landing/public-works-trench.jpg"
+              alt="A worker digging a narrow drainage trench while others in safety vests look on" loading="lazy" />
+            <figcaption>Digging a drainage trench under Labour-Intensive Public Works</figcaption>
+          </figure>
         </div>
-        <div class="col-md-3">
-          <div class="card p-3 border-info">
-            <strong class="text-info">Support:</strong> UNOPS and third-party agencies
-            inflation
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card p-3 border-info">
-            <strong class="text-info">Coordination:</strong> National Social Protection Working Group
-          </div>
+        <div class="col-lg-7">
+          <h2 class="section-title">Key achievements</h2>
+          <ol class="achievements">
+            <li><span><strong>154,426</strong> out of 157,500 households registered across 15 counties.</span></li>
+            <li><span>Cash transfers launched for registered households.</span></li>
+            <li><span>Labour-Intensive Public Works created community assets and jobs.</span></li>
+            <li><span>Government-led MIS under rollout.</span></li>
+          </ol>
         </div>
       </div>
     </div>
-  </div>
-  <footer class="footer text-white  mt-5">
+  </section>
 
-    <div class="stakeholders">
-
-      <p>&copy; 2025 SNSOP - Safety Net for Socioeconomic Opportunities Project</p>
+  <!-- Partners -->
+  <section class="section partners">
+    <div class="container">
+      <h2 class="section-title">Partners</h2>
+      <dl class="partner-list">
+        @for (partner of partners; track partner.role) {
+        <div>
+          <dt>{{ partner.role }}</dt>
+          <dd>{{ partner.name }}</dd>
+        </div>
+        }
+      </dl>
     </div>
+  </section>
 
-    <div class="version">
-      <p>Version 2.0.1</p>
+  }
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <img src="SNSOP_logo.png" alt="SNSOP" />
+          <span>Safety Net for Socioeconomic Opportunities Project</span>
+        </div>
+        <span class="version">Version {{ appVersion }}</span>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; {{ currentYear }} SNSOP - Safety Net for Socioeconomic Opportunities Project</p>
+      </div>
     </div>
   </footer>
+
+  <!-- Two-part split: shares at each end, bar, exact counts beneath -->
+  <ng-template #splitView let-parts let-names="names">
+    @if (summaryStatus() === 'loading') {
+    <span class="skeleton skeleton-bar"></span>
+    } @else {
+    <div class="split-ends">
+      @for (part of parts; track part.label; let i = $index) {
+      <div [class.end]="i === 1">
+        <span class="swatch" [class.alt]="i === 1"></span>
+        {{ part.label }}
+        <strong>{{ summaryStatus() === 'ready' ? (part.pct | number: '1.0-1') + '%' : '—' }}</strong>
+      </div>
+      }
+    </div>
+
+    <div class="split-bar" role="img"
+      [attr.aria-label]="parts[0].label + ' ' + (parts[0].pct | number: '1.0-1') + ' percent, ' + parts[1].label + ' ' + (parts[1].pct | number: '1.0-1') + ' percent'">
+      @for (part of parts; track part.label; let i = $index) {
+      @if (part.pct > 0) {
+      <div class="split-seg" [class.alt]="i === 1" tabindex="0" [style.width.%]="part.pct * progress()"
+        [attr.data-tip]="names[i] + ': ' + formatFull(part.count) + ' (' + (part.pct | number: '1.0-1') + '%)'">
+      </div>
+      }
+      }
+    </div>
+
+    <div class="split-ends split-counts">
+      @for (part of parts; track part.label; let i = $index) {
+      <div [class.end]="i === 1">
+        {{ summaryStatus() === 'ready' ? formatFull(part.count) : '—' }}
+        <span>{{ names[i] }}</span>
+      </div>
+      }
+    </div>
+    }
+  </ng-template>
+
   <!-- Toast -->
   <p-toast position="bottom-right"></p-toast>
 
