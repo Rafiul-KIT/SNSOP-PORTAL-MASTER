@@ -93,7 +93,7 @@
           @switch (summaryStatus()) {
           @case ('ready') {
           <span>Live programme figures from the SNSOP MIS</span>
-          <span>As of {{ asOf() | date: 'd MMMM y' }}</span>
+          <!-- <span>As of {{ asOf() | date: 'd MMMM y' }}</span> -->
           }
           @case ('loading') { <span>Loading latest figures…</span> }
           @default {
@@ -195,7 +195,7 @@
     <div class="container">
       <div class="footer-main">
         <div class="footer-brand">
-          <img src="SNSOP_logo.png" alt="SNSOP" />
+          <img src="SNSOP_logo_light.png" alt="SNSOP" />
           <span>Safety Net for Socioeconomic Opportunities Project</span>
         </div>
         <span class="version">Version {{ appVersion }}</span>

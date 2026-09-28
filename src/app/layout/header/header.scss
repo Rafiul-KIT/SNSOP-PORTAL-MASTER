@@ -361,11 +361,14 @@
     font-weight: 500;
     text-decoration: none;
 
+    // Light logo variant (white lettering and ribbon outline) for the dark teal bar
     img {
-      height: 34px;
+      flex-shrink: 0;
+      height: 44px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
     }
 
-    span {
+    .brand-name {
       padding-left: 14px;
       border-left: 1px solid rgba(255, 255, 255, 0.25);
       overflow: hidden;
@@ -374,8 +377,14 @@
     }
 
     @media (max-width: 991.98px) {
-      span {
+      .brand-name {
         display: none;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      img {
+        height: 36px;
       }
     }
   }
