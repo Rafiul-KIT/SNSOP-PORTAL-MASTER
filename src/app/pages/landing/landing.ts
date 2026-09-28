@@ -39,7 +39,7 @@ const COUNT_UP_MS = 1600;
     ProgressSpinnerModule,
     Loader,
     Toast
-    
+
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
@@ -50,7 +50,7 @@ export class Landing implements OnDestroy, OnInit {
     ? null
     : environment.env === 'qa' ? 'QA' : 'DEV';
 
-  readonly appVersion = '3.0.0';
+  readonly appVersion = '3.0.1';
   readonly currentYear = new Date().getFullYear();
 
   private landingService = inject(LandingService);

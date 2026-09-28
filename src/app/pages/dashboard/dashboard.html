@@ -1,26 +1,42 @@
 <div class="portal-wrapper">
-  <div class="portal-items">
-        @for(portal of portalList; track portal.label){
+  <div class="portal-content">
+    <header class="portal-head">
+      <p class="portal-kicker">SNSOP Management Information System</p>
+      <h1>Welcome to SNSOP</h1>
+      <p class="portal-lead">Choose a portal to continue.</p>
+    </header>
+
+    <nav class="portal-items" aria-label="Portals">
+      @for(portal of portalList; track portal.label){
       @if(portal.link){
-        <a class="portal hand" [href]="portal.link" [pTooltip]="portal.tooltipText">
-          <i [class]="portal.icon"></i>
-          <span>{{ portal.label }}</span>
-        </a>
+      <a class="portal" [href]="portal.link">
+        <ng-container *ngTemplateOutlet="portalBody; context: { $implicit: portal }"></ng-container>
+      </a>
       } @else if (portal.routerLink) {
-        <a class="portal hand" [routerLink]="portal.routerLink" [pTooltip]="portal.tooltipText">
-          <i [class]="portal.icon"></i>
-          <span>{{ portal.label }}</span>
-        </a>
+      <a class="portal" [routerLink]="portal.routerLink">
+        <ng-container *ngTemplateOutlet="portalBody; context: { $implicit: portal }"></ng-container>
+      </a>
       }
-       @else {
-        <span class="portal blocked-pointer" [pTooltip]="portal.tooltipText">
-          <i [class]="portal.icon"></i>
-          <span>{{ portal.label }}</span>
-        </span>
+      @else {
+      <span class="portal is-disabled" aria-disabled="true">
+        <ng-container *ngTemplateOutlet="portalBody; context: { $implicit: portal }"></ng-container>
+      </span>
       }
-    }
+      }
+    </nav>
   </div>
-    <div class="version">
-    <h6> Version 2.0.1</h6>
+
+  <div class="version">
+    <h6> Version 3.0.1</h6>
   </div>
 </div>
+
+<!-- Icon badge, name and one-line description, shared by every card -->
+<ng-template #portalBody let-portal>
+  <span class="portal-icon"><i [class]="portal.icon" aria-hidden="true"></i></span>
+  <span class="portal-text">
+    <span class="portal-name">{{ portal.label }}</span>
+    <span class="portal-desc">{{ portal.description }}</span>
+  </span>
+  <i class="fas fa-arrow-right portal-arrow" aria-hidden="true"></i>
+</ng-template>

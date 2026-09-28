@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Tooltip, TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterModule, TooltipModule],
+  imports: [RouterModule, NgTemplateOutlet],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -23,38 +23,38 @@ export class Dashboard {
         label: 'Beneficiary',
         icon: 'fas fa-user-friends',
         link: environment.portals.beneficiary,
-        tooltipText: 'Beneficiary Management Portal',
+        description: 'Beneficiary management',
       },
       {
         label: 'Payment',
         icon: 'fas fa-credit-card',
         link: environment.portals.payment,
-        tooltipText: 'Payment Portal',
+        description: 'Payments to beneficiaries',
       },
       {
         label: 'GRM',
         icon: 'fas fa-sitemap',
         link: environment.portals.grm,
-        tooltipText: 'Grievance Redress Mechanism',
+        description: 'Grievance redress mechanism',
       },
       {
         label: 'Economic Opportunities',
         icon: 'fas fa-briefcase',
         // link: environment.portals.economicOpportunities,
         link: environment.portals.economicOpportunities,
-        tooltipText: 'Economic Opportunities Portal',
+        description: 'Livelihood support and training',
       },
       {
         label: 'Monitoring & Evaluation',
         icon: 'fas fa-chart-bar',
         link: environment.portals.mNe,
-        tooltipText: 'Monitoring & Evaluation Portal',
+        description: 'Monitoring and evaluation',
       },
       {
         label: 'Survey CTO',
         icon: 'fas fa-poll',
         link: environment.portals.surveyCTO,
-        tooltipText: 'Survey CTO Portal',
+        description: 'SurveyCTO field data',
       },
       // {
       //   label: 'Report',
@@ -65,32 +65,32 @@ export class Dashboard {
         label: 'Analytics Report',
         icon: 'fas fa-chart-line',
         routerLink: '/home/metabase',
-        tooltipText: 'Reports Dashboard',
+        description: 'Reports dashboard',
       },
       // {
       //   label: 'Help Desk',
       //   icon: 'fas fa-headset',
       //   link: environment.portals.helpDesk,
 
-      //   tooltipText: 'Help Desk Portal - IT Support',
+      //   description: 'IT support help desk',
       // },
       {
         label: 'DMS',
         icon: 'fas fa-file',
         link: environment.portals.dms,
-        tooltipText: 'Document Management System'
+        description: 'Document management system'
       },
       {
         label: 'Settings',
         icon: 'fas fa-cog',
         link: environment.portals.masterSettings,
-        tooltipText: 'Settings portal - User & Role Management',
+        description: 'User and role management',
       },
       // {
       //   label: 'Automated Targeting',
       //   icon: 'fas fa-arrows-down-to-people',
       //   routerLink: '/automated-targeting/dashboard',
-      //   tooltipText: 'Automated Targeting Portal',
+      //   description: 'Automated targeting',
       // },
     ];
   }
