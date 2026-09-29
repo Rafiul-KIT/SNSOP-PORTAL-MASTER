@@ -36,7 +36,7 @@
 
     <div class="container hero-content">
       <p class="hero-label">Social protection in South Sudan</p>
-      <h1>Safety Net for Socioeconomic Opportunities Project</h1>
+      <h1>South Sudan Safety Net for Socioeconomic Opportunities Project</h1>
       <p class="hero-objective">
         Cash transfers, income-generating opportunities and a stronger national safety net
         delivery system for vulnerable households.
@@ -87,12 +87,22 @@
             </div>
             <div class="stat-label">Completed subprojects</div>
           </div>
+
+          <div class="stat">
+            <div class="stat-value" [title]="formatFull(coveredBomas)">{{ formatCount(coveredBomas) }}</div>
+            <div class="stat-label">Covered bomas</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-value" [title]="formatFull(population)">{{ compact(population) }}</div>
+            <div class="stat-label">Population</div>
+          </div>
         </div>
 
         <div class="stats-foot">
           @switch (summaryStatus()) {
           @case ('ready') {
-          <span>Live programme figures from the SNSOP MIS</span>
+          <!-- <span>Live programme figures from the SNSOP MIS</span> -->
           <!-- <span>As of {{ asOf() | date: 'd MMMM y' }}</span> -->
           }
           @case ('loading') { <span>Loading latest figures…</span> }
@@ -164,7 +174,7 @@
         <div class="col-lg-7">
           <h2 class="section-title">Key achievements</h2>
           <ol class="achievements">
-            <li><span><strong>154,426</strong> out of 157,500 households registered across 15 counties.</span></li>
+            <!-- <li><span><strong>154,426</strong> out of 157,500 households registered across 15 counties.</span></li> -->
             <li><span>Cash transfers launched for registered households.</span></li>
             <li><span>Labour-Intensive Public Works created community assets and jobs.</span></li>
             <li><span>Government-led MIS under rollout.</span></li>

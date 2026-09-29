@@ -6,7 +6,7 @@
         <img src="SNSOP_logo_light.png" alt="SNSOP Logo" />
         <span class="brand-name">Safety Net for Socioeconomic Opportunities Project</span>
       </a>
-      <button class="btn btn-primary fw-bold px-3 px-lg-4 py-1 py-lg-2" type="button" [disabled]="isLoading"
+      <button class="btn btn-login fw-bold px-3 px-lg-4 py-1 py-lg-2" type="button" [disabled]="isLoading"
         (click)="loginWithAzureAD()">
         <i class="fas fa-sign-in-alt me-1 me-lg-2"></i>
         {{ isLoading ? 'Logging in...' : 'MIS Login' }}

@@ -181,7 +181,7 @@ h3 {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: 1.25fr 1fr 1fr 1fr;
+  grid-template-columns: 1.25fr repeat(5, 1fr);
 }
 
 .stat {
@@ -225,6 +225,40 @@ h3 {
   margin-top: 2px;
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+// Six across on desktop: tighter cells and smaller figures so the widest value (SSP paid) fits
+@media (min-width: 992px) {
+  .stat {
+    padding: 4px 20px 26px;
+  }
+
+  .stat-value {
+    font-size: 1.9rem;
+
+    .unit {
+      margin-right: 4px;
+      font-size: 0.85rem;
+    }
+  }
+
+  .stat-lead .stat-value {
+    font-size: 2.6rem;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .stat {
+    padding: 4px 14px 22px;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .stat-lead .stat-value {
+    font-size: 2.2rem;
+  }
 }
 
 .stats-foot {
@@ -448,7 +482,7 @@ h3 {
 
 .band-photo {
   position: relative;
-  aspect-ratio: 5 / 4;
+  aspect-ratio: 3 / 2;
   margin: 0;
   overflow: hidden;
   border-radius: var(--radius);
@@ -702,7 +736,7 @@ h3 {
   }
 
   .band-photo {
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 16 / 9;
   }
 
   .partner-list {
@@ -752,7 +786,7 @@ h3 {
   }
 
   .band-photo {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
   }
 
   .partner-list {

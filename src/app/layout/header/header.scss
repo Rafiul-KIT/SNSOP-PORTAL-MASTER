@@ -349,6 +349,25 @@
       flex-shrink: 0;
       white-space: nowrap;
     }
+
+    // Ochre from the landing palette: the warm complement to the teal bar,
+    // with deep teal text (about 7:1 contrast)
+    .btn-login {
+      --bs-btn-color: #062e31;
+      --bs-btn-bg: #e9b949;
+      --bs-btn-border-color: #e9b949;
+      --bs-btn-hover-color: #062e31;
+      --bs-btn-hover-bg: #f2c869;
+      --bs-btn-hover-border-color: #f2c869;
+      --bs-btn-active-color: #062e31;
+      --bs-btn-active-bg: #d9a73a;
+      --bs-btn-active-border-color: #d9a73a;
+      --bs-btn-disabled-color: #062e31;
+      --bs-btn-disabled-bg: #e9b949;
+      --bs-btn-disabled-border-color: #e9b949;
+      --bs-btn-focus-shadow-rgb: 233, 185, 73;
+      --bs-btn-border-radius: 50rem;
+    }
   }
 
   .landing-brand {

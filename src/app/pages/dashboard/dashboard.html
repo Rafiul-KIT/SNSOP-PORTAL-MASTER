@@ -1,26 +1,26 @@
 <div class="portal-wrapper">
   <div class="portal-items">
-        @for(portal of portalList; track portal.label){
-      @if(portal.link){
-        <a class="portal hand" [href]="portal.link" [pTooltip]="portal.tooltipText">
-          <i [class]="portal.icon"></i>
-          <span>{{ portal.label }}</span>
-        </a>
-      } @else if (portal.routerLink) {
-        <a class="portal hand" [routerLink]="portal.routerLink" [pTooltip]="portal.tooltipText">
-          <i [class]="portal.icon"></i>
-          <span>{{ portal.label }}</span>
-        </a>
-      }
-       @else {
-        <span class="portal blocked-pointer" [pTooltip]="portal.tooltipText">
-          <i [class]="portal.icon"></i>
-          <span>{{ portal.label }}</span>
-        </span>
-      }
+    @for(portal of portalList; track portal.label){
+    @if(portal.link){
+    <a class="portal hand" [href]="portal.link" [pTooltip]="portal.tooltipText">
+      <i [class]="portal.icon"></i>
+      <span>{{ portal.label }}</span>
+    </a>
+    } @else if (portal.routerLink) {
+    <a class="portal hand" [routerLink]="portal.routerLink" [pTooltip]="portal.tooltipText">
+      <i [class]="portal.icon"></i>
+      <span>{{ portal.label }}</span>
+    </a>
+    }
+    @else {
+    <span class="portal blocked-pointer" [pTooltip]="portal.tooltipText">
+      <i [class]="portal.icon"></i>
+      <span>{{ portal.label }}</span>
+    </span>
+    }
     }
   </div>
-    <div class="version">
-    <h6> Version 2.0.1</h6>
+  <div class="version">
+    <h6> Version 3.0.1</h6>
   </div>
 </div>

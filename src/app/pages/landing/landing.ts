@@ -39,7 +39,7 @@ const COUNT_UP_MS = 1600;
     ProgressSpinnerModule,
     Loader,
     Toast
-    
+
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
@@ -50,7 +50,7 @@ export class Landing implements OnDestroy, OnInit {
     ? null
     : environment.env === 'qa' ? 'QA' : 'DEV';
 
-  readonly appVersion = '3.0.0';
+  readonly appVersion = '3.0.1';
   readonly currentYear = new Date().getFullYear();
 
   private landingService = inject(LandingService);
@@ -59,6 +59,9 @@ export class Landing implements OnDestroy, OnInit {
   readonly summaryStatus = signal<SummaryStatus>('loading');
   readonly asOf = signal<Date>(new Date());
   readonly summary = signal<LandingSummary | null>(null);
+  // Fixed coverage figures, not part of the MIS summary
+  readonly population = 12_400_000;
+  readonly coveredBomas = 417;
   // Eased 0 -> 1 progress that drives the count-up numbers and bar widths together.
   readonly progress = signal(0);
 
