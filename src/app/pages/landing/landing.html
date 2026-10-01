@@ -71,14 +71,14 @@
             <div class="stat-exact">SSP {{ formatFull(summary()?.totalSspPaid) }}</div>
             }
           </div>
-
+          <!-- 
           <div class="stat">
             <div class="stat-value" [title]="formatFull(summary()?.totalWorkedBeneficiary)">
               @if (summaryStatus() === 'loading') { <span class="skeleton"></span> }
               @else { {{ summaryStatus() === 'ready' ? formatCount(animated().totalWorkedBeneficiary) : '—' }} }
             </div>
             <div class="stat-label">Beneficiaries who have worked</div>
-          </div>
+          </div> -->
 
           <div class="stat">
             <div class="stat-value" [title]="formatFull(summary()?.totalCompletedSubprojects)">
